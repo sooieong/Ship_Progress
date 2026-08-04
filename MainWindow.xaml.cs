@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Ship_Progress.Views;
 
 namespace Ship_Progress
 {
@@ -44,8 +45,8 @@ namespace Ship_Progress
                         break;
 
                     case "Tab4": // feature/tab4_Setting 브랜치에서 작업 예정
-                        // MainContentViewPort.Content = new Tab4_SettingView();
-                        SetPlaceholderText("시스템 설정 화면 준비 중입니다.");
+                        MainContentViewPort.Content = new Tab4_SettingView();
+                        // SetPlaceholderText("시스템 설정 화면 준비 중입니다.");
                         break;
                 }
             }
@@ -78,22 +79,36 @@ namespace Ship_Progress
             MessageBox.Show("데이터를 새로고침하였습니다.", "새로고침", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        // [참고] 나중에 설정(tab4_Setting)에서 호출할 다크/라이트 모드 전환 함수 예시
+        // 🎯 설정(tab4_Setting)에서 호출할 다크/라이트 모드 전환 함수
         public void ToggleTheme(bool isDarkMode)
         {
             if (isDarkMode)
             {
+                // 🌙 다크 모드: 배경은 어둡게, 모든 텍스트는 완전한 흰색(#FFFFFF) 계열로 통일
                 Application.Current.Resources["HeaderBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E1E1E"));
                 Application.Current.Resources["SidebarBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#252526"));
                 Application.Current.Resources["MainContentBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#121212"));
+                Application.Current.Resources["CardBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2D2D2D"));
+                Application.Current.Resources["BorderBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3E3E42"));
+
+                // 🎯 텍스트 리소스: 회색 없이 모두 흰색(#FFFFFF)으로 설정
                 Application.Current.Resources["PrimaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
+                Application.Current.Resources["SecondaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
+                Application.Current.Resources["SubTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
             }
             else
             {
+                // ☀️ 라이트 모드: 배경은 밝게, 모든 텍스트는 선명한 검정(#1A1A1A) 계열로 통일
                 Application.Current.Resources["HeaderBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
                 Application.Current.Resources["SidebarBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F4F5F7"));
                 Application.Current.Resources["MainContentBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EBEEF2"));
-                Application.Current.Resources["PrimaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#222222"));
+                Application.Current.Resources["CardBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
+                Application.Current.Resources["BorderBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0"));
+
+                // 🎯 텍스트 리소스: 회색 없이 모두 진한 검정(#1A1A1A)으로 설정
+                Application.Current.Resources["PrimaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1A1A1A"));
+                Application.Current.Resources["SecondaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1A1A1A"));
+                Application.Current.Resources["SubTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1A1A1A"));
             }
         }
     }

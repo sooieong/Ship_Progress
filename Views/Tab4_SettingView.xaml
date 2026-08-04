@@ -1,0 +1,94 @@
+﻿<UserControl x:Class="Ship_Progress.Views.Tab4_SettingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1000">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="32">
+
+            <!-- ======================================================== -->
+            <!-- SECTION 1: 테마 설정 (라이트 / 다크 모드) -->
+            <!-- ======================================================== -->
+            <Border Background="{DynamicResource HeaderBackgroundBrush}" 
+                    BorderBrush="{DynamicResource BorderBrush}" 
+                    BorderThickness="1" 
+                    CornerRadius="12" 
+                    Margin="0,0,0,20" 
+                    Padding="20">
+                <StackPanel>
+                    <TextBlock Text="화면 테마 설정" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,4"/>
+                    <!-- 가독성을 위해 PrimaryTextBrush로 전환 -->
+                    <TextBlock Text="선호하는 대시보드 화면 모드를 선택하세요." FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,16"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 라이트 모드 선택 카드 -->
+                        <Border x:Name="LightModeCard" Grid.Column="0" Margin="0,0,10,0" Padding="16" 
+                                Background="{DynamicResource CardBackgroundBrush}" 
+                                BorderBrush="{DynamicResource HanwhaOrangeBrush}" 
+                                BorderThickness="2" CornerRadius="8" Cursor="Hand"
+                                MouseLeftButtonDown="LightModeCard_Click">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <RadioButton x:Name="LightModeRadio" GroupName="ThemeGroup" IsChecked="True" 
+                                             VerticalAlignment="Center" Checked="ThemeRadio_Checked"/>
+                                <StackPanel Margin="12,0,0,0">
+                                    <TextBlock Text="☀️ 라이트 모드" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                    <TextBlock Text="기본 밝은 테마 화면입니다." FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 다크 모드 선택 카드 -->
+                        <Border x:Name="DarkModeCard" Grid.Column="1" Margin="10,0,0,0" Padding="16" 
+                                Background="{DynamicResource CardBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BorderBrush}" 
+                                BorderThickness="1" CornerRadius="8" Cursor="Hand"
+                                MouseLeftButtonDown="DarkModeCard_Click">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <RadioButton x:Name="DarkModeRadio" GroupName="ThemeGroup" IsChecked="False" 
+                                             VerticalAlignment="Center" Checked="ThemeRadio_Checked"/>
+                                <StackPanel Margin="12,0,0,0">
+                                    <TextBlock Text="🌙 다크 모드" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                    <TextBlock Text="눈이 편안한 어두운 테마 화면입니다." FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- ======================================================== -->
+            <!-- SECTION 2: 시스템 정보 -->
+            <!-- ======================================================== -->
+            <Border Background="{DynamicResource HeaderBackgroundBrush}" 
+                    BorderBrush="{DynamicResource BorderBrush}" 
+                    BorderThickness="1" 
+                    CornerRadius="12" 
+                    Padding="20">
+                <StackPanel>
+                    <TextBlock Text="시스템 정보" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+
+                    <Grid Margin="0,6">
+                        <TextBlock Text="대시보드 버전" Foreground="{DynamicResource PrimaryTextBrush}" FontSize="12"/>
+                        <TextBlock Text="v1.0.0 (Hanwha Ocean Custom)" HorizontalAlignment="Right" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" FontSize="12"/>
+                    </Grid>
+
+                    <Separator Background="{DynamicResource BorderBrush}" Margin="0,4"/>
+
+                    <Grid Margin="0,6">
+                        <TextBlock Text="연동 데이터베이스" Foreground="{DynamicResource PrimaryTextBrush}" FontSize="12"/>
+                        <TextBlock Text="Connected (Ship_Progress_DB)" HorizontalAlignment="Right" Foreground="#43A047" FontWeight="SemiBold" FontSize="12"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

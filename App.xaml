@@ -8,8 +8,10 @@
         <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#F4F5F7"/>
         <SolidColorBrush x:Key="MainContentBackgroundBrush" Color="#EBEEF2"/>
 
-        <SolidColorBrush x:Key="PrimaryTextBrush" Color="#222222"/>
-        <SolidColorBrush x:Key="SecondaryTextBrush" Color="#666666"/>
+        <!-- 🎯 회색 계열(#666666 등)을 전면 제거하고 선명한 검정(#1A1A1A)으로 통일 -->
+        <SolidColorBrush x:Key="PrimaryTextBrush" Color="#1A1A1A"/>
+        <SolidColorBrush x:Key="SecondaryTextBrush" Color="#1A1A1A"/>
+        <SolidColorBrush x:Key="SubTextBrush" Color="#1A1A1A"/>
 
         <!-- 한화오션 공식 오렌지 컬러 (RGB 243, 115, 33) -->
         <SolidColorBrush x:Key="HanwhaOrangeBrush" Color="#F37321"/>
