@@ -1,0 +1,337 @@
+﻿using LiveCharts;
+using LiveCharts.Wpf;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
+
+namespace Ship_Progress
+{
+    public partial class Tab2_ShipView : UserControl, INotifyPropertyChanged
+    {
+        // -----------------------------------------------------------
+        // 1. S-Curve 데이터 세트 및 설정
+        // -----------------------------------------------------------
+        private readonly string[] dateLabels = { "05-01", "05-15", "06-01", "06-15", "07-01", "07-15", "08-01" };
+        private readonly double[] planData = { 15.0, 30.0, 48.0, 65.0, 80.0, 92.0, 100.0 };
+        private readonly double[] actualData = { 12.0, 26.0, 42.0, 62.0 };
+        private const int CurrentMonthIndex = 3;
+
+        // -----------------------------------------------------------
+        // 2. 1행 KPI 동적 바인딩 프로퍼티
+        // -----------------------------------------------------------
+        private string _selectedShipNo = "H120";
+        public string SelectedShipNo
+        {
+            get => _selectedShipNo;
+            set { _selectedShipNo = value; OnPropertyChanged(); }
+        }
+
+        private string _selectedSeriesName = "A SERIES";
+        public string SelectedSeriesName
+        {
+            get => _selectedSeriesName;
+            set { _selectedSeriesName = value; OnPropertyChanged(); }
+        }
+
+        private string _expectedEndDate = "2026-11-20";
+        public string ExpectedEndDate
+        {
+            get => _expectedEndDate;
+            set { _expectedEndDate = value; OnPropertyChanged(); }
+        }
+
+        // -----------------------------------------------------------
+        // 3. 3행 하단 LiveCharts 도넛 차트 바인딩 프로퍼티
+        // -----------------------------------------------------------
+        private SeriesCollection _steelPieSeries;
+        public SeriesCollection SteelPieSeries
+        {
+            get => _steelPieSeries;
+            set { _steelPieSeries = value; OnPropertyChanged(); }
+        }
+
+        private SeriesCollection _outfittingPieSeries;
+        public SeriesCollection OutfittingPieSeries
+        {
+            get => _outfittingPieSeries;
+            set { _outfittingPieSeries = value; OnPropertyChanged(); }
+        }
+
+        private SeriesCollection _pipingPieSeries;
+        public SeriesCollection PipingPieSeries
+        {
+            get => _pipingPieSeries;
+            set { _pipingPieSeries = value; OnPropertyChanged(); }
+        }
+
+        private SeriesCollection _electricPieSeries;
+        public SeriesCollection ElectricPieSeries
+        {
+            get => _electricPieSeries;
+            set { _electricPieSeries = value; OnPropertyChanged(); }
+        }
+
+        // -----------------------------------------------------------
+        // 4. H120 위험 기자재 모델 클래스
+        // -----------------------------------------------------------
+        public class H120RiskItem
+        {
+            public string Category { get; set; }
+            public string EquipmentName { get; set; }
+            public int DelayDays { get; set; }
+            public string DelayText => $"{DelayDays}일";
+            public string Status { get; set; }
+
+            public Brush StatusBgColor => Status switch
+            {
+                "위험" => new SolidColorBrush(Color.FromArgb(40, 229, 57, 53)),
+                "주의" => new SolidColorBrush(Color.FromArgb(40, 251, 140, 0)),
+                _ => new SolidColorBrush(Color.FromArgb(40, 67, 160, 71))
+            };
+
+            public Brush StatusFgColor => Status switch
+            {
+                "위험" => new SolidColorBrush(Color.FromRgb(229, 57, 53)),
+                "주의" => new SolidColorBrush(Color.FromRgb(251, 140, 0)),
+                _ => new SolidColorBrush(Color.FromRgb(67, 160, 71))
+            };
+
+            public H120RiskItem(string category, string equipmentName, int delayDays, string status)
+            {
+                Category = category;
+                EquipmentName = equipmentName;
+                DelayDays = delayDays;
+                Status = status;
+            }
+        }
+
+        // -----------------------------------------------------------
+        // 5. 생성자 및 이벤트 핸들러
+        // -----------------------------------------------------------
+        public Tab2_ShipView()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+
+            ChartCanvas.MouseDown += (s, e) =>
+            {
+                PointTooltip.Visibility = Visibility.Collapsed;
+            };
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoadShipDashboardData("H120");
+        }
+
+        private void ChartCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            DrawSCurveChart();
+        }
+
+        // -----------------------------------------------------------
+        // 6. 데이터 로드 및 차트 생성 로직
+        // -----------------------------------------------------------
+        public void LoadShipDashboardData(string shipNo)
+        {
+            SelectedShipNo = shipNo;
+            SelectedSeriesName = "A SERIES";
+            ExpectedEndDate = "2026-11-20";
+
+            // S-Curve 차트 그리기
+            DrawSCurveChart();
+
+            // 도넛 차트 정적 데이터 바인딩
+            SteelPieSeries = CreateDonutSeries(85, "#1E88E5");      // 강재
+            OutfittingPieSeries = CreateDonutSeries(72, "#43A047"); // 의장품
+            PipingPieSeries = CreateDonutSeries(68, "#FB8C00");     // 배관
+            ElectricPieSeries = CreateDonutSeries(60, "#8E24AA");   // 전장품
+
+            // 위험 기자재 데이터 바인딩
+            var riskList = new List<H120RiskItem>
+            {
+                new H120RiskItem("의장", "메인엔진 패키지 입고 지연", 14, "위험"),
+                new H120RiskItem("배관", "고압 LNG 밸브 수급 소폭 지연", 4, "주의")
+            };
+
+            if (H120RiskDataGrid != null)
+            {
+                H120RiskDataGrid.ItemsSource = riskList;
+            }
+        }
+
+        // 도넛 차트 시리즈 생성 헬퍼 메서드
+        private SeriesCollection CreateDonutSeries(double percentage, string hexColor)
+        {
+            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hexColor));
+
+            // 다크모드 여부에 따라 도넛 미입고 배경색을 어둡거나 밝은 테마 톤으로 동적 처리
+            bool isDarkMode = Application.Current.Resources["PrimaryTextBrush"] is SolidColorBrush sc && sc.Color.R > 200;
+            var dynamicBgBrush = isDarkMode
+                ? new SolidColorBrush(Color.FromRgb(224, 224, 224))     // 다크모드용 배경 바 색상
+                : new SolidColorBrush(Color.FromRgb(224, 224, 224)); // 라이트모드용 배경 바 색상
+
+            return new SeriesCollection
+    {
+        new PieSeries
+        {
+            Title = "입고",
+            Values = new ChartValues<double> { percentage },
+            Fill = brush,
+            StrokeThickness = 0,
+            PushOut = 0
+        },
+        new PieSeries
+        {
+            Title = "미입고",
+            Values = new ChartValues<double> { 100.0 - percentage },
+            Fill = dynamicBgBrush,
+            StrokeThickness = 0,
+            PushOut = 0,
+            IsHitTestVisible = false
+        }
+    };
+        }
+
+        // S-Curve 캔버스 드로잉 로직 (다크/라이트 모드 리소스 대응 적용)
+        private void DrawSCurveChart()
+        {
+            if (ChartCanvas == null || ChartCanvas.ActualWidth <= 0 || ChartCanvas.ActualHeight <= 0) return;
+
+            var elementsToRemove = ChartCanvas.Children.Cast<UIElement>()
+                .Where(e => e != PointTooltip)
+                .ToList();
+
+            foreach (var elem in elementsToRemove)
+            {
+                ChartCanvas.Children.Remove(elem);
+            }
+
+            double[] planDataValues = { 0, 15, 35, 60, 85, 100 };
+            double[] actualDataValues = { 0, 12, 32, 58, 86.4 };
+
+            double width = ChartCanvas.ActualWidth;
+            double height = ChartCanvas.ActualHeight;
+
+            double paddingLeft = 40;
+            double paddingRight = 30;
+            double paddingTop = 20;
+            double paddingBottom = 40;
+
+            double chartW = width - paddingLeft - paddingRight;
+            double chartH = height - paddingTop - paddingBottom;
+
+            // 앱 전역 테마 텍스트 컬러 가져오기 (다크/라이트 자동 연동)
+            Brush textBrush = Application.Current.Resources["PrimaryTextBrush"] as Brush ?? Brushes.Black;
+            Brush gridLineBrush = Application.Current.Resources["BorderBrush"] as Brush ?? new SolidColorBrush(Color.FromRgb(235, 235, 235));
+
+            // 그리드 라인 및 Y축 레이블 생성
+            for (int i = 0; i <= 5; i++)
+            {
+                double yVal = i * 20;
+                double yPos = paddingTop + chartH - (yVal / 100.0 * chartH);
+
+                Line gridLine = new Line { X1 = paddingLeft, Y1 = yPos, X2 = width - paddingRight, Y2 = yPos, Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0")), StrokeThickness = 1 };
+                ChartCanvas.Children.Add(gridLine);
+
+                TextBlock yLabel = new TextBlock { Text = $"{yVal}%", FontSize = 10, Foreground = textBrush, FontWeight = FontWeights.SemiBold };
+                Canvas.SetLeft(yLabel, 5);
+                Canvas.SetTop(yLabel, yPos - 7);
+                ChartCanvas.Children.Add(yLabel);
+            }
+
+            // X축 레이블 생성
+            if (dateLabels != null && dateLabels.Length > 0)
+            {
+                for (int m = 0; m < dateLabels.Length; m++)
+                {
+                    double xPos = paddingLeft + (m / (double)(dateLabels.Length - 1) * chartW);
+
+                    TextBlock xLabel = new TextBlock { Text = dateLabels[m], FontSize = 10, Foreground = textBrush, FontWeight = FontWeights.SemiBold };
+                    Canvas.SetLeft(xLabel, xPos - 12);
+                    Canvas.SetTop(xLabel, height - paddingBottom + 6);
+                    ChartCanvas.Children.Add(xLabel);
+                }
+            }
+
+            Polyline planPolyline = new Polyline { Stroke = new SolidColorBrush(Color.FromRgb(30, 136, 229)), StrokeThickness = 2 };
+            Polyline actualPolyline = new Polyline { Stroke = new SolidColorBrush(Color.FromRgb(243, 115, 33)), StrokeThickness = 2.5 };
+
+            int dateCount = (dateLabels != null && dateLabels.Length > 0) ? dateLabels.Length : planDataValues.Length;
+
+            for (int i = 0; i < planDataValues.Length; i++)
+            {
+                double x = paddingLeft + (i / (double)(dateCount - 1) * chartW);
+                double y = paddingTop + chartH - (planDataValues[i] / 100.0 * chartH);
+                planPolyline.Points.Add(new Point(x, y));
+            }
+
+            int latestIndex = actualDataValues.Length - 1;
+
+            for (int i = 0; i < actualDataValues.Length; i++)
+            {
+                double x = paddingLeft + (i / (double)(dateCount - 1) * chartW);
+                double y = paddingTop + chartH - (actualDataValues[i] / 100.0 * chartH);
+                actualPolyline.Points.Add(new Point(x, y));
+
+                bool isLatest = (i == latestIndex);
+
+                Ellipse dot = new Ellipse
+                {
+                    Width = isLatest ? 12 : 8,
+                    Height = isLatest ? 12 : 8,
+                    Fill = isLatest ? new SolidColorBrush(Color.FromRgb(243, 115, 33)) : (Application.Current.Resources["HeaderBackgroundBrush"] as Brush ?? Brushes.White),
+                    Stroke = new SolidColorBrush(Color.FromRgb(243, 115, 33)),
+                    StrokeThickness = 2,
+                    Cursor = Cursors.Hand
+                };
+
+                double currentX = x;
+                double currentY = y;
+                double dotRadius = dot.Width / 2.0;
+                double val = actualDataValues[i];
+
+                dot.MouseDown += (s, ev) =>
+                {
+                    if (PointTooltip != null && TooltipText != null)
+                    {
+                        TooltipText.Text = $"{val:F1}%";
+                        PointTooltip.Visibility = Visibility.Visible;
+                        PointTooltip.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+
+                        double tooltipWidth = PointTooltip.DesiredSize.Width;
+                        double targetLeft = currentX - (tooltipWidth / 2.0);
+                        double targetTop = currentY + dotRadius + 4;
+
+                        Canvas.SetLeft(PointTooltip, Math.Max(0, targetLeft));
+                        Canvas.SetTop(PointTooltip, targetTop);
+                    }
+                    ev.Handled = true;
+                };
+
+                Canvas.SetLeft(dot, x - dotRadius);
+                Canvas.SetTop(dot, y - dotRadius);
+                ChartCanvas.Children.Add(dot);
+            }
+
+            ChartCanvas.Children.Insert(0, planPolyline);
+            ChartCanvas.Children.Insert(1, actualPolyline);
+        }
+
+        // -----------------------------------------------------------
+        // 7. INotifyPropertyChanged 구현
+        // -----------------------------------------------------------
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+}

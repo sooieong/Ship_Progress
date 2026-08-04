@@ -34,8 +34,8 @@ namespace Ship_Progress
                         break;
 
                     case "Tab2": // feature/tab2_Ship 브랜치에서 작업 예정
-                        // MainContentViewPort.Content = new Tab2_ShipView();
-                        SetPlaceholderText("공정 분석 화면 준비 중입니다.");
+                        MainContentViewPort.Content = new Tab2_ShipView();
+                        // SetPlaceholderText("공정 분석 화면 준비 중입니다.");
                         break;
 
                     case "Tab3": // feature/tab3_Leadtime 브랜치에서 작업 예정
