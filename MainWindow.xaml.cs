@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Ship_Progress.Views;
 
 namespace Ship_Progress
 {
@@ -13,7 +14,7 @@ namespace Ship_Progress
             // 🎯 실행 시 기본 화면 설정 (Tab1 화면이 아직 없으므로 안내 문구 표시)
             if (MainContentViewPort != null)
             {
-                SetPlaceholderText("메인 (종합 시리즈 분석) 화면 준비 중입니다.");
+                MainContentViewPort.Content = new Tab1_MainView(); // 실행 시 탭1 먼저 뜨게 설정
             }
         }
 
@@ -29,8 +30,8 @@ namespace Ship_Progress
                 switch (tabTag)
                 {
                     case "Tab1": // feature/tab1_Main 브랜치에서 작업 예정
-                        // MainContentViewPort.Content = new Tab1_MainView();
-                        SetPlaceholderText("메인 (종합 시리즈 분석) 화면 준비 중입니다.");
+                        MainContentViewPort.Content = new Tab1_MainView();
+                        // SetPlaceholderText("메인 (종합 시리즈 분석) 화면 준비 중입니다.");
                         break;
 
                     case "Tab2": // feature/tab2_Ship 브랜치에서 작업 예정
@@ -44,8 +45,8 @@ namespace Ship_Progress
                         break;
 
                     case "Tab4": // feature/tab4_Setting 브랜치에서 작업 예정
-                        // MainContentViewPort.Content = new Tab4_SettingView();
-                        SetPlaceholderText("시스템 설정 화면 준비 중입니다.");
+                        MainContentViewPort.Content = new Tab4_SettingView();
+                        // SetPlaceholderText("시스템 설정 화면 준비 중입니다.");
                         break;
                 }
             }

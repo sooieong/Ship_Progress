@@ -1,0 +1,399 @@
+﻿<UserControl x:Class="Ship_Progress.Tab1_MainView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             mc:Ignorable="d" 
+             Loaded="UserControl_Loaded"
+             d:DesignHeight="900" d:DesignWidth="1100">
+
+    <Grid Margin="16">
+        <!-- ========================================== -->
+        <!-- 레이아웃 정의: 3행 x 2열 구조 (+ 간격 Row/Col) -->
+        <!-- ========================================== -->
+        <Grid.RowDefinitions>
+            <!-- 1행: [상자 1] 호선별 공정률 / [상자 2] 호선별 공정 흐름 -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <!-- 2행: [상자 3] 위험 기자재 현황 분포 -->
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="12"/>
+            <!-- 3행: [상자 4] 협력사별 납기율 / [상자 5] 막대그래프 영역 -->
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="16"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ========================================== -->
+        <!-- [1행 - 좌측 상자] 호선별 공정률 -->
+        <!-- ========================================== -->
+        <Border Grid.Row="0" Grid.Column="0" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="호선별 공정률" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+
+                <UniformGrid Grid.Row="1" Columns="3" VerticalAlignment="Center">
+                    <!-- H120 -->
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="H120" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="A SERIES" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,2,0,8"/>
+
+                        <Grid Width="150" Height="85">
+                            <lvc:PieChart StartingRotationAngle="270" InnerRadius="48" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" Series="{Binding H120GaugeSeries}" LegendLocation="None"/>
+                            <TextBlock Text="87.2%" FontSize="19" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,14"/>
+                            <TextBlock Text="0%" FontSize="9" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="6,0,0,0"/>
+                            <TextBlock Text="100%" FontSize="9" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,6,0"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- H121 -->
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="H121" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="A SERIES" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,2,0,8"/>
+
+                        <Grid Width="150" Height="85">
+                            <lvc:PieChart StartingRotationAngle="270" InnerRadius="48" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" Series="{Binding H121GaugeSeries}" LegendLocation="None"/>
+                            <TextBlock Text="82.1%" FontSize="19" FontWeight="Bold" Foreground="#FF9800" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,14"/>
+                            <TextBlock Text="0%" FontSize="9" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="6,0,0,0"/>
+                            <TextBlock Text="100%" FontSize="9" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,6,0"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- H122 -->
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="H122" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="B SERIES" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,2,0,8"/>
+
+                        <Grid Width="150" Height="85">
+                            <lvc:PieChart StartingRotationAngle="270" InnerRadius="48" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" Series="{Binding H122GaugeSeries}" LegendLocation="None"/>
+                            <TextBlock Text="91.3%" FontSize="19" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,14"/>
+                            <TextBlock Text="0%" FontSize="9" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="6,0,0,0"/>
+                            <TextBlock Text="100%" FontSize="9" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,6,0"/>
+                        </Grid>
+                    </StackPanel>
+                </UniformGrid>
+            </Grid>
+        </Border>
+
+        <!-- ========================================== -->
+        <!-- [1행 - 우측 상자] 호선별 공정 흐름 -->
+        <!-- ========================================== -->
+        <Border Grid.Row="0" Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="호선별 공정 흐름" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+
+                <DataGrid x:Name="ProcessStatusDataGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="False" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{DynamicResource BorderBrush}" Background="Transparent" RowHeight="44" BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="호선" Binding="{Binding ShipNo}" Width="80"/>
+
+                        <DataGridTemplateColumn Header="강재절단" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Ellipse Width="18" Height="18" Fill="{Binding SteelCuttingColor}" HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="블록조립" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Ellipse Width="18" Height="18" Fill="{Binding BlockAssemblyColor}" HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="탑재" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Ellipse Width="18" Height="18" Fill="{Binding ErectionColor}" HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="의장" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Ellipse Width="18" Height="18" Fill="{Binding OutfittingColor}" HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="시운전" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Ellipse Width="18" Height="18" Fill="{Binding SeaTrialColor}" HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- ========================================== -->
+        <!-- [2행 - 좌측 상자] 위험 기자재 현황 분포 -->
+        <!-- ========================================== -->
+        <Border Grid.Row="2" Grid.Column="0" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="위험 기자재 현황 분포" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Rectangle Width="10" Height="10" Fill="#E53935" Margin="0,0,4,0"/>
+                        <TextBlock Text="위험" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,12,0"/>
+
+                        <Rectangle Width="10" Height="10" Fill="#FA8C16" Margin="0,0,4,0"/>
+                        <TextBlock Text="주의" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,12,0"/>
+
+                        <Rectangle Width="10" Height="10" Fill="#22C55E" Margin="0,0,4,0"/>
+                        <TextBlock Text="정상" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="위험 항목 " FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                        <TextBlock Text="{Binding TotalCriticalCount}" FontSize="15" FontWeight="Bold" Foreground="#E53935"/>
+                        <TextBlock Text="건" FontSize="12" FontWeight="Bold" Foreground="#E53935"/>
+                    </StackPanel>
+                </Grid>
+
+                <lvc:CartesianChart Grid.Row="1" Series="{Binding EquipmentRiskSeries}" LegendLocation="None" Hoverable="False" DisableAnimations="True">
+                    <lvc:CartesianChart.AxisY>
+                        <lvc:Axis Labels="{Binding EquipmentRiskLabels}" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}">
+                            <lvc:Axis.Separator>
+                                <lvc:Separator Step="1" IsEnabled="False"/>
+                            </lvc:Axis.Separator>
+                        </lvc:Axis>
+                    </lvc:CartesianChart.AxisY>
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis MinValue="0" LabelFormatter="{Binding CountFormatter}" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}">
+                            <lvc:Axis.Separator>
+                                <lvc:Separator Stroke="#33ffffff" StrokeThickness="0.5" Step="2"/>
+                            </lvc:Axis.Separator>
+                        </lvc:Axis>
+                    </lvc:CartesianChart.AxisX>
+                </lvc:CartesianChart>
+            </Grid>
+        </Border>
+
+        <!-- ========================================================= -->
+        <!-- [2~3행 - 우측 대형 상자] 위험 기자재 현황 (표 그대로 2~3행 수직 연장) -->
+        <!-- ========================================================= -->
+        <Border Grid.Row="2" Grid.RowSpan="3" Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="위험 기자재 현황" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+
+                <DataGrid x:Name="CriticalEquipmentDataGrid" Grid.Row="1" ItemsSource="{Binding CriticalEquipmentList}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{DynamicResource BorderBrush}" Background="Transparent" RowHeight="36" BorderThickness="0" VerticalScrollBarVisibility="Auto">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="시리즈" Binding="{Binding Series}" Width="80"/>
+                        <DataGridTextColumn Header="호선" Binding="{Binding ShipNo}" Width="60"/>
+                        <DataGridTextColumn Header="공정" Binding="{Binding Process}" Width="60"/>
+                        <DataGridTextColumn Header="문제 내용" Binding="{Binding IssueDetail}" Width="*"/>
+                        <DataGridTextColumn Header="지연 일수" Binding="{Binding DelayDays}" Width="70"/>
+
+                        <DataGridTemplateColumn Header="상태" Width="65">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding StatusBgColor}">
+                                        <TextBlock Text="{Binding Status}" Foreground="{Binding StatusFgColor}" FontSize="11" FontWeight="Bold"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- ========================================================= -->
+        <!-- [3행 - 좌측 분할 영역] 각각 1:1 비율 독립 흰색 상자 2개 -->
+        <!-- ========================================================= -->
+        <Grid Grid.Row="4" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- [상자 4] 협력사별 납기율 (오각형 분포도 독립 상자) -->
+            <Border Grid.Column="0" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="협력사별 납기율" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+
+                    <!-- 오각형 레이더 차트 커스텀 렌더링 영역 -->
+                    <Viewbox Grid.Row="1" Stretch="Uniform">
+                        <Grid Width="260" Height="220" Margin="10">
+                            <!-- 1. 배경 오각형 격자선 (20%, 40%, 60%, 80%, 100% 동심원 선) -->
+                            <Polygon Points="130,20 225,89 189,201 71,201 35,89" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.8" Fill="Transparent"/>
+                            <Polygon Points="130,36 206,91 177,181 83,181 54,91" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
+                            <Polygon Points="130,52 187,93 165,161 95,161 73,93" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
+                            <Polygon Points="130,68 168,95 153,141 107,141 92,95" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
+                            <Polygon Points="130,84 149,97 141,121 119,121 111,97" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
+
+                            <!-- 2. 중심에서 각 꼭짓점으로 나가는 방사형 축 선 -->
+                            <Line X1="130" Y1="110" X2="130" Y2="20" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
+                            <Line X1="130" Y1="110" X2="225" Y2="89" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
+                            <Line X1="130" Y1="110" X2="189" Y2="201" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
+                            <Line X1="130" Y1="110" X2="71" Y2="201" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
+                            <Line X1="130" Y1="110" X2="35" Y2="89" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
+
+                            <!-- 3. [동적 바인딩] 실데이터 기반 오각형 영역 (Fill: 반투명 한화오렌지, Stroke: 오렌지 테두리) -->
+                            <Polygon Points="{Binding RadarPolygonPoints}" 
+                         Fill="#77F37321" 
+                         Stroke="#F37321" 
+                         StrokeThickness="2" 
+                         StrokeLineJoin="Round"/>
+
+                            <!-- 4. [동적 바인딩] 각 5개 지점의 노란색 정점 포인트 -->
+                            <ItemsControl ItemsSource="{Binding RadarDataPoints}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas Width="260" Height="220"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                                        <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Ellipse Width="6" Height="6" Fill="#FFEB3B" Margin="-3,-3,0,0"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- 5. 5개 협력사 라벨 텍스트 (이미지 위치 기준) -->
+                            <TextBlock Text="Hanwha Ocean" Canvas.Top="2" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="Samsung Heavy" Margin="190,75,0,0" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="STX Offshore" Margin="170,203,0,0" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="Daewoo E&amp;C" Margin="0,203,170,0" HorizontalAlignment="Right" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="Hyundai Mipo" Margin="0,75,190,0" HorizontalAlignment="Right" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                        </Grid>
+                    </Viewbox>
+                </Grid>
+            </Border>
+
+            <!-- [상자 5] 막대그래프 영역 (추후 구현용 독립 상자) -->
+            <Border Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 타이틀: 기자재 수급 현황 -->
+                    <TextBlock Grid.Row="0" Text="기자재 수급 현황" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+
+                    <!-- 기자재 수급 현황 도넛 차트 영역 -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 1. 도넛 차트 및 중앙 텍스트 -->
+                        <Grid Grid.Column="0">
+                            <lvc:PieChart Series="{Binding SupplyStatusSeries}" 
+                              InnerRadius="55" 
+                              Background="Transparent" 
+                              LegendLocation="None" 
+                              Hoverable="True"/>
+
+                            <!-- 도넛 차트 중앙 텍스트 -->
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding OnTimePercentageText}" 
+                               FontSize="18" 
+                               FontWeight="Bold" 
+                               Foreground="#22C55E" 
+                               HorizontalAlignment="Center"/>
+                                <TextBlock Text="On Time" 
+                               FontSize="11" 
+                               Foreground="{DynamicResource SecondaryTextBrush}" 
+                               HorizontalAlignment="Center" 
+                               Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- 2. 우측 커스텀 범례 (Legend) 목록 -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                            <!-- 정상 수급 (On Time) -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Ellipse Grid.Column="0" Width="10" Height="10" Fill="#22C55E" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <TextBlock Text="{Binding OnTimePercentageText}" FontWeight="Bold" FontSize="13" Foreground="#22C55E" Margin="0,0,6,0"/>
+                                    <TextBlock Text="On Time" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- 지연 (Delayed) -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Ellipse Grid.Column="0" Width="10" Height="10" Fill="#E53935" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <TextBlock Text="{Binding DelayedPercentageText}" FontWeight="Bold" FontSize="13" Foreground="#E53935" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Delayed" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- 대기/미정 (Pending) -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Ellipse Grid.Column="0" Width="10" Height="10" Fill="#888888" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <TextBlock Text="{Binding PendingPercentageText}" FontWeight="Bold" FontSize="13" Foreground="#888888" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Pending" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
