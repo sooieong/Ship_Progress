@@ -8,6 +8,8 @@
         <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#F4F5F7"/>
         <SolidColorBrush x:Key="MainContentBackgroundBrush" Color="#EBEEF2"/>
 
+        <SolidColorBrush Color="#E0E0E0" x:Key="BorderBrush"/>
+        
         <SolidColorBrush x:Key="PrimaryTextBrush" Color="#222222"/>
         <SolidColorBrush x:Key="SecondaryTextBrush" Color="#666666"/>
 
