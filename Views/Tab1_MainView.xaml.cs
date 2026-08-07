@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Text.RegularExpressions; 
 
 namespace Ship_Progress
 {
@@ -254,7 +255,14 @@ namespace Ship_Progress
                 new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "배관", IssueDetail = "유압 파이프 자재 현장 수령 소폭 지연", DelayDays = "1일", Status = "정상" }
             };
 
-            CriticalEquipmentList = new ObservableCollection<EquipmentRiskItem>(riskDataList);
+            // [수정] DelayDays 문자열에서 숫자만 추출하여 내림차순 정렬
+            var sortedList = riskDataList
+                .OrderByDescending(x => GetDaysNumber(x.DelayDays))
+                .ToList();
+
+            // [수정] riskDataList 대신 정렬된 sortedList를 전달
+            CriticalEquipmentList = new ObservableCollection<EquipmentRiskItem>(sortedList);
+
             TotalCriticalCount = riskDataList.Count(x => x.Status == "위험");
             EquipmentRiskLabels = new string[] { "H122", "H121", "H120" };
 
@@ -294,6 +302,14 @@ namespace Ship_Progress
                     MaxRowHeight = 16
                 }
             };
+        }
+
+        // [신규 추가] "14일" 같은 문자열에서 숫자(14)만 extracted해서 반환하는 메서드
+        private int GetDaysNumber(string delayDaysText)
+        {
+            if (string.IsNullOrEmpty(delayDaysText)) return 0;
+            var match = Regex.Match(delayDaysText, @"\d+");
+            return match.Success ? int.Parse(match.Value) : 0;
         }
 
         // -----------------------------------------------------------
