@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Text.RegularExpressions; 
+using System.Text.RegularExpressions;
 
 namespace Ship_Progress
 {
@@ -83,7 +83,7 @@ namespace Ship_Progress
         }
 
         // -----------------------------------------------------------
-        // 3. 하단 좌측: 협력사별 납기율 오각형 차트 프로퍼티
+        // 3. 하단 좌측: 호선별 자재 납기율 오각형 차트 프로퍼티
         // -----------------------------------------------------------
         private PointCollection _radarPolygonPoints;
         public PointCollection RadarPolygonPoints
@@ -98,6 +98,14 @@ namespace Ship_Progress
             get => _radarDataPoints;
             set { _radarDataPoints = value; OnPropertyChangedImpl(); }
         }
+
+        // [신규 추가] 호선별 5대 부문 임의 데이터 (기자재, 기관의장, 선체의장, 선실의장, 전기의장 순서)
+        private Dictionary<string, double[]> shipVendorData = new Dictionary<string, double[]>()
+        {
+            { "H120", new double[] { 85.0, 90.0, 78.0, 92.0, 88.0 } },
+            { "H121", new double[] { 75.0, 82.0, 80.0, 70.0, 85.0 } },
+            { "H122", new double[] { 95.0, 88.0, 91.0, 94.0, 90.0 } }
+        };
 
         // -----------------------------------------------------------
         // 4. 하단 우측: 기자재 수급 현황 (도넛 차트 및 텍스트) 프로퍼티
@@ -195,8 +203,8 @@ namespace Ship_Progress
             LoadGaugeData();
             LoadProcessStatusData();
             LoadEquipmentRiskData();
-            LoadVendorDeliveryData();
-            LoadSupplyStatusData(); // 기자재 수급 현황 도넛 차트 로드 추가
+            LoadVendorDeliveryData("전체 (평균)"); // 기본값 전체(평균)으로 로드
+            LoadSupplyStatusData();
         }
 
         // -----------------------------------------------------------
@@ -255,12 +263,10 @@ namespace Ship_Progress
                 new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "배관", IssueDetail = "유압 파이프 자재 현장 수령 소폭 지연", DelayDays = "1일", Status = "정상" }
             };
 
-            // [수정] DelayDays 문자열에서 숫자만 추출하여 내림차순 정렬
             var sortedList = riskDataList
                 .OrderByDescending(x => GetDaysNumber(x.DelayDays))
                 .ToList();
 
-            // [수정] riskDataList 대신 정렬된 sortedList를 전달
             CriticalEquipmentList = new ObservableCollection<EquipmentRiskItem>(sortedList);
 
             TotalCriticalCount = riskDataList.Count(x => x.Status == "위험");
@@ -304,7 +310,6 @@ namespace Ship_Progress
             };
         }
 
-        // [신규 추가] "14일" 같은 문자열에서 숫자(14)만 extracted해서 반환하는 메서드
         private int GetDaysNumber(string delayDaysText)
         {
             if (string.IsNullOrEmpty(delayDaysText)) return 0;
@@ -313,23 +318,39 @@ namespace Ship_Progress
         }
 
         // -----------------------------------------------------------
-        // 4. 협력사별 납기율 (오각형 분포도) 로드 함수
+        // 4. 호선별 자재 납기율 (오각형 분포도) 로드 및 드롭다운 연동 함수
         // -----------------------------------------------------------
-        private void LoadVendorDeliveryData()
+        private void ShipSelectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            double[] values = new double[]
+            if (ShipSelectionComboBox?.SelectedItem is ComboBoxItem selectedItem)
             {
-                88, // Hanwha Ocean (상단 12시방향)
-                85, // Samsung Heavy (우측 상단)
-                80, // STX Offshore (우측 하단)
-                92, // Daewoo E&C (좌측 하단)
-                78  // Hyundai Mipo (좌측 상단)
-            };
+                string selection = selectedItem.Content.ToString();
+                LoadVendorDeliveryData(selection);
+            }
+        }
+
+        private void LoadVendorDeliveryData(string targetKey)
+        {
+            double[] values = new double[5];
+
+            if (targetKey.Contains("전체"))
+            {
+                // 각 호선별 값들의 진짜 평균 계산 (기자재, 기관의장, 선체의장, 선실의장, 전기의장 각 항목별 평균)
+                for (int i = 0; i < 5; i++)
+                {
+                    values[i] = shipVendorData.Values.Average(arr => arr[i]);
+                }
+            }
+            else if (shipVendorData.ContainsKey(targetKey))
+            {
+                values = shipVendorData[targetKey];
+            }
 
             double centerX = 130;
             double centerY = 110;
             double maxRadius = 90;
 
+            // 5대 축 각도 (기자재: -90도, 기관의장: -18도, 선체의장: 54도, 선실의장: 126도, 전기의장: 198도)
             double[] angles = new double[] { -90, -18, 54, 126, 198 };
 
             var points = new PointCollection();
@@ -353,7 +374,7 @@ namespace Ship_Progress
         }
 
         // -----------------------------------------------------------
-        // 5. 기자재 수급 현황 도넛 차트 데이터 로드 함수 (새로 추가)
+        // 5. 기자재 수급 현황 도넛 차트 데이터 로드 함수
         // -----------------------------------------------------------
         private void LoadSupplyStatusData()
         {
@@ -371,21 +392,21 @@ namespace Ship_Progress
                 {
                     Title = "On Time",
                     Values = new ChartValues<double> { onTimeVal },
-                    Fill = new SolidColorBrush(Color.FromRgb(34, 197, 94)), // 녹색
+                    Fill = new SolidColorBrush(Color.FromRgb(34, 197, 94)),
                     StrokeThickness = 0
                 },
                 new PieSeries
                 {
                     Title = "Delayed",
                     Values = new ChartValues<double> { delayedVal },
-                    Fill = new SolidColorBrush(Color.FromRgb(229, 57, 53)), // 빨간색
+                    Fill = new SolidColorBrush(Color.FromRgb(229, 57, 53)),
                     StrokeThickness = 0
                 },
                 new PieSeries
                 {
                     Title = "Pending",
                     Values = new ChartValues<double> { pendingVal },
-                    Fill = new SolidColorBrush(Color.FromRgb(224, 224, 224)), // 회색
+                    Fill = new SolidColorBrush(Color.FromRgb(224, 224, 224)),
                     StrokeThickness = 0
                 }
             };

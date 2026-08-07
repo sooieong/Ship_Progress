@@ -246,7 +246,7 @@
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- [상자 4] 협력사별 납기율 (오각형 분포도 독립 상자) -->
+            <!-- [상자 4] 호선별 자재 납기율 (드롭다운 + 오각형 레이더 차트) -->
             <Border Grid.Column="0" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -254,33 +254,50 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="협력사별 납기율" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+                    <!-- 타이틀 및 드롭다운 선택 영역 -->
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="호선별 자재 납기율" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+
+                        <ComboBox x:Name="ShipSelectionComboBox" Grid.Column="1" Width="100" Height="26" 
+                      SelectedIndex="0" SelectionChanged="ShipSelectionComboBox_SelectionChanged"
+                      FontSize="12" VerticalContentAlignment="Center">
+                            <ComboBoxItem Content="전체 (평균)"/>
+                            <ComboBoxItem Content="H120"/>
+                            <ComboBoxItem Content="H121"/>
+                            <ComboBoxItem Content="H122"/>
+                        </ComboBox>
+                    </Grid>
 
                     <!-- 오각형 레이더 차트 커스텀 렌더링 영역 -->
                     <Viewbox Grid.Row="1" Stretch="Uniform">
                         <Grid Width="260" Height="220" Margin="10">
-                            <!-- 1. 배경 오각형 격자선 (20%, 40%, 60%, 80%, 100% 동심원 선) -->
+                            <!-- 1. 배경 오각형 격자선 -->
                             <Polygon Points="130,20 225,89 189,201 71,201 35,89" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.8" Fill="Transparent"/>
                             <Polygon Points="130,36 206,91 177,181 83,181 54,91" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
                             <Polygon Points="130,52 187,93 165,161 95,161 73,93" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
                             <Polygon Points="130,68 168,95 153,141 107,141 92,95" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
                             <Polygon Points="130,84 149,97 141,121 119,121 111,97" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
 
-                            <!-- 2. 중심에서 각 꼭짓점으로 나가는 방사형 축 선 -->
+                            <!-- 2. 방사형 축 선 -->
                             <Line X1="130" Y1="110" X2="130" Y2="20" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
                             <Line X1="130" Y1="110" X2="225" Y2="89" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
                             <Line X1="130" Y1="110" X2="189" Y2="201" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
                             <Line X1="130" Y1="110" X2="71" Y2="201" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
                             <Line X1="130" Y1="110" X2="35" Y2="89" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
 
-                            <!-- 3. [동적 바인딩] 실데이터 기반 오각형 영역 (Fill: 반투명 한화오렌지, Stroke: 오렌지 테두리) -->
+                            <!-- 3. 실데이터 기반 오각형 영역 -->
                             <Polygon Points="{Binding RadarPolygonPoints}" 
                          Fill="#77F37321" 
                          Stroke="#F37321" 
                          StrokeThickness="2" 
                          StrokeLineJoin="Round"/>
 
-                            <!-- 4. [동적 바인딩] 각 5개 지점의 노란색 정점 포인트 -->
+                            <!-- 4. 정점 포인트 -->
                             <ItemsControl ItemsSource="{Binding RadarDataPoints}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -300,17 +317,17 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <!-- 5. 5개 협력사 라벨 텍스트 (이미지 위치 기준) -->
-                            <TextBlock Text="Hanwha Ocean" Canvas.Top="2" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                            <TextBlock Text="Samsung Heavy" Margin="190,75,0,0" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                            <TextBlock Text="STX Offshore" Margin="170,203,0,0" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                            <TextBlock Text="Daewoo E&amp;C" Margin="0,203,170,0" HorizontalAlignment="Right" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                            <TextBlock Text="Hyundai Mipo" Margin="0,75,190,0" HorizontalAlignment="Right" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <!-- 5. 5대 의장 부문 축 레이블 (기자재, 기관의장, 선체의장, 선실의장, 전기의장) -->
+                            <TextBlock Text="기자재" Canvas.Top="2" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="기관의장" Margin="190,75,0,0" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="선체의장" Margin="170,203,0,0" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="선실의장" Margin="0,203,170,0" HorizontalAlignment="Right" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="전기의장" Margin="0,75,190,0" HorizontalAlignment="Right" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
                         </Grid>
                     </Viewbox>
                 </Grid>
             </Border>
-
+            
             <!-- [상자 5] 막대그래프 영역 (추후 구현용 독립 상자) -->
             <Border Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>
