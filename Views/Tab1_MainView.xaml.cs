@@ -268,7 +268,8 @@ namespace Ship_Progress
                     DataLabels = true,
                     LabelsPosition = BarLabelPosition.Parallel,
                     FontSize = 11,
-                    Foreground = Brushes.White
+                    Foreground = Brushes.White,
+                    MaxRowHeight = 16
                 },
                 new StackedRowSeries
                 {
@@ -278,7 +279,8 @@ namespace Ship_Progress
                     DataLabels = true,
                     LabelsPosition = BarLabelPosition.Parallel,
                     FontSize = 11,
-                    Foreground = Brushes.White
+                    Foreground = Brushes.White,
+                    MaxRowHeight = 16
                 },
                 new StackedRowSeries
                 {
@@ -288,7 +290,8 @@ namespace Ship_Progress
                     DataLabels = true,
                     LabelsPosition = BarLabelPosition.Parallel,
                     FontSize = 11,
-                    Foreground = Brushes.White
+                    Foreground = Brushes.White,
+                    MaxRowHeight = 16
                 }
             };
         }
