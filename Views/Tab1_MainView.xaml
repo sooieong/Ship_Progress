@@ -344,7 +344,7 @@
                                FontWeight="Bold" 
                                Foreground="#22C55E" 
                                HorizontalAlignment="Center"/>
-                                <TextBlock Text="On Time" 
+                                <TextBlock Text="정시 납품" 
                                FontSize="11" 
                                Foreground="{DynamicResource SecondaryTextBrush}" 
                                HorizontalAlignment="Center" 
@@ -363,7 +363,7 @@
                                 <Ellipse Grid.Column="0" Width="10" Height="10" Fill="#22C55E" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                                     <TextBlock Text="{Binding OnTimePercentageText}" FontWeight="Bold" FontSize="13" Foreground="#22C55E" Margin="0,0,6,0"/>
-                                    <TextBlock Text="On Time" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="정시 납품" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Grid>
 
@@ -376,7 +376,7 @@
                                 <Ellipse Grid.Column="0" Width="10" Height="10" Fill="#E53935" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                                     <TextBlock Text="{Binding DelayedPercentageText}" FontWeight="Bold" FontSize="13" Foreground="#E53935" Margin="0,0,6,0"/>
-                                    <TextBlock Text="Delayed" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="지연" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Grid>
 
@@ -389,7 +389,7 @@
                                 <Ellipse Grid.Column="0" Width="10" Height="10" Fill="#888888" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                                     <TextBlock Text="{Binding PendingPercentageText}" FontWeight="Bold" FontSize="13" Foreground="#888888" Margin="0,0,6,0"/>
-                                    <TextBlock Text="Pending" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="보류/대기" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
