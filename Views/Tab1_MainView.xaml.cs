@@ -256,7 +256,7 @@ namespace Ship_Progress
 
             CriticalEquipmentList = new ObservableCollection<EquipmentRiskItem>(riskDataList);
             TotalCriticalCount = riskDataList.Count(x => x.Status == "위험");
-            EquipmentRiskLabels = new string[] { "B SERIES - H122", "A SERIES - H121", "A SERIES - H120" };
+            EquipmentRiskLabels = new string[] { "H122", "H121", "H120" };
 
             EquipmentRiskSeries = new SeriesCollection
             {

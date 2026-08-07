@@ -190,7 +190,11 @@
                         </lvc:Axis>
                     </lvc:CartesianChart.AxisY>
                     <lvc:CartesianChart.AxisX>
-                        <lvc:Axis MinValue="0" LabelFormatter="{Binding CountFormatter}" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}">
+                        <lvc:Axis ShowLabels="False"
+              MinValue="0" 
+              LabelFormatter="{Binding CountFormatter}" 
+              FontSize="10" 
+              Foreground="{DynamicResource PrimaryTextBrush}">
                             <lvc:Axis.Separator>
                                 <lvc:Separator Stroke="#33ffffff" StrokeThickness="0.5" Step="2"/>
                             </lvc:Axis.Separator>
