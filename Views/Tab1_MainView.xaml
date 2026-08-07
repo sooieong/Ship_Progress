@@ -179,7 +179,7 @@
                     </StackPanel>
                 </Grid>
 
-                <lvc:CartesianChart Grid.Row="1" Series="{Binding EquipmentRiskSeries}" LegendLocation="None" Hoverable="False" DisableAnimations="True">
+                <lvc:CartesianChart Grid.Row="1" Series="{Binding EquipmentRiskSeries}" LegendLocation="None" Hoverable="False" DisableAnimations="True" DataTooltip="{x:Null}">
                     <lvc:CartesianChart.AxisY>
                         <lvc:Axis Labels="{Binding EquipmentRiskLabels}" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}">
                             <lvc:Axis.Separator>
@@ -335,7 +335,8 @@
                               InnerRadius="55" 
                               Background="Transparent" 
                               LegendLocation="None" 
-                              Hoverable="True"/>
+                              Hoverable="True"
+                              DataTooltip="{x:Null}"/>
 
                             <!-- 도넛 차트 중앙 텍스트 -->
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
