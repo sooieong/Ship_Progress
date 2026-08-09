@@ -326,19 +326,6 @@ namespace Ship_Progress
             Foreground = Brushes.White,
             MaxRowHeight = 16
         },
-        new StackedRowSeries
-        {
-            Title = "정상",
-            Values = normalValues, // 동적 집계된 Values 할당
-            Fill = new SolidColorBrush(Color.FromRgb(34, 197, 94)),
-            StackMode = StackMode.Percentage,
-            DataLabels = true,
-            LabelPoint = countFormatter,
-            LabelsPosition = BarLabelPosition.Parallel,
-            FontSize = 11,
-            Foreground = Brushes.White,
-            MaxRowHeight = 16
-        }
     };
         }
 
