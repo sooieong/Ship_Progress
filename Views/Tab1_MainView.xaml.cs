@@ -252,62 +252,94 @@ namespace Ship_Progress
         private void LoadEquipmentRiskData()
         {
             var riskDataList = new List<EquipmentRiskItem>
-            {
-                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "의장", IssueDetail = "메인엔진 패키지 입고 지연", DelayDays = "14일", Status = "위험" },
-                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "배관", IssueDetail = "고압 LNG 밸브 수급 소폭 지연", DelayDays = "4일", Status = "주의" },
-                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "기관", IssueDetail = "선박평형수 처리장치(BWTS) 펌프 입고 지연", DelayDays = "7일", Status = "주의" },
-                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "전기", IssueDetail = "스위치보드 배전반 서류 검사 지연", DelayDays = "3일", Status = "정상" },
-                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "도장", IssueDetail = "특수 방오도료 수급 소폭 지연", DelayDays = "2일", Status = "정상" },
-                new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "의장", IssueDetail = "선실 거주구 판넬 자재 입고 소폭 지연", DelayDays = "2일", Status = "정상" },
-                new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "기관", IssueDetail = "비상발전기(Emergency Gen) 테스트 일정 조정", DelayDays = "5일", Status = "주의" },
-                new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "배관", IssueDetail = "유압 파이프 자재 현장 수령 소폭 지연", DelayDays = "1일", Status = "정상" }
-            };
+    {
+        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "의장", IssueDetail = "메인엔진 패키지 입고 지연", DelayDays = "14일", Status = "위험" },
+        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "배관", IssueDetail = "고압 LNG 밸브 수급 소폭 지연", DelayDays = "4일", Status = "주의" },
+        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "기관", IssueDetail = "선박평형수 처리장치(BWTS) 펌프 입고 지연", DelayDays = "7일", Status = "주의" },
+        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "전기", IssueDetail = "스위치보드 배전반 서류 검사 지연", DelayDays = "3일", Status = "정상" },
+        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "도장", IssueDetail = "특수 방오도료 수급 소폭 지연", DelayDays = "2일", Status = "정상" },
+        new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "의장", IssueDetail = "선실 거주구 판넬 자재 입고 소폭 지연", DelayDays = "2일", Status = "정상" },
+        new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "기관", IssueDetail = "비상발전기(Emergency Gen) 테스트 일정 조정", DelayDays = "5일", Status = "주의" },
+        new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "배관", IssueDetail = "유압 파이프 자재 현장 수령 소폭 지연", DelayDays = "1일", Status = "정상" }
+    };
 
             var sortedList = riskDataList
                 .OrderByDescending(x => GetDaysNumber(x.DelayDays))
                 .ToList();
 
             CriticalEquipmentList = new ObservableCollection<EquipmentRiskItem>(sortedList);
-
             TotalCriticalCount = riskDataList.Count(x => x.Status == "위험");
+
+            // Y축 레이블 정의 (아래에서 위 순서: H122 -> H121 -> H120)
             EquipmentRiskLabels = new string[] { "H122", "H121", "H120" };
 
-            EquipmentRiskSeries = new SeriesCollection
+            // -----------------------------------------------------------
+            // [동적 데이터 집계] EquipmentRiskLabels 순서에 맞게 건수 자동 계산
+            // -----------------------------------------------------------
+            var dangerValues = new ChartValues<double>();
+            var warningValues = new ChartValues<double>();
+            var normalValues = new ChartValues<double>();
+
+            foreach (var shipNo in EquipmentRiskLabels)
             {
-                new StackedRowSeries
+                // 해당 호선의 상태별 개수를 동적으로 카운트
+                dangerValues.Add(riskDataList.Count(x => x.ShipNo == shipNo && x.Status == "위험"));
+                warningValues.Add(riskDataList.Count(x => x.ShipNo == shipNo && x.Status == "주의"));
+                normalValues.Add(riskDataList.Count(x => x.ShipNo == shipNo && x.Status == "정상"));
+            }
+
+            // Formatter 설정
+            Func<ChartPoint, string> countFormatter = point =>
+            {
+                if (point.Instance is double rawValue && rawValue > 0)
                 {
-                    Title = "위험",
-                    Values = new ChartValues<double> { 0, 0, 1 },
-                    Fill = new SolidColorBrush(Color.FromRgb(229, 57, 53)),
-                    DataLabels = true,
-                    LabelsPosition = BarLabelPosition.Parallel,
-                    FontSize = 11,
-                    Foreground = Brushes.White,
-                    MaxRowHeight = 16
-                },
-                new StackedRowSeries
-                {
-                    Title = "주의",
-                    Values = new ChartValues<double> { 1, 1, 1 },
-                    Fill = new SolidColorBrush(Color.FromRgb(250, 140, 22)),
-                    DataLabels = true,
-                    LabelsPosition = BarLabelPosition.Parallel,
-                    FontSize = 11,
-                    Foreground = Brushes.White,
-                    MaxRowHeight = 16
-                },
-                new StackedRowSeries
-                {
-                    Title = "정상",
-                    Values = new ChartValues<double> { 2, 2, 0 },
-                    Fill = new SolidColorBrush(Color.FromRgb(34, 197, 94)),
-                    DataLabels = true,
-                    LabelsPosition = BarLabelPosition.Parallel,
-                    FontSize = 11,
-                    Foreground = Brushes.White,
-                    MaxRowHeight = 16
+                    return $"{rawValue}건";
                 }
+                return "";
             };
+
+            EquipmentRiskSeries = new SeriesCollection
+    {
+        new StackedRowSeries
+        {
+            Title = "위험",
+            Values = dangerValues, // 동적 집계된 Values 할당
+            Fill = new SolidColorBrush(Color.FromRgb(229, 57, 53)),
+            StackMode = StackMode.Percentage,
+            DataLabels = true,
+            LabelPoint = countFormatter,
+            LabelsPosition = BarLabelPosition.Parallel,
+            FontSize = 11,
+            Foreground = Brushes.White,
+            MaxRowHeight = 16
+        },
+        new StackedRowSeries
+        {
+            Title = "주의",
+            Values = warningValues, // 동적 집계된 Values 할당
+            Fill = new SolidColorBrush(Color.FromRgb(250, 140, 22)),
+            StackMode = StackMode.Percentage,
+            DataLabels = true,
+            LabelPoint = countFormatter,
+            LabelsPosition = BarLabelPosition.Parallel,
+            FontSize = 11,
+            Foreground = Brushes.White,
+            MaxRowHeight = 16
+        },
+        new StackedRowSeries
+        {
+            Title = "정상",
+            Values = normalValues, // 동적 집계된 Values 할당
+            Fill = new SolidColorBrush(Color.FromRgb(34, 197, 94)),
+            StackMode = StackMode.Percentage,
+            DataLabels = true,
+            LabelPoint = countFormatter,
+            LabelsPosition = BarLabelPosition.Parallel,
+            FontSize = 11,
+            Foreground = Brushes.White,
+            MaxRowHeight = 16
+        }
+    };
         }
 
         private int GetDaysNumber(string delayDaysText)
