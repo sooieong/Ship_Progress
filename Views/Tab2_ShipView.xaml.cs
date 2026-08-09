@@ -86,29 +86,26 @@ namespace Ship_Progress
             public string Category { get; set; }
             public string EquipmentName { get; set; }
             public int DelayDays { get; set; }
-            public string DelayText => $"{DelayDays}일";
             public string Status { get; set; }
+            public Brush StatusBgColor { get; set; }
+            public Brush StatusFgColor { get; set; }
+            public string MainProcessImpact { get; set; }
 
-            public Brush StatusBgColor => Status switch
-            {
-                "위험" => new SolidColorBrush(Color.FromArgb(40, 229, 57, 53)),
-                "주의" => new SolidColorBrush(Color.FromArgb(40, 251, 140, 0)),
-                _ => new SolidColorBrush(Color.FromArgb(40, 67, 160, 71))
-            };
+            public string DelayText => $"{DelayDays}일";
 
-            public Brush StatusFgColor => Status switch
-            {
-                "위험" => new SolidColorBrush(Color.FromRgb(229, 57, 53)),
-                "주의" => new SolidColorBrush(Color.FromRgb(251, 140, 0)),
-                _ => new SolidColorBrush(Color.FromRgb(67, 160, 71))
-            };
-
-            public H120RiskItem(string category, string equipmentName, int delayDays, string status)
+            public H120RiskItem(string category, string equipmentName, int delayDays, string status, string statusBgHex, string statusFgHex, string mainProcessImpact)
             {
                 Category = category;
                 EquipmentName = equipmentName;
                 DelayDays = delayDays;
                 Status = status;
+
+                // Hex 색상 문자열을 Brush 객체로 변환
+                var converter = new BrushConverter();
+                StatusBgColor = (Brush)converter.ConvertFromString(statusBgHex);
+                StatusFgColor = (Brush)converter.ConvertFromString(statusFgHex);
+
+                MainProcessImpact = mainProcessImpact;
             }
         }
 
@@ -154,17 +151,14 @@ namespace Ship_Progress
             PipingPieSeries = CreateDonutSeries(68, "#FB8C00");     // 배관
             ElectricPieSeries = CreateDonutSeries(60, "#8E24AA");   // 전장품
 
-            // 위험 기자재 데이터 바인딩
-            var riskList = new List<H120RiskItem>
-            {
-                new H120RiskItem("의장", "메인엔진 패키지 입고 지연", 14, "위험"),
-                new H120RiskItem("배관", "고압 LNG 밸브 수급 소폭 지연", 4, "주의")
-            };
+            // 위험 품목 현황 데이터 (상태 및 배지 색상 포함)
+            var riskItems = new List<H120RiskItem>
+{
+    new H120RiskItem("의장", "메인 배전반 (MSBD)", 14, "심각", "#FFEBEE", "#D32F2F", "탑재 지연"),
+    new H120RiskItem("배관", "고압 밸브 블록", 4, "주의", "#FFF3E0", "#E65100", "공정 간섭")
+};
 
-            if (H120RiskDataGrid != null)
-            {
-                H120RiskDataGrid.ItemsSource = riskList;
-            }
+            H120RiskDataGrid.ItemsSource = riskItems;
         }
 
         // 도넛 차트 시리즈 생성 헬퍼 메서드
@@ -179,25 +173,25 @@ namespace Ship_Progress
                 : new SolidColorBrush(Color.FromRgb(224, 224, 224)); // 라이트모드용 배경 바 색상
 
             return new SeriesCollection
-    {
-        new PieSeries
-        {
-            Title = "입고",
-            Values = new ChartValues<double> { percentage },
-            Fill = brush,
-            StrokeThickness = 0,
-            PushOut = 0
-        },
-        new PieSeries
-        {
-            Title = "미입고",
-            Values = new ChartValues<double> { 100.0 - percentage },
-            Fill = dynamicBgBrush,
-            StrokeThickness = 0,
-            PushOut = 0,
-            IsHitTestVisible = false
-        }
-    };
+            {
+                new PieSeries
+                {
+                    Title = "입고",
+                    Values = new ChartValues<double> { percentage },
+                    Fill = brush,
+                    StrokeThickness = 0,
+                    PushOut = 0
+                },
+                new PieSeries
+                {
+                    Title = "미입고",
+                    Values = new ChartValues<double> { 100.0 - percentage },
+                    Fill = dynamicBgBrush,
+                    StrokeThickness = 0,
+                    PushOut = 0,
+                    IsHitTestVisible = false
+                }
+            };
         }
 
         // S-Curve 캔버스 드로잉 로직 (다크/라이트 모드 리소스 대응 적용)

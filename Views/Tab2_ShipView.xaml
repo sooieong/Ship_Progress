@@ -368,27 +368,43 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="위험 기자재 현황" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+                    <TextBlock Grid.Row="0" Text="위험 품목 현황" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
                     <DataGrid x:Name="H120RiskDataGrid" Grid.Row="1" 
-                              AutoGenerateColumns="False" 
-                              IsReadOnly="True" 
-                              CanUserSortColumns="False"
-                              HeadersVisibility="Column"
-                              GridLinesVisibility="Horizontal"
-                              HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
-                              Background="Transparent" 
-                              RowHeight="36"
-                              BorderThickness="0">
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True" 
+                  CanUserSortColumns="False"
+                  HeadersVisibility="Column"
+                  GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
+                  Background="Transparent" 
+                  RowHeight="36"
+                  BorderThickness="0">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="구분" Binding="{Binding Category}" Width="70"/>
                             <DataGridTextColumn Header="기자재명" Binding="{Binding EquipmentName}" Width="*"/>
                             <DataGridTextColumn Header="지연" Binding="{Binding DelayText}" Width="60"/>
+
+                            <!-- 1. 상태 컬럼 (배지 스타일) -->
                             <DataGridTemplateColumn Header="상태" Width="70">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Style="{StaticResource StatusBorderStyle}" Background="{Binding StatusBgColor}">
                                             <TextBlock Text="{Binding Status}" Foreground="{Binding StatusFgColor}" FontWeight="Bold" FontSize="11"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- 2. 주공정 영향 컬럼 (상태 색상 연동 적용) -->
+                            <DataGridTemplateColumn Header="주공정 영향" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource StatusBorderStyle}" Background="{Binding StatusBgColor}">
+                                            <TextBlock Text="{Binding MainProcessImpact}" 
+                           Foreground="{Binding StatusFgColor}" 
+                           FontWeight="Bold" 
+                           FontSize="11"/>
                                         </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
