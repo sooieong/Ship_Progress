@@ -1,6 +1,4 @@
-﻿using LiveCharts;
-using LiveCharts.Wpf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -13,6 +11,45 @@ using System.Windows.Shapes;
 
 namespace Ship_Progress
 {
+    // -----------------------------------------------------------
+    // [신규] 블록별 공정 현황 데이터 모델 클래스 (한국어/수치 전용)
+    // -----------------------------------------------------------
+    public class BlockProgressItem
+    {
+        public string Title { get; set; }          // 항목 명칭 (한국어 전용)
+        public double Progress { get; set; }       // 진행률 수치 (0 ~ 100)
+
+        public Brush BarColor { get; set; }        // 바 및 텍스트 색상
+        public string ProgressText => $"{Progress}%";
+
+        public BlockProgressItem(string title, double progress)
+        {
+            Title = title;
+            Progress = progress;
+
+            // -----------------------------------------------------------
+            // if 문 조건 지정을 통한 진행 상태별 색상 설정
+            // (90% 이상: 초록, 60% 이상: 주황/노랑, 60% 미만: 빨강)
+            // -----------------------------------------------------------
+            if (progress >= 90)
+            {
+                // 초록색 (Green)
+                BarColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4CAF50"));
+            }
+            else if (progress >= 60)
+            {
+                // 주황색 (Orange/Yellow)
+                BarColor = (Application.Current.TryFindResource("HanwhaOrangeBrush") as Brush)
+               ?? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F37321"));
+            }
+            else
+            {
+                // 빨간색 (Red)
+                BarColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E53935"));
+            }
+        }
+    }
+
     public partial class Tab2_ShipView : UserControl, INotifyPropertyChanged
     {
         // -----------------------------------------------------------
@@ -48,34 +85,13 @@ namespace Ship_Progress
         }
 
         // -----------------------------------------------------------
-        // 3. 3행 하단 LiveCharts 도넛 차트 바인딩 프로퍼티
+        // 3. 3행 하단 블록별 공정 현황 바인딩 프로퍼티
         // -----------------------------------------------------------
-        private SeriesCollection _steelPieSeries;
-        public SeriesCollection SteelPieSeries
+        private List<BlockProgressItem> _blockProgressList;
+        public List<BlockProgressItem> BlockProgressList
         {
-            get => _steelPieSeries;
-            set { _steelPieSeries = value; OnPropertyChanged(); }
-        }
-
-        private SeriesCollection _outfittingPieSeries;
-        public SeriesCollection OutfittingPieSeries
-        {
-            get => _outfittingPieSeries;
-            set { _outfittingPieSeries = value; OnPropertyChanged(); }
-        }
-
-        private SeriesCollection _pipingPieSeries;
-        public SeriesCollection PipingPieSeries
-        {
-            get => _pipingPieSeries;
-            set { _pipingPieSeries = value; OnPropertyChanged(); }
-        }
-
-        private SeriesCollection _electricPieSeries;
-        public SeriesCollection ElectricPieSeries
-        {
-            get => _electricPieSeries;
-            set { _electricPieSeries = value; OnPropertyChanged(); }
+            get => _blockProgressList;
+            set { _blockProgressList = value; OnPropertyChanged(); }
         }
 
         // -----------------------------------------------------------
@@ -145,53 +161,24 @@ namespace Ship_Progress
             // S-Curve 차트 그리기
             DrawSCurveChart();
 
-            // 도넛 차트 정적 데이터 바인딩
-            SteelPieSeries = CreateDonutSeries(85, "#1E88E5");      // 강재
-            OutfittingPieSeries = CreateDonutSeries(72, "#43A047"); // 의장품
-            PipingPieSeries = CreateDonutSeries(68, "#FB8C00");     // 배관
-            ElectricPieSeries = CreateDonutSeries(60, "#8E24AA");   // 전장품
+            // 영문 및 대괄호[] 모두 제거 / 순수 한국어 명칭과 수치만 세팅
+            BlockProgressList = new List<BlockProgressItem>
+            {
+                new BlockProgressItem("기관실 대형 주기계", 100),
+                new BlockProgressItem("발전기 엔진 및 보일러", 100),
+                new BlockProgressItem("추진 계통", 85),
+                new BlockProgressItem("갑판 대형 장비", 70),
+                new BlockProgressItem("화물창", 45)
+            };
 
             // 위험 품목 현황 데이터 (상태 및 배지 색상 포함)
             var riskItems = new List<H120RiskItem>
-{
-    new H120RiskItem("의장", "메인 배전반 (MSBD)", 14, "심각", "#FFEBEE", "#D32F2F", "탑재 지연"),
-    new H120RiskItem("배관", "고압 밸브 블록", 4, "주의", "#FFF3E0", "#E65100", "공정 간섭")
-};
+            {
+                new H120RiskItem("의장", "메인 배전반 (MSBD)", 14, "위험", "#FFEBEE", "#D32F2F", "추진 계통"),
+                new H120RiskItem("배관", "고압 밸브 블록", 4, "주의", "#FFF3E0", "#E65100", "갑판 대형 장비")
+            };
 
             H120RiskDataGrid.ItemsSource = riskItems;
-        }
-
-        // 도넛 차트 시리즈 생성 헬퍼 메서드
-        private SeriesCollection CreateDonutSeries(double percentage, string hexColor)
-        {
-            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hexColor));
-
-            // 다크모드 여부에 따라 도넛 미입고 배경색을 어둡거나 밝은 테마 톤으로 동적 처리
-            bool isDarkMode = Application.Current.Resources["PrimaryTextBrush"] is SolidColorBrush sc && sc.Color.R > 200;
-            var dynamicBgBrush = isDarkMode
-                ? new SolidColorBrush(Color.FromRgb(224, 224, 224))     // 다크모드용 배경 바 색상
-                : new SolidColorBrush(Color.FromRgb(224, 224, 224)); // 라이트모드용 배경 바 색상
-
-            return new SeriesCollection
-            {
-                new PieSeries
-                {
-                    Title = "입고",
-                    Values = new ChartValues<double> { percentage },
-                    Fill = brush,
-                    StrokeThickness = 0,
-                    PushOut = 0
-                },
-                new PieSeries
-                {
-                    Title = "미입고",
-                    Values = new ChartValues<double> { 100.0 - percentage },
-                    Fill = dynamicBgBrush,
-                    StrokeThickness = 0,
-                    PushOut = 0,
-                    IsHitTestVisible = false
-                }
-            };
         }
 
         // S-Curve 캔버스 드로잉 로직 (다크/라이트 모드 리소스 대응 적용)
