@@ -15,14 +15,14 @@
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
     </UserControl.Resources>
-    
+
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <!-- 1. 상단 호선 선택 & KPI 영역 -->
             <RowDefinition Height="Auto"/>
-            <!-- 2. 하단 상세 영역 (추후 확장용) -->
+            <!-- 2. 중단 시각화 영역 (좌: 납기 현황 차트 + 우: 위험 기자재 현황 표) -->
             <RowDefinition Height="*"/>
-            <!-- 3. 하단 시각화 영역 (좌측 표 + 우측 확장 영역) -->
+            <!-- 3. 하단 시각화 영역 (좌: 추후 확장 영역 + 우: 결품/지연 알림) -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -49,21 +49,21 @@
                         <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
                             <StackPanel Orientation="Horizontal">
                                 <!-- H120 선택 예시 (클릭 이벤트 연결 가능) -->
-                                <Border Background="{DynamicResource HanwhaOrangeBrush}" CornerRadius="4" Padding="12,6" Margin="0,0,6,0" Cursor="Hand">
+                                <Border Background="{DynamicResource HanwhaOrangeBrush}" CornerRadius="4" Padding="12,6" Margin="0,0,6,0" Cursor="Hand" Tag="H120" MouseDown="ShipCard_MouseDown">
                                     <StackPanel>
                                         <TextBlock Text="H120" FontWeight="Bold" FontSize="18" Foreground="White" HorizontalAlignment="Center"/>
                                         <TextBlock Text="A SERIES" FontSize="10" Foreground="#FFE0C2" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Border>
 
-                                <Border Background="Transparent" CornerRadius="4" Padding="10,6" Margin="0,0,6,0" Cursor="Hand">
+                                <Border Background="Transparent" CornerRadius="4" Padding="10,6" Margin="0,0,6,0" Cursor="Hand" Tag="H121" MouseDown="ShipCard_MouseDown">
                                     <StackPanel>
                                         <TextBlock Text="H121" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
                                         <TextBlock Text="A SERIES" FontSize="9" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Border>
 
-                                <Border Background="Transparent" CornerRadius="4" Padding="10,6" Margin="0,0,6,0" Cursor="Hand">
+                                <Border Background="Transparent" CornerRadius="4" Padding="10,6" Margin="0,0,6,0" Cursor="Hand" Tag="H122" MouseDown="ShipCard_MouseDown">
                                     <StackPanel>
                                         <TextBlock Text="H122" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
                                         <TextBlock Text="B SERIES" FontSize="9" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
@@ -146,10 +146,17 @@
         </Grid>
 
         <!-- ========================================== -->
-        <!-- 2. 중단 시각화 영역 (주요 프로젝트별 납기 현황) -->
+        <!-- 2. 중단 시각화 영역 (좌: 납기 현황 차트 / 우: 위험 기자재 현황 표) -->
         <!-- ========================================== -->
         <Grid Grid.Row="1" Margin="0,0,0,0">
-            <Border Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- [2-1] 좌측: 납기 현황 차트 카드 -->
+            <Border Grid.Column="0" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -159,14 +166,14 @@
                     <!-- 카드 타이틀 및 범례 -->
                     <Grid Grid.Row="0" Margin="0,0,0,12">
                         <TextBlock Text="납기 현황" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <!-- 1. 목표 범례 (초록색) -->
                             <Ellipse Width="10" Height="10" Fill="#22C55E" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                            <TextBlock Text="목표" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                            <TextBlock Text="목표" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
 
                             <!-- 2. 현재 입고 범례 (주황색) -->
                             <Ellipse Width="10" Height="10" Fill="#FB8C00" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                            <TextBlock Text="현재 입고" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                            <TextBlock Text="현재 입고" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
 
                             <!-- 3. 잔여 필요량 범례 (빨간색) -->
                             <Ellipse Width="10" Height="10" Fill="#E53935" VerticalAlignment="Center" Margin="0,0,4,0"/>
@@ -183,20 +190,9 @@
                     </Canvas>
                 </Grid>
             </Border>
-        </Grid>
 
-        <!-- ========================================== -->
-        <!-- 3. 하단 시각화 (좌: 납기 관리 세부 표 / 우: 추후 확장 영역) -->
-        <!-- ========================================== -->
-        <Grid Grid.Row="2" Margin="0,16,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="16"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- [3-1] 좌측 납기 리스크/관리 현황 표 카드 -->
-            <Border Grid.Column="0" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+            <!-- [2-2] 우측: 위험 기자재 현황 표 카드 (3행에서 이동) -->
+            <Border Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -216,7 +212,6 @@
                               RowHeight="36"
                               BorderThickness="0">
                         <DataGrid.Columns>
-                            <!-- 호선 컬럼 삭제 완료 -->
                             <DataGridTextColumn Header="구분" Binding="{Binding Category}" Width="60"/>
                             <DataGridTextColumn Header="기자재명" Binding="{Binding EquipmentName}" Width="*"/>
                             <DataGridTextColumn Header="협력사" Binding="{Binding Vendor}" Width="100"/>
@@ -236,8 +231,36 @@
                     </DataGrid>
                 </Grid>
             </Border>
+        </Grid>
 
-            <!-- [3-2] 우측 결품/지연 알림 영역 -->
+        <!-- ========================================== -->
+        <!-- 3. 하단 시각화 (좌: 추후 확장 영역 / 우: 결품/지연 알림) -->
+        <!-- ========================================== -->
+        <Grid Grid.Row="2" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- [3-1] 좌측: 새로운 시각화 영역 (임의 공간 확보용 Placeholder) -->
+            <Border Grid.Column="0" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="추후 확장 시각화 영역" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+
+                    <!-- 빈 공간 안내용 텍스트 -->
+                    <TextBlock Grid.Row="1" Text="새로운 시각화 컴포넌트가 들어올 자리입니다." 
+                               FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" Opacity="0.5" 
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+
+            <!-- [3-2] 우측: 결품/지연 알림 영역 -->
             <Border Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -248,7 +271,6 @@
                     </Grid.RowDefinitions>
 
                     <!-- 카드 타이틀 및 알림 필터 탭 -->
-                    <!-- 카드 타이틀 및 알림 필터 탭 (1행 카드 디자인 적용) -->
                     <Grid Grid.Row="0" Margin="0,0,0,12">
                         <TextBlock Text="결품/지연 알림" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
 
