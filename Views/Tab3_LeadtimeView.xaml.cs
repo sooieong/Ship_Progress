@@ -54,17 +54,48 @@ namespace Ship_Progress.Views
         // -----------------------------------------------------------
         // 2. 2행 납기 현황 차트용 데이터 및 설정
         // -----------------------------------------------------------
-        private readonly string[] projectLabels = { "Jan 2026", "Feb 2026", "Mar 2026", "Apr 2026", "May 2026", "Jun 2026" };
-        private readonly double[] targetBarValues = { 206, 319, 211, 416, 511, 398 };
-        private readonly double[] actualBarValues = { 40, 25, 204, 186, 492, 160 };
+        private string[] currentChartLabels = Array.Empty<string>();
+        private double[] currentChartTargets = Array.Empty<double>();
+        private double[] currentChartActuals = Array.Empty<double>();
+
+        private void UpdateChartDataForShip(string shipNo)
+        {
+            if (_allLeadtimeList == null) return;
+
+            // 현재 선택된 호선에 해당하는 항목들 중 체크된 항목들만 필터링
+            var selectedItems = _allLeadtimeList
+                .Where(x => x.ShipNo == shipNo && x.IsSelected)
+                .ToList();
+
+            // 만약 체크된 항목이 하나도 없다면 전체를 보여주거나 빈 화면 처리 (여기서는 전체 반영)
+            if (selectedItems.Count == 0)
+            {
+                selectedItems = _allLeadtimeList.Where(x => x.ShipNo == shipNo).ToList();
+            }
+
+            currentChartLabels = selectedItems.Select(x => x.EquipmentName).ToArray();
+
+            // 임시 목표/현재입고 수치 부여 (필요에 따라 모델 값 연동 가능)
+            currentChartTargets = selectedItems.Select(x => (double)(x.RemainingDays * 30 + 200)).ToArray();
+            currentChartActuals = selectedItems.Select(x => (double)(x.RemainingDays * 20 + 100)).ToArray();
+
+            DrawLeadtimeChart();
+        }
 
         // -----------------------------------------------------------
         // 3. 3행 하단 좌측 표 모델 및 원본 리스트
         // -----------------------------------------------------------
         private List<LeadtimeItem> _allLeadtimeList;
 
-        public class LeadtimeItem
+        public class LeadtimeItem : INotifyPropertyChanged
         {
+            private bool _isSelected = true; // 기본 체크 상태
+            public bool IsSelected
+            {
+                get => _isSelected;
+                set { _isSelected = value; OnPropertyChanged(); }
+            }
+
             public string Series { get; set; }
             public string ShipNo { get; set; }
             public string Category { get; set; }
@@ -100,21 +131,27 @@ namespace Ship_Progress.Views
                 RemainingDays = remainingDays;
                 Status = status;
             }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
 
         // -----------------------------------------------------------
         // 4. 3행 하단 우측 알림 리스트 모델 및 원본 리스트
         // -----------------------------------------------------------
         private List<NotificationItem> _allNotificationList;
-        private string _currentNotificationFilter = "전체"; // 현재 선택된 알림 탭 (전체/지연/결품) 유지용
+        private string _currentNotificationFilter = "전체";
 
         public class NotificationItem
         {
             public string Series { get; set; }
             public string ShipNo { get; set; }
-            public string Category { get; set; } // "지연" 또는 "결품"
-            public string Issuer { get; set; }   // 발신주체
-            public string Vendor { get; set; }   // 협력사명
+            public string Category { get; set; }
+            public string Issuer { get; set; }
+            public string Vendor { get; set; }
             public string EquipmentName { get; set; }
             public string NoticeMessage { get; set; }
             public string RegisterDate { get; set; }
@@ -158,9 +195,9 @@ namespace Ship_Progress.Views
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            DrawLeadtimeChart();
             LoadLeadtimeTableData();
             LoadNotificationData();
+            UpdateChartDataForShip(SelectedShipNo);
         }
 
         private void LeadtimeChartCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -168,8 +205,14 @@ namespace Ship_Progress.Views
             DrawLeadtimeChart();
         }
 
+        // 체크박스 상태 변경 시 차트 실시간 갱신 이벤트
+        private void RiskItem_CheckChanged(object sender, RoutedEventArgs e)
+        {
+            UpdateChartDataForShip(SelectedShipNo);
+        }
+
         // -----------------------------------------------------------
-        // 6. 상단 호선 선택 카드 클릭 이벤트 (좌측 표 + 우측 알림 리스트 동시 필터링)
+        // 6. 상단 호선 선택 카드 클릭 이벤트
         // -----------------------------------------------------------
         private void ShipCard_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -178,11 +221,9 @@ namespace Ship_Progress.Views
                 SelectedShipNo = shipNo;
                 SelectedSeriesName = shipNo == "H122" ? "B SERIES" : "A SERIES";
 
-                // 1. 좌측 표 데이터 필터링
                 FilterDataByShip(shipNo);
-
-                // 2. 우측 알림 리스트 데이터 필터링 (호선 + 현재 선택된 알림 탭 조건 유지)
                 FilterNotifications(shipNo, _currentNotificationFilter);
+                UpdateChartDataForShip(shipNo);
             }
         }
 
@@ -198,20 +239,15 @@ namespace Ship_Progress.Views
             }
         }
 
-        // -----------------------------------------------------------
-        // 7. 우측 상단 결품/지연 알림 라디오버튼 필터링 이벤트 핸들러
-        // -----------------------------------------------------------
         private void NotificationFilter_Checked(object sender, RoutedEventArgs e)
         {
             if (sender is RadioButton rb && rb.Tag is string filterType)
             {
                 _currentNotificationFilter = filterType;
-                // 현재 선택되어 있는 호선(SelectedShipNo)과 탭 필터 조건 결합하여 갱신
                 FilterNotifications(SelectedShipNo, filterType);
             }
         }
 
-        // 호선과 알림 종류(전체/지연/결품)를 모두 고려하여 우측 리스트를 갱신하는 통합 메서드
         private void FilterNotifications(string shipNo, string categoryFilter)
         {
             if (_allNotificationList == null || NotificationListView == null) return;
@@ -227,11 +263,12 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 8. 2행 중단 차트 드로잉 로직 (보조축 및 수치 레이블 적용)
+        // 8. 2행 중단 차트 드로잉 로직
         // -----------------------------------------------------------
         private void DrawLeadtimeChart()
         {
             if (LeadtimeChartCanvas == null || LeadtimeChartCanvas.ActualWidth <= 0 || LeadtimeChartCanvas.ActualHeight <= 0) return;
+            if (currentChartLabels == null || currentChartLabels.Length == 0) return;
 
             var elementsToRemove = LeadtimeChartCanvas.Children.Cast<UIElement>()
                 .Where(e => e != LeadtimeTooltip)
@@ -248,7 +285,7 @@ namespace Ship_Progress.Views
             double paddingLeft = 50;
             double paddingRight = 60;
             double paddingTop = 25;
-            double paddingBottom = 40;
+            double paddingBottom = 50;
 
             double chartW = width - paddingLeft - paddingRight;
             double chartH = height - paddingTop - paddingBottom;
@@ -258,7 +295,6 @@ namespace Ship_Progress.Views
             double maxBarValue = 600;
             double maxGapValue = 300;
 
-            // 1. 좌측 주축 Y축 격자 및 레이블
             for (int i = 0; i <= 4; i++)
             {
                 double yVal = i * 150;
@@ -282,7 +318,6 @@ namespace Ship_Progress.Views
                 LeadtimeChartCanvas.Children.Add(yLabel);
             }
 
-            // 2. 우측 보조축 Y축 레이블 (잔여 필요량 Gap용)
             for (int i = 0; i <= 4; i++)
             {
                 double gVal = i * 75;
@@ -300,8 +335,8 @@ namespace Ship_Progress.Views
                 LeadtimeChartCanvas.Children.Add(rightYLabel);
             }
 
-            int count = projectLabels.Length;
-            double slotWidth = chartW / count;
+            int count = currentChartLabels.Length;
+            double slotWidth = chartW / Math.Max(1, count);
 
             Polyline gapPolyline = new Polyline
             {
@@ -314,15 +349,23 @@ namespace Ship_Progress.Views
                 double slotX = paddingLeft + (i * slotWidth);
                 double centerX = slotX + (slotWidth / 2.0);
 
-                TextBlock xLabel = new TextBlock { Text = projectLabels[i], FontSize = 10, Foreground = textBrush, FontWeight = FontWeights.SemiBold };
-                Canvas.SetLeft(xLabel, centerX - 18);
+                TextBlock xLabel = new TextBlock
+                {
+                    Text = currentChartLabels[i],
+                    FontSize = 10,
+                    Foreground = textBrush,
+                    FontWeight = FontWeights.SemiBold,
+                    TextTrimming = TextTrimming.CharacterEllipsis,
+                    MaxWidth = slotWidth - 4
+                };
+                xLabel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                Canvas.SetLeft(xLabel, centerX - (xLabel.DesiredSize.Width / 2.0));
                 Canvas.SetTop(xLabel, height - paddingBottom + 8);
                 LeadtimeChartCanvas.Children.Add(xLabel);
 
-                double barWidth = slotWidth * 0.32;
+                double barWidth = Math.Min(slotWidth * 0.32, 30);
 
-                // Target (전체 필요) 막대 정의
-                double tVal = targetBarValues[i];
+                double tVal = currentChartTargets[i];
                 double tHeight = (tVal / maxBarValue) * chartH;
                 double tY = paddingTop + chartH - tHeight;
 
@@ -330,23 +373,21 @@ namespace Ship_Progress.Views
                 {
                     Width = barWidth,
                     Height = Math.Max(0, tHeight),
-                    Fill = new SolidColorBrush(Color.FromRgb(34, 197, 94)) // 초록색 단색 (#22C55E)
+                    Fill = new SolidColorBrush(Color.FromRgb(34, 197, 94))
                 };
                 Canvas.SetLeft(targetBar, centerX - barWidth - 2);
                 Canvas.SetTop(targetBar, tY);
                 LeadtimeChartCanvas.Children.Add(targetBar);
 
-                // 🎯 [이 부분의 aHeight, aY 변수 정의가 빠져있었1습니다]
-                double aVal = actualBarValues[i];
+                double aVal = currentChartActuals[i];
                 double aHeight = (aVal / maxBarValue) * chartH;
                 double aY = paddingTop + chartH - aHeight;
 
-                // Actual (현재 입고) 막대 정의
                 Rectangle actualBar = new Rectangle
                 {
                     Width = barWidth,
                     Height = Math.Max(0, aHeight),
-                    Fill = new SolidColorBrush(Color.FromRgb(251, 140, 0)) // 주황색 단색 (#FB8C00)
+                    Fill = new SolidColorBrush(Color.FromRgb(251, 140, 0))
                 };
                 Canvas.SetLeft(actualBar, centerX + 2);
                 Canvas.SetTop(actualBar, aY);
@@ -387,7 +428,7 @@ namespace Ship_Progress.Views
                 {
                     if (LeadtimeTooltip != null && LeadtimeTooltipText != null)
                     {
-                        LeadtimeTooltipText.Text = $"{projectLabels[i]} 잔여 필요량: {gapVal:F0} (Target: {tVal}, Actual: {aVal})";
+                        LeadtimeTooltipText.Text = $"{currentChartLabels[i]} 잔여 필요량: {gapVal:F0} (목표: {tVal}, 현재입고: {aVal})";
                         LeadtimeTooltip.Visibility = Visibility.Visible;
                         LeadtimeTooltip.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
 
@@ -426,7 +467,6 @@ namespace Ship_Progress.Views
                 new LeadtimeItem("B SERIES", "H122", "배관", "유압 파이프 자재", "태광유압", "2026-03-14", 9, "정상")
             };
 
-            // 기본 선택된 "H120" 기준으로 필터링 적용
             FilterDataByShip(SelectedShipNo);
         }
 
@@ -447,7 +487,6 @@ namespace Ship_Progress.Views
                 new NotificationItem("B SERIES", "H122", "결품", "협력사", "태광유압", "유압 파이프 자재", "현장 수령 물량 중 일부 규격 변경에 따른 확인 요청", "2026-07-30 08:45")
             };
 
-            // 기본 선택된 "H120" 및 "전체" 필터 기준으로 초기 로드
             FilterNotifications(SelectedShipNo, _currentNotificationFilter);
         }
 

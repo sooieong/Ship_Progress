@@ -202,16 +202,27 @@
                     <TextBlock Grid.Row="0" Text="납기 현황 DB" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
                     <DataGrid x:Name="LeadtimeRiskDataGrid" Grid.Row="1" 
-                              AutoGenerateColumns="False" 
-                              IsReadOnly="True" 
-                              CanUserSortColumns="True"
-                              HeadersVisibility="Column"
-                              GridLinesVisibility="Horizontal"
-                              HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
-                              Background="Transparent" 
-                              RowHeight="36"
-                              BorderThickness="0">
+          AutoGenerateColumns="False" 
+          IsReadOnly="False" 
+          CanUserSortColumns="True"
+          HeadersVisibility="Column"
+          GridLinesVisibility="Horizontal"
+          HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
+          Background="Transparent" 
+          RowHeight="36"
+          BorderThickness="0">
                         <DataGrid.Columns>
+                            <!-- 체크박스 컬럼 -->
+                            <DataGridTemplateColumn Header="선택" Width="50">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" 
+                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                              Checked="RiskItem_CheckChanged" Unchecked="RiskItem_CheckChanged"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
                             <DataGridTextColumn Header="구분" Binding="{Binding Category}" Width="60"/>
                             <DataGridTextColumn Header="기자재명" Binding="{Binding EquipmentName}" Width="*"/>
                             <DataGridTextColumn Header="협력사" Binding="{Binding Vendor}" Width="100"/>
