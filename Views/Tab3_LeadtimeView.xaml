@@ -165,7 +165,7 @@
 
                     <!-- 카드 타이틀 및 범례 -->
                     <Grid Grid.Row="0" Margin="0,0,0,12">
-                        <TextBlock Text="납기 현황" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="납기 현황 차트" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <!-- 1. 목표 범례 (초록색) -->
                             <Ellipse Width="10" Height="10" Fill="#22C55E" VerticalAlignment="Center" Margin="0,0,4,0"/>
@@ -199,7 +199,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="위험 기자재 현황" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+                    <TextBlock Grid.Row="0" Text="납기 현황 DB" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
                     <DataGrid x:Name="LeadtimeRiskDataGrid" Grid.Row="1" 
                               AutoGenerateColumns="False" 
@@ -345,7 +345,7 @@
 
                     <!-- 카드 타이틀 및 알림 필터 탭 -->
                     <Grid Grid.Row="0" Margin="0,0,0,12">
-                        <TextBlock Text="결품/지연 알림" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="지연/요청 현황" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <!-- 전체 버튼 -->
