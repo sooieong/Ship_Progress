@@ -243,7 +243,7 @@
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- [3-1] 좌측: 새로운 시각화 영역 (임의 공간 확보용 Placeholder) -->
+            <!-- [3-1] 좌측: 기자재 공정 현황 요약 카드 -->
             <Border Grid.Column="0" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -251,12 +251,85 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="추후 확장 시각화 영역" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+                    <!-- 카드 타이틀 -->
+                    <TextBlock Grid.Row="0" Text="기자재 공정 현황 요약" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
-                    <!-- 빈 공간 안내용 텍스트 -->
-                    <TextBlock Grid.Row="1" Text="새로운 시각화 컴포넌트가 들어올 자리입니다." 
-                               FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" Opacity="0.5" 
-                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <!-- 5열 요약 정보 그리드 -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 1. 전체 기자재 -->
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="전체 기자재" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock Text="📦" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="1,248" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                <TextBlock Text="건" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <Border Grid.Column="0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" HorizontalAlignment="Right" Margin="0,10"/>
+
+                        <!-- 2. 발주 완료 -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="발주 완료" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock Text="📋" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="1,182" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                    <TextBlock Text="건" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
+                                </StackPanel>
+                                <TextBlock Text="(94.7%)" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Opacity="0.8" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <Border Grid.Column="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" HorizontalAlignment="Right" Margin="0,10"/>
+
+                        <!-- 3. 제작 중 -->
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="제작 중" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock Text="🏭" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="892" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                    <TextBlock Text="건" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
+                                </StackPanel>
+                                <TextBlock Text="(71.5%)" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Opacity="0.8" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <Border Grid.Column="2" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" HorizontalAlignment="Right" Margin="0,10"/>
+
+                        <!-- 4. 출하 준비 -->
+                        <StackPanel Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="출하 준비" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock Text="🚚" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="463" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                    <TextBlock Text="건" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
+                                </StackPanel>
+                                <TextBlock Text="(37.1%)" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Opacity="0.8" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <Border Grid.Column="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" HorizontalAlignment="Right" Margin="0,10"/>
+
+                        <!-- 5. 출하 완료 -->
+                        <StackPanel Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="출하 완료" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock Text="🚢" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="256" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                    <TextBlock Text="건" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
+                                </StackPanel>
+                                <TextBlock Text="(20.5%)" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Opacity="0.8" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Border>
 
