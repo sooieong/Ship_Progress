@@ -159,7 +159,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Text="위험 기자재 현황 분포" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" Text="위험 품목 현황 분포" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Rectangle Width="10" Height="10" Fill="#E53935" Margin="0,0,4,0"/>
@@ -212,7 +212,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="위험 기자재 현황" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+                <TextBlock Grid.Row="0" Text="위험 품목 현황" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
                 <DataGrid x:Name="CriticalEquipmentDataGrid" Grid.Row="1" ItemsSource="{Binding CriticalEquipmentList}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{DynamicResource BorderBrush}" Background="Transparent" RowHeight="36" BorderThickness="0" VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
@@ -337,7 +337,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 타이틀: 기자재 수급 현황 -->
-                    <TextBlock Grid.Row="0" Text="기자재 수급 현황" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+                    <TextBlock Grid.Row="0" Text="품목 수급 현황" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
                     <!-- 기자재 수급 현황 도넛 차트 영역 -->
                     <Grid Grid.Row="1">
