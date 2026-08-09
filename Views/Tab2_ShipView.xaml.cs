@@ -40,7 +40,7 @@ namespace Ship_Progress
             set { _selectedSeriesName = value; OnPropertyChanged(); }
         }
 
-        private string _expectedEndDate = "2026-11-20";
+        private string _expectedEndDate = "2028-08-07";
         public string ExpectedEndDate
         {
             get => _expectedEndDate;
