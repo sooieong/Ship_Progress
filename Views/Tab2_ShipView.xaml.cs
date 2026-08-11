@@ -55,7 +55,7 @@ namespace Ship_Progress
         // -----------------------------------------------------------
         // 1. S-Curve 데이터 세트 및 설정
         // -----------------------------------------------------------
-        private readonly string[] dateLabels = { "05-01", "05-15", "06-01", "06-15", "07-01", "07-15", "08-01" };
+        private readonly string[] dateLabels = { "2026.05", "2026.06", "2026.07", "2026.08", "2026.09", "2026.10", "2026.11" };
         private readonly double[] planData = { 15.0, 30.0, 48.0, 65.0, 80.0, 92.0, 100.0 };
         private readonly double[] actualData = { 12.0, 26.0, 42.0, 62.0 };
         private const int CurrentMonthIndex = 3;
