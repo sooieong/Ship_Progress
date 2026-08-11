@@ -4,6 +4,14 @@
         Title="Ship Building Progress Dashboard" Height="768" Width="1280"
         WindowStartupLocation="CenterScreen">
 
+    <Window.Resources>
+        <!-- 🔄 새로고침 아이콘 360도 연속 회전 애니메이션 -->
+        <Storyboard x:Key="RotateRefreshAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                             From="0" To="360" Duration="0:0:1"/>
+        </Storyboard>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
@@ -20,7 +28,6 @@
             <Grid Margin="16,0">
                 <!-- 좌측: 로고 + 프로젝트 타이틀 -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <!-- 상대 경로로 수정하여 이미지 깨짐 방지 -->
                     <Image Source="C:\Users\sooieong\source\repos\Ship_Progress\Images\Hanwha_Ocean_Logo.png"
                            Height="40" 
                            Stretch="Uniform"
@@ -34,8 +41,25 @@
                                TextWrapping="NoWrap"/>
                 </StackPanel>
 
-                <!-- 우측: 알림 아이콘 & 새로고침 버튼 -->
+                <!-- 우측: 날짜/시간 & 알림 아이콘 & 새로고침 버튼 -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+
+                    <!-- 실시간 날짜 및 시간 -->
+                    <Border Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="8,4"
+                            Margin="0,0,12,0"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock x:Name="DateTimeTextBlock" 
+                                       Text="2026-08-11 10:44:47" 
+                                       FontSize="13" 
+                                       Foreground="{DynamicResource PrimaryTextBrush}" 
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
 
                     <!-- 알림 영역 -->
                     <Grid Margin="0,0,8,0">
@@ -113,17 +137,31 @@
                         </Popup>
                     </Grid>
 
-                    <!-- 새로고침 버튼 -->
-                    <Button Height="36" 
+                    <!-- 새로고침 버튼 (회전 애니메이션 및 상태 변경 적용) -->
+                    <Button x:Name="RefreshButton"
+                            Height="36" 
                             Padding="8,0"
                             Background="Transparent" 
                             BorderThickness="0" 
                             Cursor="Hand"
                             Click="RefreshButton_Click"
-                            ToolTip="새로고침">
+                            ToolTip="새로고침 (1분마다 자동 갱신)">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="🔄" FontSize="15" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBlock Text="새로고침" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="RefreshIconText" 
+                                       Text="🔄" 
+                                       FontSize="15" 
+                                       VerticalAlignment="Center" 
+                                       Margin="0,0,6,0"
+                                       RenderTransformOrigin="0.5,0.5">
+                                <TextBlock.RenderTransform>
+                                    <RotateTransform x:Name="RefreshIconRotate" Angle="0"/>
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                            <TextBlock x:Name="RefreshStatusText" 
+                                       Text="새로고침" 
+                                       FontSize="13" 
+                                       Foreground="{DynamicResource PrimaryTextBrush}" 
+                                       VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
@@ -145,46 +183,122 @@
                     Background="{DynamicResource SidebarBackgroundBrush}" 
                     BorderBrush="{DynamicResource BorderBrush}" 
                     BorderThickness="0,0,1,0">
-                <StackPanel Margin="0,12,0,0">
+                <Grid Margin="0,12,0,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <RadioButton Style="{StaticResource SidebarTabButtonStyle}" 
-                                 Tag="Tab1" 
-                                 IsChecked="True" 
-                                 Checked="Tab_Checked">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🏠" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="메인" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
+                    <!-- 상단 메뉴 버튼 목록 -->
+                    <StackPanel Grid.Row="0">
+                        <RadioButton Style="{StaticResource SidebarTabButtonStyle}" 
+                                     Tag="Tab1" 
+                                     IsChecked="True" 
+                                     Checked="Tab_Checked">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🏠" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="메인" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
 
-                    <RadioButton Style="{StaticResource SidebarTabButtonStyle}" 
-                                 Tag="Tab2"
-                                 Checked="Tab_Checked">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🚢" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="공정 분석" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
+                        <RadioButton Style="{StaticResource SidebarTabButtonStyle}" 
+                                     Tag="Tab2"
+                                     Checked="Tab_Checked">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🚢" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="공정 분석" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
 
-                    <RadioButton Style="{StaticResource SidebarTabButtonStyle}" 
-                                 Tag="Tab3"
-                                 Checked="Tab_Checked">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="⚙️" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="납기 관리" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
+                        <RadioButton Style="{StaticResource SidebarTabButtonStyle}" 
+                                     Tag="Tab3"
+                                     Checked="Tab_Checked">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⚙️" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="납기 관리" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
 
-                    <RadioButton Style="{StaticResource SidebarTabButtonStyle}" 
-                                 Tag="Tab4"
-                                 Checked="Tab_Checked">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🖥️" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="시스템 설정" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
+                        <RadioButton Style="{StaticResource SidebarTabButtonStyle}" 
+                                     Tag="Tab4"
+                                     Checked="Tab_Checked">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🖥️" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="시스템 설정" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+                    </StackPanel>
 
-                </StackPanel>
+                    <!-- 하단 피드 영역 -->
+                    <StackPanel Grid.Row="1" Margin="8,0">
+                        <!-- 1. 메시지 입력 카드 -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="8" 
+                                Padding="10" 
+                                Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="부서 협업/라이브 피드" 
+                                           FontWeight="Bold" 
+                                           FontSize="12" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}" 
+                                           Margin="0,0,0,8"/>
+
+                                <TextBox x:Name="FeedInputTextBox" 
+                                         Height="60" 
+                                         AcceptsReturn="True" 
+                                         TextWrapping="Wrap" 
+                                         VerticalScrollBarVisibility="Auto" 
+                                         Padding="4" 
+                                         FontSize="11" 
+                                         Background="#FAFAFA"
+                                         BorderBrush="{DynamicResource BorderBrush}"
+                                         ToolTip="멘션(@) 및 메시지 작성..."/>
+
+                                <Button Content="[전송]" 
+                                        HorizontalAlignment="Right" 
+                                        Margin="0,6,0,0" 
+                                        Padding="8,2" 
+                                        FontSize="11" 
+                                        Click="SendFeedButton_Click"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 2. 최근 피드 목록 카드 -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="8" 
+                                Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="실시간 피드" 
+                                           FontWeight="Bold" 
+                                           FontSize="12" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}" 
+                                           Margin="0,0,0,8"/>
+
+                                <ScrollViewer x:Name="FeedScrollViewer" MaxHeight="160" VerticalScrollBarVisibility="Auto">
+                                    <StackPanel x:Name="FeedListStackPanel">
+                                        <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,0,0,6" Foreground="{DynamicResource PrimaryTextBrush}">
+                                            <Run Text="[생산팀]" FontWeight="Bold"/> <Run Text="@구매팀_최부장" Foreground="#1976D2" FontWeight="Bold"/> <Run Text="H120 메안엔진 지연으로 탑재 순서 변경 검토 요청 (14:20)"/>
+                                        </TextBlock>
+                                        <Separator Background="{DynamicResource BorderBrush}" Margin="0,2,0,6"/>
+
+                                        <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,0,0,6" Foreground="{DynamicResource PrimaryTextBrush}">
+                                            <Run Text="[구매팀]" FontWeight="Bold"/> <Run Text="@PM_홍길동" Foreground="#1976D2" FontWeight="Bold"/> <Run Text="고압 LNG 밸브 공급처 교체 승인 요청 (11:15)"/>
+                                        </TextBlock>
+                                        <Separator Background="{DynamicResource BorderBrush}" Margin="0,2,0,6"/>
+
+                                        <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}">
+                                            <Run Text="[PM]" FontWeight="Bold"/> <Run Text="@생산팀_김과장" Foreground="#1976D2" FontWeight="Bold"/> <Run Text="CP 영향 +2일로 확인, 일정 수정 진행하세요. (15:01)"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
             </Border>
 
             <!-- 3. 메인 뷰 포트 -->
