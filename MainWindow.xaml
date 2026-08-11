@@ -271,7 +271,7 @@
                                 CornerRadius="8" 
                                 Padding="10">
                             <StackPanel>
-                                <TextBlock Text="부서 협업/라이브 피드" 
+                                <TextBlock Text="실시간 피드" 
                                            FontWeight="Bold" 
                                            FontSize="12" 
                                            Foreground="{DynamicResource PrimaryTextBrush}" 
