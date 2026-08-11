@@ -1,21 +1,63 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Ship_Progress
 {
     public partial class MainWindow : Window
     {
+        private DispatcherTimer _clockTimer;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            // 🎯 실시간 시계 타이머 설정 (1초마다 갱신)
+            StartClock();
 
             // 🎯 실행 시 기본 화면 설정 (Tab1 화면이 아직 없으므로 안내 문구 표시)
             if (MainContentViewPort != null)
             {
                 SetPlaceholderText("메인 (종합 시리즈 분석) 화면 준비 중입니다.");
             }
+        }
+
+        // 실시간 시계 구동 메서드
+        private void StartClock()
+        {
+            UpdateDateTime(); // 최초 실행 시 즉시 업데이트
+
+            _clockTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1)
+            };
+            _clockTimer.Tick += (s, e) => UpdateDateTime();
+            _clockTimer.Start();
+        }
+
+        // 날짜 및 시간 텍스트 업데이트 (YYYY-MM-DD HH:mm:ss)
+        private void UpdateDateTime()
+        {
+            if (DateTimeTextBlock != null)
+            {
+                DateTimeTextBlock.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+        }
+
+        // 상단 새로고침 버튼 클릭 (중복 제거 및 통합 완료)
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 1. 시간 최신화
+            UpdateDateTime();
+
+            // 2. 새로고침 완료 안내 메시지 표시
+            MessageBox.Show($"데이터가 새로고침되었습니다.\n(기준 시각: {DateTime.Now:yyyy-MM-dd HH:mm:ss})",
+                            "새로고침 완료",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
         }
 
         // 사이드바 탭 선택 이벤트
@@ -70,13 +112,10 @@ namespace Ship_Progress
         private void NotificationButton_Click(object sender, RoutedEventArgs e)
         {
             // 알림 팝업 창의 열림/닫힘 상태를 토글
-            NotificationPopup.IsOpen = !NotificationPopup.IsOpen;
-        }
-
-        // 상단 새로고침 버튼 클릭
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("데이터를 새로고침하였습니다.", "새로고침", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (NotificationPopup != null)
+            {
+                NotificationPopup.IsOpen = !NotificationPopup.IsOpen;
+            }
         }
 
         // 하단 피드 전송 버튼 클릭
@@ -98,7 +137,7 @@ namespace Ship_Progress
                     Foreground = (Brush)Application.Current.Resources["PrimaryTextBrush"]
                 };
 
-                // 예시용 내 부서 정보 (필요시 로그인 정보로 대체 가능)
+                // 예시용 내 부서 정보
                 Run deptRun = new Run("[PM] ") { FontWeight = FontWeights.Bold };
                 newFeedText.Inlines.Add(deptRun);
 
@@ -108,7 +147,6 @@ namespace Ship_Progress
                 {
                     if (word.StartsWith("@"))
                     {
-                        // @로 시작하는 단어는 강조 처리
                         Run mentionRun = new Run(word + " ")
                         {
                             Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1976D2")),
@@ -129,7 +167,7 @@ namespace Ship_Progress
                 };
                 newFeedText.Inlines.Add(timeRun);
 
-                // 5. 구분선(Separator) 생성 (목록에 이미 요소가 있을 경우)
+                // 5. 구분선(Separator) 생성 및 최신 피드 상단 추가
                 if (FeedListStackPanel.Children.Count > 0)
                 {
                     Separator separator = new Separator
@@ -137,8 +175,6 @@ namespace Ship_Progress
                         Background = (Brush)Application.Current.Resources["BorderBrush"],
                         Margin = new Thickness(0, 2, 0, 6)
                     };
-                    // 가장 최근 메시지가 위로 오게 하려면 Insert(0, ...), 맨 아래 붙이려면 Add(...)
-                    // 최신 메시지를 맨 위에 표시하는 방식:
                     FeedListStackPanel.Children.Insert(0, separator);
                     FeedListStackPanel.Children.Insert(0, newFeedText);
                 }
@@ -150,12 +186,12 @@ namespace Ship_Progress
                 // 6. 입력창 초기화
                 FeedInputTextBox.Clear();
 
-                // 7. 스크롤을 맨 위로 이동 (최신 피드가 상단에 오는 방식인 경우)
+                // 7. 스크롤을 맨 위로 이동
                 FeedScrollViewer?.ScrollToTop();
             }
         }
 
-        // [참고] 나중에 설정(tab4_Setting)에서 호출할 다크/라이트 모드 전환 함수 예시
+        // [참고] 다크/라이트 모드 전환 함수 예시
         public void ToggleTheme(bool isDarkMode)
         {
             if (isDarkMode)
