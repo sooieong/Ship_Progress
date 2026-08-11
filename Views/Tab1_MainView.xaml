@@ -161,21 +161,25 @@
 
                     <TextBlock Grid.Column="0" Text="위험 품목 현황 분포" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
 
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Rectangle Width="10" Height="10" Fill="#E53935" Margin="0,0,4,0"/>
-                        <TextBlock Text="위험" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,12,0"/>
-
-                        <Rectangle Width="10" Height="10" Fill="#FA8C16" Margin="0,0,4,0"/>
-                        <TextBlock Text="주의" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,12,0"/>
-
-                        <Rectangle Width="10" Height="10" Fill="#22C55E" Margin="0,0,4,0"/>
-                        <TextBlock Text="정상" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                    </StackPanel>
-
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="위험 항목 " FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                        <TextBlock Text="{Binding TotalCriticalCount}" FontSize="15" FontWeight="Bold" Foreground="#E53935"/>
-                        <TextBlock Text="건" FontSize="12" FontWeight="Bold" Foreground="#E53935"/>
+                        <!-- 위험 아이콘 & 위험 건수 -->
+                        <Rectangle Width="10" Height="10" Fill="#E53935" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <TextBlock FontSize="13" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center">
+        <Run Text="위험 "/>
+        <Run Text="{Binding TotalCriticalCount}" Foreground="#E53935"/>
+        <Run Text="건"/>
+                        </TextBlock>
+
+                        <!-- 구분선 (슬래시) -->
+                        <TextBlock Text=" / " FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="4,0,4,0"/>
+
+                        <!-- 주의 아이콘 & 주의 건수 -->
+                        <Rectangle Width="10" Height="10" Fill="#FA8C16" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <TextBlock FontSize="13" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center">
+        <Run Text="주의 "/>
+        <Run Text="{Binding TotalWarningCount}" Foreground="#FA8C16"/>
+        <Run Text="건"/>
+                        </TextBlock>
                     </StackPanel>
                 </Grid>
 

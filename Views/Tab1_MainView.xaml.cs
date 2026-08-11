@@ -73,6 +73,13 @@ namespace Ship_Progress
             set { _totalCriticalCount = value; OnPropertyChangedImpl(); }
         }
 
+        private int _totalWarningCount;
+        public int TotalWarningCount
+        {
+            get => _totalWarningCount;
+            set { _totalWarningCount = value; OnPropertyChangedImpl(); }
+        }
+
         public Func<double, string> CountFormatter { get; set; } = value => value.ToString("N0");
 
         private ObservableCollection<EquipmentRiskItem> _criticalEquipmentList;
@@ -269,6 +276,7 @@ namespace Ship_Progress
 
             CriticalEquipmentList = new ObservableCollection<EquipmentRiskItem>(sortedList);
             TotalCriticalCount = riskDataList.Count(x => x.Status == "위험");
+            TotalWarningCount = riskDataList.Count(x => x.Status == "주의");
 
             // Y축 레이블 정의 (아래에서 위 순서: H122 -> H121 -> H120)
             EquipmentRiskLabels = new string[] { "H122", "H121", "H120" };
