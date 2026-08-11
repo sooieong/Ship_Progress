@@ -1,24 +1,35 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace Ship_Progress
 {
     public partial class MainWindow : Window
     {
-        private DispatcherTimer _clockTimer;
+        private DispatcherTimer _clockTimer;        // 1초 실시간 시계용
+        private DispatcherTimer _autoRefreshTimer;  // 1분 자동 새로고침용
+        private DispatcherTimer _resetStatusTimer;  // 체크 표시 1.5초 후 복귀용
+        private Storyboard _rotateStoryboard;       // 아이콘 회전 애니메이션
 
         public MainWindow()
         {
             InitializeComponent();
 
-            // 🎯 실시간 시계 타이머 설정 (1초마다 갱신)
+            // 🎯 실시간 시계 타이머 시작 (1초 마다)
             StartClock();
 
-            // 🎯 실행 시 기본 화면 설정 (Tab1 화면이 아직 없으므로 안내 문구 표시)
+            // 🎯 회전 애니메이션 리소스 로드
+            _rotateStoryboard = (Storyboard)FindResource("RotateRefreshAnimation");
+
+            // 🎯 1분 자동 새로고침 타이머 시작
+            StartAutoRefreshTimer();
+
+            // 🎯 실행 시 기본 화면 설정
             if (MainContentViewPort != null)
             {
                 SetPlaceholderText("메인 (종합 시리즈 분석) 화면 준비 중입니다.");
@@ -38,6 +49,45 @@ namespace Ship_Progress
             _clockTimer.Start();
         }
 
+        // ⏱️ 매분 정각 00초에 맞춰 자동 새로고침 실행
+        private void StartAutoRefreshTimer()
+        {
+            DateTime now = DateTime.Now;
+
+            // 다음 정각 00초 시각 계산 (예: 현재 10:04:25라면 다음은 10:05:00)
+            DateTime nextMinute = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0).AddMinutes(1);
+
+            // 다음 정각 00초까지 남은 시간 계산 (예: 35초)
+            TimeSpan initialDelay = nextMinute - now;
+
+            // 1단계: 첫 정각 00초가 될 때까지 기다리는 일회성 타이머
+            DispatcherTimer initialTimer = new DispatcherTimer
+            {
+                Interval = initialDelay
+            };
+
+            initialTimer.Tick += (s, e) =>
+            {
+                initialTimer.Stop(); // 일회성 타이머 종료
+
+                // 첫 정각(00초) 시점에 1회 새로고침 수행
+                Dispatcher.InvokeAsync(async () => await ExecuteRefreshAsync());
+
+                // 2단계: 정각 맞춘 이후부터 정확히 1분(60초) 간격으로 반복 실행하는 타이머 시작
+                _autoRefreshTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMinutes(1)
+                };
+                _autoRefreshTimer.Tick += (s2, e2) =>
+                {
+                    Dispatcher.InvokeAsync(async () => await ExecuteRefreshAsync());
+                };
+                _autoRefreshTimer.Start();
+            };
+
+            initialTimer.Start();
+        }
+
         // 날짜 및 시간 텍스트 업데이트 (YYYY-MM-DD HH:mm:ss)
         private void UpdateDateTime()
         {
@@ -47,17 +97,85 @@ namespace Ship_Progress
             }
         }
 
-        // 상단 새로고침 버튼 클릭 (중복 제거 및 통합 완료)
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        // 🔄 상단 새로고침 버튼 클릭 (수동 실행)
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            // 1. 시간 최신화
+            await ExecuteRefreshAsync();
+        }
+
+        // 🚀 핵심: 자동/수동 새로고침 프로세스 & UI 애니메이션 제어
+        private async Task ExecuteRefreshAsync()
+        {
+            // 1. [상태: Refreshing] 회전 애니메이션 시작 및 UI 갱신
+            SetRefreshingUIState(true);
+
+            // 2. 비동기 데이터 갱신 작업 (1초 비동기 대기 시뮬레이션)
+            await FetchDashboardDataAsync();
+
+            // 3. 시간 최신화
             UpdateDateTime();
 
-            // 2. 새로고침 완료 안내 메시지 표시
-            MessageBox.Show($"데이터가 새로고침되었습니다.\n(기준 시각: {DateTime.Now:yyyy-MM-dd HH:mm:ss})",
-                            "새로고침 완료",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Information);
+            // 4. [상태: Success] 회전 멈추고 초록색 체크 아이콘으로 전환
+            SetRefreshingUIState(false);
+            ShowSuccessState();
+        }
+
+        // 데이터 로딩 비동기 로직 (DB / API 연동 영역)
+        private async Task FetchDashboardDataAsync()
+        {
+            // 실제 데이터 바인딩이나 DB 조회 작업을 진행하시면 됩니다.
+            await Task.Delay(1000);
+        }
+
+        // UI 회전 애니메이션 및 텍스트 제어
+        private void SetRefreshingUIState(bool isRefreshing)
+        {
+            if (isRefreshing)
+            {
+                // 복귀 타이머가 작동 중이었다면 중지
+                _resetStatusTimer?.Stop();
+
+                RefreshIconText.Text = "🔄";
+                RefreshIconText.Foreground = (Brush)Application.Current.Resources["PrimaryTextBrush"];
+                RefreshStatusText.Text = "갱신 중...";
+
+                // 회전 애니메이션 시작
+                _rotateStoryboard.Begin(RefreshIconText, true);
+            }
+            else
+            {
+                // 회전 애니메이션 중지
+                _rotateStoryboard.Stop(RefreshIconText);
+                RefreshIconRotate.Angle = 0; // 회전 각도 초기화
+            }
+        }
+
+        // 1.5초 동안 초록색 체크(✔) 아이콘 표시 후 원복
+        private void ShowSuccessState()
+        {
+            RefreshIconText.Text = "✔";
+            RefreshIconText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#43A047")); // 초록색
+            RefreshStatusText.Text = "업데이트됨";
+
+            // 1.5초 후 기본 UI 상태로 복귀시키는 타이머
+            _resetStatusTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1.5)
+            };
+            _resetStatusTimer.Tick += (s, e) =>
+            {
+                ResetRefreshUI();
+                _resetStatusTimer.Stop();
+            };
+            _resetStatusTimer.Start();
+        }
+
+        // 기본 UI 상태(Idle)로 복귀
+        private void ResetRefreshUI()
+        {
+            RefreshIconText.Text = "🔄";
+            RefreshIconText.Foreground = (Brush)Application.Current.Resources["PrimaryTextBrush"];
+            RefreshStatusText.Text = "새로고침";
         }
 
         // 사이드바 탭 선택 이벤트
@@ -67,34 +185,28 @@ namespace Ship_Progress
             {
                 string tabTag = radioButton.Tag?.ToString();
 
-                // 🎯 각 브랜치(feature/tab1_Main, feature/tab2_Ship 등)에서 
-                // 해당 View를 작성한 뒤 아래 주석을 풀고 연결하시면 됩니다!
                 switch (tabTag)
                 {
-                    case "Tab1": // feature/tab1_Main 브랜치에서 작업 예정
-                        // MainContentViewPort.Content = new Tab1_MainView();
+                    case "Tab1":
                         SetPlaceholderText("메인 (종합 시리즈 분석) 화면 준비 중입니다.");
                         break;
 
-                    case "Tab2": // feature/tab2_Ship 브랜치에서 작업 예정
-                        // MainContentViewPort.Content = new Tab2_ShipView();
+                    case "Tab2":
                         SetPlaceholderText("공정 분석 화면 준비 중입니다.");
                         break;
 
-                    case "Tab3": // feature/tab3_Leadtime 브랜치에서 작업 예정
-                        // MainContentViewPort.Content = new Tab3_LeadtimeView();
+                    case "Tab3":
                         SetPlaceholderText("납기 관리 화면 준비 중입니다.");
                         break;
 
-                    case "Tab4": // feature/tab4_Setting 브랜치에서 작업 예정
-                        // MainContentViewPort.Content = new Tab4_SettingView();
+                    case "Tab4":
                         SetPlaceholderText("시스템 설정 화면 준비 중입니다.");
                         break;
                 }
             }
         }
 
-        // 💡 화면이 아직 없는 탭을 클릭했을 때 표시해 줄 임시 텍스트 생성 함수
+        // 임시 텍스트 생성 함수
         private void SetPlaceholderText(string message)
         {
             MainContentViewPort.Content = new TextBlock
@@ -111,7 +223,6 @@ namespace Ship_Progress
         // 알림 버튼 클릭 이벤트
         private void NotificationButton_Click(object sender, RoutedEventArgs e)
         {
-            // 알림 팝업 창의 열림/닫힘 상태를 토글
             if (NotificationPopup != null)
             {
                 NotificationPopup.IsOpen = !NotificationPopup.IsOpen;
@@ -125,10 +236,8 @@ namespace Ship_Progress
 
             if (!string.IsNullOrEmpty(rawText))
             {
-                // 1. 현재 시간 가져오기 (HH:mm 포맷)
                 string currentTime = DateTime.Now.ToString("HH:mm");
 
-                // 2. 새로운 피드용 TextBlock 생성
                 TextBlock newFeedText = new TextBlock
                 {
                     TextWrapping = TextWrapping.Wrap,
@@ -137,11 +246,9 @@ namespace Ship_Progress
                     Foreground = (Brush)Application.Current.Resources["PrimaryTextBrush"]
                 };
 
-                // 예시용 내 부서 정보
                 Run deptRun = new Run("[PM] ") { FontWeight = FontWeights.Bold };
                 newFeedText.Inlines.Add(deptRun);
 
-                // 3. 작성된 텍스트 파싱 (@멘션 처리 및 시간 추가)
                 string[] words = rawText.Split(' ');
                 foreach (var word in words)
                 {
@@ -160,14 +267,12 @@ namespace Ship_Progress
                     }
                 }
 
-                // 4. 실시간 작성 시간 추가
                 Run timeRun = new Run($"({currentTime})")
                 {
                     Foreground = (Brush)Application.Current.Resources["SubTextBrush"]
                 };
                 newFeedText.Inlines.Add(timeRun);
 
-                // 5. 구분선(Separator) 생성 및 최신 피드 상단 추가
                 if (FeedListStackPanel.Children.Count > 0)
                 {
                     Separator separator = new Separator
@@ -183,15 +288,12 @@ namespace Ship_Progress
                     FeedListStackPanel.Children.Add(newFeedText);
                 }
 
-                // 6. 입력창 초기화
                 FeedInputTextBox.Clear();
-
-                // 7. 스크롤을 맨 위로 이동
                 FeedScrollViewer?.ScrollToTop();
             }
         }
 
-        // [참고] 다크/라이트 모드 전환 함수 예시
+        // 다크/라이트 모드 전환 함수
         public void ToggleTheme(bool isDarkMode)
         {
             if (isDarkMode)
