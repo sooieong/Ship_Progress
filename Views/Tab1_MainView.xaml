@@ -219,13 +219,59 @@
                 <TextBlock Grid.Row="0" Text="위험 품목 현황" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
                 <DataGrid x:Name="CriticalEquipmentDataGrid" Grid.Row="1" ItemsSource="{Binding CriticalEquipmentList}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{DynamicResource BorderBrush}" Background="Transparent" RowHeight="36" BorderThickness="0" VerticalScrollBarVisibility="Auto">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="시리즈" Binding="{Binding Series}" Width="80"/>
-                        <DataGridTextColumn Header="호선" Binding="{Binding ShipNo}" Width="60"/>
-                        <DataGridTextColumn Header="공정" Binding="{Binding Process}" Width="60"/>
-                        <DataGridTextColumn Header="문제 내용" Binding="{Binding IssueDetail}" Width="*"/>
-                        <DataGridTextColumn Header="지연 일수" Binding="{Binding DelayDays}" Width="70"/>
 
+                    <!-- [추가] TextColumn의 기본 셀 스타일 (모든 텍스트 컬럼 상하좌우 가운데 정렬) -->
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+
+                    <DataGrid.Resources>
+                        <Style x:Key="CenterAlignedCell" TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGrid.Resources>
+
+                    <DataGrid.Columns>
+                        <!-- 1. 시리즈 -->
+                        <DataGridTextColumn Header="시리즈" Binding="{Binding Series}" Width="80" ElementStyle="{StaticResource CenterAlignedCell}"/>
+
+                        <!-- 2. 호선 -->
+                        <DataGridTextColumn Header="호선" Binding="{Binding ShipNo}" Width="60" ElementStyle="{StaticResource CenterAlignedCell}"/>
+
+                        <!-- 3. 구분 (필터 아이콘 포함 TemplateColumn) -->
+                        <DataGridTemplateColumn Width="65">
+                            <DataGridTemplateColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <Grid Width="50" Height="24">
+                                        <TextBlock Text="구분" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,0,0,0"/>
+                                        <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                                        Click="ProcessFilterButton_Click" Cursor="Hand" ToolTip="구분 필터">
+                                            <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
+                                          Fill="#475569" Width="10" Height="10" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.HeaderTemplate>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Process}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!-- 4. 문제 내용 -->
+                        <DataGridTextColumn Header="문제 내용" Binding="{Binding IssueDetail}" Width="*" ElementStyle="{StaticResource CenterAlignedCell}"/>
+
+                        <!-- 5. 지연 일수 -->
+                        <DataGridTextColumn Header="지연 일수" Binding="{Binding DelayDays}" Width="70" ElementStyle="{StaticResource CenterAlignedCell}"/>
+
+                        <!-- 6. 상태 -->
                         <DataGridTemplateColumn Header="상태" Width="65">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -239,7 +285,7 @@
                 </DataGrid>
             </Grid>
         </Border>
-
+        
         <!-- ========================================================= -->
         <!-- [3행 - 좌측 분할 영역] 각각 1:1 비율 독립 흰색 상자 2개 -->
         <!-- ========================================================= -->

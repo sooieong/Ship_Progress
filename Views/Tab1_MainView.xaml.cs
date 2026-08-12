@@ -89,6 +89,10 @@ namespace Ship_Progress
             set { _criticalEquipmentList = value; OnPropertyChangedImpl(); }
         }
 
+        // 필터링을 위한 원본 데이터 및 필터 상태 변수 추가
+        private List<EquipmentRiskItem> _originalCriticalEquipmentList = new List<EquipmentRiskItem>();
+        private string _currentProcessFilter = "전체";
+
         // -----------------------------------------------------------
         // 3. 하단 좌측: 호선별 자재 납기율 오각형 차트 프로퍼티
         // -----------------------------------------------------------
@@ -106,7 +110,6 @@ namespace Ship_Progress
             set { _radarDataPoints = value; OnPropertyChangedImpl(); }
         }
 
-        // [신규 추가] 호선별 5대 부문 임의 데이터 (기자재, 기관의장, 선체의장, 선실의장, 전기의장 순서)
         private Dictionary<string, double[]> shipVendorData = new Dictionary<string, double[]>()
         {
             { "H120", new double[] { 85.0, 90.0, 78.0, 92.0, 88.0 } },
@@ -210,7 +213,7 @@ namespace Ship_Progress
             LoadGaugeData();
             LoadProcessStatusData();
             LoadEquipmentRiskData();
-            LoadVendorDeliveryData("전체 (평균)"); // 기본값 전체(평균)으로 로드
+            LoadVendorDeliveryData("전체 (평균)");
             LoadSupplyStatusData();
         }
 
@@ -259,44 +262,39 @@ namespace Ship_Progress
         private void LoadEquipmentRiskData()
         {
             var riskDataList = new List<EquipmentRiskItem>
-    {
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "의장", IssueDetail = "메인엔진 패키지 입고 지연", DelayDays = "14일", Status = "위험" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "배관", IssueDetail = "고압 LNG 밸브 수급 소폭 지연", DelayDays = "4일", Status = "주의" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "기관", IssueDetail = "선박평형수 처리장치(BWTS) 펌프 입고 지연", DelayDays = "7일", Status = "주의" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "전기", IssueDetail = "스위치보드 배전반 서류 검사 지연", DelayDays = "3일", Status = "정상" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "도장", IssueDetail = "특수 방오도료 수급 소폭 지연", DelayDays = "2일", Status = "정상" },
-        new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "의장", IssueDetail = "선실 거주구 판넬 자재 입고 소폭 지연", DelayDays = "2일", Status = "정상" },
-        new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "기관", IssueDetail = "비상발전기(Emergency Gen) 테스트 일정 조정", DelayDays = "5일", Status = "주의" },
-        new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "배관", IssueDetail = "유압 파이프 자재 현장 수령 소폭 지연", DelayDays = "1일", Status = "정상" }
-    };
+            {
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "의장", IssueDetail = "메인엔진 패키지 입고 지연", DelayDays = "14일", Status = "위험" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "배관", IssueDetail = "고압 LNG 밸브 수급 소폭 지연", DelayDays = "4일", Status = "주의" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "기관", IssueDetail = "선박평형수 처리장치(BWTS) 펌프 입고 지연", DelayDays = "7일", Status = "주의" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "전기", IssueDetail = "스위치보드 배전반 서류 검사 지연", DelayDays = "3일", Status = "정상" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "도장", IssueDetail = "특수 방오도료 수급 소폭 지연", DelayDays = "2일", Status = "정상" },
+                new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "의장", IssueDetail = "선실 거주구 판넬 자재 입고 소폭 지연", DelayDays = "2일", Status = "정상" },
+                new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "기관", IssueDetail = "비상발전기(Emergency Gen) 테스트 일정 조정", DelayDays = "5일", Status = "주의" },
+                new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "배관", IssueDetail = "유압 파이프 자재 현장 수령 소폭 지연", DelayDays = "1일", Status = "정상" }
+            };
 
-            var sortedList = riskDataList
-                .OrderByDescending(x => GetDaysNumber(x.DelayDays))
-                .ToList();
+            // 원본 데이터 백업
+            _originalCriticalEquipmentList = riskDataList;
+            _currentProcessFilter = "전체";
 
-            CriticalEquipmentList = new ObservableCollection<EquipmentRiskItem>(sortedList);
+            ApplyProcessFilter();
+
             TotalCriticalCount = riskDataList.Count(x => x.Status == "위험");
             TotalWarningCount = riskDataList.Count(x => x.Status == "주의");
 
-            // Y축 레이블 정의 (아래에서 위 순서: H122 -> H121 -> H120)
             EquipmentRiskLabels = new string[] { "H122", "H121", "H120" };
 
-            // -----------------------------------------------------------
-            // [동적 데이터 집계] EquipmentRiskLabels 순서에 맞게 건수 자동 계산
-            // -----------------------------------------------------------
             var dangerValues = new ChartValues<double>();
             var warningValues = new ChartValues<double>();
             var normalValues = new ChartValues<double>();
 
             foreach (var shipNo in EquipmentRiskLabels)
             {
-                // 해당 호선의 상태별 개수를 동적으로 카운트
                 dangerValues.Add(riskDataList.Count(x => x.ShipNo == shipNo && x.Status == "위험"));
                 warningValues.Add(riskDataList.Count(x => x.ShipNo == shipNo && x.Status == "주의"));
                 normalValues.Add(riskDataList.Count(x => x.ShipNo == shipNo && x.Status == "정상"));
             }
 
-            // Formatter 설정
             Func<ChartPoint, string> countFormatter = point =>
             {
                 if (point.Instance is double rawValue && rawValue > 0)
@@ -307,34 +305,81 @@ namespace Ship_Progress
             };
 
             EquipmentRiskSeries = new SeriesCollection
-    {
-        new StackedRowSeries
+            {
+                new StackedRowSeries
+                {
+                    Title = "위험",
+                    Values = dangerValues,
+                    Fill = new SolidColorBrush(Color.FromRgb(229, 57, 53)),
+                    StackMode = StackMode.Percentage,
+                    DataLabels = true,
+                    LabelPoint = countFormatter,
+                    LabelsPosition = BarLabelPosition.Parallel,
+                    FontSize = 11,
+                    Foreground = Brushes.White,
+                    MaxRowHeight = 16
+                },
+                new StackedRowSeries
+                {
+                    Title = "주의",
+                    Values = warningValues,
+                    Fill = new SolidColorBrush(Color.FromRgb(250, 140, 22)),
+                    StackMode = StackMode.Percentage,
+                    DataLabels = true,
+                    LabelPoint = countFormatter,
+                    LabelsPosition = BarLabelPosition.Parallel,
+                    FontSize = 11,
+                    Foreground = Brushes.White,
+                    MaxRowHeight = 16
+                },
+            };
+        }
+
+        // -----------------------------------------------------------
+        // [구분] 헤더 버튼 클릭 시 동적 메뉴 생성 및 팝업
+        // -----------------------------------------------------------
+        private void ProcessFilterButton_Click(object sender, RoutedEventArgs e)
         {
-            Title = "위험",
-            Values = dangerValues, // 동적 집계된 Values 할당
-            Fill = new SolidColorBrush(Color.FromRgb(229, 57, 53)),
-            StackMode = StackMode.Percentage,
-            DataLabels = true,
-            LabelPoint = countFormatter,
-            LabelsPosition = BarLabelPosition.Parallel,
-            FontSize = 11,
-            Foreground = Brushes.White,
-            MaxRowHeight = 16
-        },
-        new StackedRowSeries
+            if (sender is Button btn)
+            {
+                ContextMenu menu = new ContextMenu();
+
+                var distinctProcesses = _originalCriticalEquipmentList.Select(x => x.Process).Distinct().OrderBy(x => x).ToList();
+
+                MenuItem allItem = new MenuItem { Header = "전체 보기", Tag = "전체" };
+                allItem.Click += (s, ev) => { _currentProcessFilter = "전체"; ApplyProcessFilter(); };
+                menu.Items.Add(allItem);
+
+                foreach (var process in distinctProcesses)
+                {
+                    MenuItem item = new MenuItem { Header = process, Tag = process };
+                    item.Click += (s, ev) => { _currentProcessFilter = process; ApplyProcessFilter(); };
+                    menu.Items.Add(item);
+                }
+
+                btn.ContextMenu = menu;
+                menu.PlacementTarget = btn;
+                menu.IsOpen = true;
+            }
+        }
+
+        // -----------------------------------------------------------
+        // 선택된 구분에 따라 DataGrid 필터링 적용
+        // -----------------------------------------------------------
+        private void ApplyProcessFilter()
         {
-            Title = "주의",
-            Values = warningValues, // 동적 집계된 Values 할당
-            Fill = new SolidColorBrush(Color.FromRgb(250, 140, 22)),
-            StackMode = StackMode.Percentage,
-            DataLabels = true,
-            LabelPoint = countFormatter,
-            LabelsPosition = BarLabelPosition.Parallel,
-            FontSize = 11,
-            Foreground = Brushes.White,
-            MaxRowHeight = 16
-        },
-    };
+            if (CriticalEquipmentDataGrid == null) return;
+
+            var query = _originalCriticalEquipmentList.AsEnumerable();
+
+            if (_currentProcessFilter != "전체")
+            {
+                query = query.Where(x => x.Process == _currentProcessFilter);
+            }
+
+            var sortedResult = query.OrderByDescending(x => GetDaysNumber(x.DelayDays)).ToList();
+            CriticalEquipmentList = new ObservableCollection<EquipmentRiskItem>(sortedResult);
+            CriticalEquipmentDataGrid.ItemsSource = CriticalEquipmentList;
         }
 
         private int GetDaysNumber(string delayDaysText)
@@ -362,7 +407,6 @@ namespace Ship_Progress
 
             if (targetKey.Contains("전체"))
             {
-                // 각 호선별 값들의 진짜 평균 계산 (기자재, 기관의장, 선체의장, 선실의장, 전기의장 각 항목별 평균)
                 for (int i = 0; i < 5; i++)
                 {
                     values[i] = shipVendorData.Values.Average(arr => arr[i]);
@@ -377,7 +421,6 @@ namespace Ship_Progress
             double centerY = 110;
             double maxRadius = 90;
 
-            // 5대 축 각도 (기자재: -90도, 기관의장: -18도, 선체의장: 54도, 선실의장: 126도, 전기의장: 198도)
             double[] angles = new double[] { -90, -18, 54, 126, 198 };
 
             var points = new PointCollection();
