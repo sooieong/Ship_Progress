@@ -211,6 +211,24 @@
           Background="Transparent" 
           RowHeight="36"
           BorderThickness="0">
+
+                        <!-- 모든 컬럼 헤더 가운데 정렬 및 굵게 설정 -->
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+
+                        <!-- 모든 셀 텍스트 가운데 정렬 스타일 -->
+                        <DataGrid.Resources>
+                            <Style x:Key="CenterAlignedCell" TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGrid.Resources>
+
                         <DataGrid.Columns>
                             <!-- 체크박스 컬럼 -->
                             <DataGridTemplateColumn Header="선택" Width="50">
@@ -223,12 +241,60 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTextColumn Header="구분" Binding="{Binding Category}" Width="60"/>
-                            <DataGridTextColumn Header="기자재명" Binding="{Binding EquipmentName}" Width="*"/>
-                            <DataGridTextColumn Header="협력사" Binding="{Binding Vendor}" Width="100"/>
-                            <DataGridTextColumn Header="납기일" Binding="{Binding DeliveryDate}" Width="90"/>
-                            <DataGridTextColumn Header="잔여일수" Binding="{Binding RemainingDaysText}" Width="70"/>
+                            <!-- 1. [구분] 컬럼 (필터 버튼 포함, 폭 65) -->
+                            <DataGridTemplateColumn Width="65">
+                                <DataGridTemplateColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Grid Width="50" Height="24">
+                                            <TextBlock Text="구분" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2,0,0,0"/>
+                                            <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                                Click="CategoryFilterButton_Click" Cursor="Hand" ToolTip="구분 필터">
+                                                <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
+                                  Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.HeaderTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Category}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
 
+                            <!-- 기자재명 컬럼 -->
+                            <DataGridTextColumn Header="기자재명" Binding="{Binding EquipmentName}" Width="*" ElementStyle="{StaticResource CenterAlignedCell}"/>
+
+                            <!-- 2. [협력사] 컬럼 (필터 버튼 포함, 폭 105) -->
+                            <DataGridTemplateColumn Width="105">
+                                <DataGridTemplateColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Grid Width="90" Height="24">
+                                            <TextBlock Text="협력사" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2,0,0,0"/>
+                                            <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                                Click="VendorFilterButton_Click" Cursor="Hand" ToolTip="협력사 필터">
+                                                <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
+                                  Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.HeaderTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Vendor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- 납기일 컬럼 -->
+                            <DataGridTextColumn Header="납기일" Binding="{Binding DeliveryDate}" Width="90" ElementStyle="{StaticResource CenterAlignedCell}"/>
+
+                            <!-- 잔여일수 컬럼 -->
+                            <DataGridTextColumn Header="잔여일수" Binding="{Binding RemainingDaysText}" Width="70" ElementStyle="{StaticResource CenterAlignedCell}"/>
+
+                            <!-- 상태 컬럼 -->
                             <DataGridTemplateColumn Header="상태" Width="65">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>

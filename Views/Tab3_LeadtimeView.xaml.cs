@@ -62,20 +62,18 @@ namespace Ship_Progress.Views
         {
             if (_allLeadtimeList == null) return;
 
-            // 현재 선택된 호선에 해당하는 항목들 중 체크된 항목들만 필터링
-            var selectedItems = _allLeadtimeList
-                .Where(x => x.ShipNo == shipNo && x.IsSelected)
-                .ToList();
+            // 현재 선택된 호선에 해당하는 항목들 중 체크된 항목들만 필터링 (현재 필터 조건 반영)
+            var currentItems = GetFilteredLeadtimeList(shipNo);
+            var selectedItems = currentItems.Where(x => x.IsSelected).ToList();
 
-            // 만약 체크된 항목이 하나도 없다면 전체를 보여주거나 빈 화면 처리 (여기서는 전체 반영)
             if (selectedItems.Count == 0)
             {
-                selectedItems = _allLeadtimeList.Where(x => x.ShipNo == shipNo).ToList();
+                selectedItems = currentItems;
             }
 
             currentChartLabels = selectedItems.Select(x => x.EquipmentName).ToArray();
 
-            // 임시 목표/현재입고 수치 부여 (필요에 따라 모델 값 연동 가능)
+            // 임시 목표/현재입고 수치 부여
             currentChartTargets = selectedItems.Select(x => (double)(x.RemainingDays * 30 + 200)).ToArray();
             currentChartActuals = selectedItems.Select(x => (double)(x.RemainingDays * 20 + 100)).ToArray();
 
@@ -83,9 +81,11 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 3. 3행 하단 좌측 표 모델 및 원본 리스트
+        // 3. 3행 하단 좌측 표 모델 및 원본 리스트 / 필터 상태 변수
         // -----------------------------------------------------------
         private List<LeadtimeItem> _allLeadtimeList;
+        private string _currentCategoryFilter = "전체";
+        private string _currentVendorFilter = "전체";
 
         public class LeadtimeItem : INotifyPropertyChanged
         {
@@ -221,6 +221,10 @@ namespace Ship_Progress.Views
                 SelectedShipNo = shipNo;
                 SelectedSeriesName = shipNo == "H122" ? "B SERIES" : "A SERIES";
 
+                // 호선 변경 시 필터 초기화
+                _currentCategoryFilter = "전체";
+                _currentVendorFilter = "전체";
+
                 FilterDataByShip(shipNo);
                 FilterNotifications(shipNo, _currentNotificationFilter);
                 UpdateChartDataForShip(shipNo);
@@ -231,12 +235,87 @@ namespace Ship_Progress.Views
         {
             if (_allLeadtimeList == null) return;
 
-            var filteredList = _allLeadtimeList.Where(x => x.ShipNo == shipNo).ToList();
+            var filteredList = GetFilteredLeadtimeList(shipNo);
 
             if (LeadtimeRiskDataGrid != null)
             {
                 LeadtimeRiskDataGrid.ItemsSource = filteredList;
             }
+        }
+
+        private List<LeadtimeItem> GetFilteredLeadtimeList(string shipNo)
+        {
+            var query = _allLeadtimeList.Where(x => x.ShipNo == shipNo);
+
+            if (_currentCategoryFilter != "전체")
+            {
+                query = query.Where(x => x.Category == _currentCategoryFilter);
+            }
+            if (_currentVendorFilter != "전체")
+            {
+                query = query.Where(x => x.Vendor == _currentVendorFilter);
+            }
+
+            return query.ToList();
+        }
+
+        // -----------------------------------------------------------
+        // [구분] 및 [협력사] 컬럼 필터 버튼 클릭 및 동적 메뉴 생성 이벤트
+        // -----------------------------------------------------------
+        private void CategoryFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                ContextMenu menu = new ContextMenu();
+                var shipItems = _allLeadtimeList.Where(x => x.ShipNo == SelectedShipNo).ToList();
+                var distinctCategories = shipItems.Select(x => x.Category).Distinct().OrderBy(x => x).ToList();
+
+                MenuItem allItem = new MenuItem { Header = "전체 보기", Tag = "전체" };
+                allItem.Click += (s, ev) => { _currentCategoryFilter = "전체"; RefreshGridAndChart(); };
+                menu.Items.Add(allItem);
+
+                foreach (var cat in distinctCategories)
+                {
+                    MenuItem item = new MenuItem { Header = cat, Tag = cat };
+                    item.Click += (s, ev) => { _currentCategoryFilter = cat; RefreshGridAndChart(); };
+                    menu.Items.Add(item);
+                }
+
+                btn.ContextMenu = menu;
+                menu.PlacementTarget = btn;
+                menu.IsOpen = true;
+            }
+        }
+
+        private void VendorFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                ContextMenu menu = new ContextMenu();
+                var shipItems = _allLeadtimeList.Where(x => x.ShipNo == SelectedShipNo).ToList();
+                var distinctVendors = shipItems.Select(x => x.Vendor).Distinct().OrderBy(x => x).ToList();
+
+                MenuItem allItem = new MenuItem { Header = "전체 보기", Tag = "전체" };
+                allItem.Click += (s, ev) => { _currentVendorFilter = "전체"; RefreshGridAndChart(); };
+                menu.Items.Add(allItem);
+
+                foreach (var vendor in distinctVendors)
+                {
+                    MenuItem item = new MenuItem { Header = vendor, Tag = vendor };
+                    item.Click += (s, ev) => { _currentVendorFilter = vendor; RefreshGridAndChart(); };
+                    menu.Items.Add(item);
+                }
+
+                btn.ContextMenu = menu;
+                menu.PlacementTarget = btn;
+                menu.IsOpen = true;
+            }
+        }
+
+        private void RefreshGridAndChart()
+        {
+            FilterDataByShip(SelectedShipNo);
+            UpdateChartDataForShip(SelectedShipNo);
         }
 
         private void NotificationFilter_Checked(object sender, RoutedEventArgs e)
