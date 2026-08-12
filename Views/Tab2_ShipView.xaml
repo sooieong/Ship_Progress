@@ -203,7 +203,7 @@
                     <Border Grid.Column="0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" HorizontalAlignment="Right" Margin="0,5"/>
 
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock Text="공정 진행률" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="종합 공정률" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0" HorizontalAlignment="Center">
                             <TextBlock Text="86.4" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
                             <TextBlock Text="%" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
@@ -273,6 +273,8 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <!-- 연결선 영역을 위한 행 추가 -->
+                        <RowDefinition Height="16"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
@@ -305,7 +307,7 @@
                         <!-- 화살표 2 -->
                         <TextBlock Text="›" FontSize="22" FontWeight="Bold" Foreground="#B0B0B0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-18,0,0"/>
 
-                        <!-- 3. 탑재 -->
+                        <!-- 3. 탑재 (진행중) -->
                         <StackPanel HorizontalAlignment="Center">
                             <Grid Width="56" Height="56">
                                 <Ellipse Fill="{DynamicResource HanwhaOrangeBrush}">
@@ -356,8 +358,16 @@
                         </StackPanel>
                     </UniformGrid>
 
+                    <!-- 탑재 아이콘과 하단 박스를 이어주는 세로 연결선 -->
+                    <Line Grid.Row="2" 
+                          X1="0" Y1="-15" X2="0" Y2="16" 
+                          Stroke="{DynamicResource BorderBrush}" 
+                          StrokeThickness="1" 
+                          HorizontalAlignment="Center" 
+                          VerticalAlignment="Center"/>
+
                     <!-- 하단 일정 및 진행률 수치 영역 -->
-                    <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,8,0,0">
+                    <Border Grid.Row="3" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12,8">
                         <UniformGrid Columns="3">
                             <StackPanel HorizontalAlignment="Center">
                                 <TextBlock Text="시작일" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
