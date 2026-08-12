@@ -49,26 +49,127 @@
                         <TextBlock Text="호선 선택" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" Margin="0,0,0,6"/>
                         <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
                             <StackPanel Orientation="Horizontal">
-                                <Border Background="{DynamicResource HanwhaOrangeBrush}" CornerRadius="4" Padding="12,6" Margin="0,0,6,0">
+
+                                <!-- H120 호선 카드 -->
+                                <Border CornerRadius="4" Padding="12,6" Margin="0,0,6,0" Cursor="Hand" Tag="H120" MouseDown="ShipCard_MouseDown">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedShipNo}" Value="H120">
+                                                    <Setter Property="Background" Value="{DynamicResource HanwhaOrangeBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                     <StackPanel>
-                                        <TextBlock Text="H120" FontWeight="Bold" FontSize="18" Foreground="White" HorizontalAlignment="Center"/>
-                                        <TextBlock Text="A SERIES" FontSize="10" Foreground="#FFE0C2" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="H120" FontWeight="Bold" FontSize="15" HorizontalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding SelectedShipNo}" Value="H120">
+                                                            <Setter Property="Foreground" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="A SERIES" FontSize="9" HorizontalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding SelectedShipNo}" Value="H120">
+                                                            <Setter Property="Foreground" Value="#FFE0C2"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                 </Border>
 
-                                <Border Background="Transparent" CornerRadius="4" Padding="10,6" Margin="0,0,6,0">
+                                <!-- H121 호선 카드 -->
+                                <Border CornerRadius="4" Padding="10,6" Margin="0,0,6,0" Cursor="Hand" Tag="H121" MouseDown="ShipCard_MouseDown">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedShipNo}" Value="H121">
+                                                    <Setter Property="Background" Value="{DynamicResource HanwhaOrangeBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                     <StackPanel>
-                                        <TextBlock Text="H121" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
-                                        <TextBlock Text="A SERIES" FontSize="9" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="H121" FontWeight="Bold" FontSize="15" HorizontalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding SelectedShipNo}" Value="H121">
+                                                            <Setter Property="Foreground" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="A SERIES" FontSize="9" HorizontalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding SelectedShipNo}" Value="H121">
+                                                            <Setter Property="Foreground" Value="#FFE0C2"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                 </Border>
 
-                                <Border Background="Transparent" CornerRadius="4" Padding="10,6" Margin="0,0,6,0">
+                                <!-- H122 호선 카드 -->
+                                <Border CornerRadius="4" Padding="10,6" Margin="0,0,6,0" Cursor="Hand" Tag="H122" MouseDown="ShipCard_MouseDown">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedShipNo}" Value="H122">
+                                                    <Setter Property="Background" Value="{DynamicResource HanwhaOrangeBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                     <StackPanel>
-                                        <TextBlock Text="H122" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
-                                        <TextBlock Text="B SERIES" FontSize="9" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="H122" FontWeight="Bold" FontSize="15" HorizontalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding SelectedShipNo}" Value="H122">
+                                                            <Setter Property="Foreground" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="B SERIES" FontSize="9" HorizontalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding SelectedShipNo}" Value="H122">
+                                                            <Setter Property="Foreground" Value="#FFE0C2"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                 </Border>
+
                             </StackPanel>
                         </ScrollViewer>
                     </StackPanel>
@@ -345,17 +446,16 @@
                     <TextBlock Grid.Row="0" Text="위험 품목 현황" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
                     <DataGrid x:Name="H120RiskDataGrid" Grid.Row="1" 
-          AutoGenerateColumns="False" 
-          IsReadOnly="True" 
-          CanUserSortColumns="False"
-          HeadersVisibility="Column"
-          GridLinesVisibility="Horizontal"
-          HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
-          Background="Transparent" 
-          RowHeight="36"
-          BorderThickness="0">
+                          AutoGenerateColumns="False" 
+                          IsReadOnly="True" 
+                          CanUserSortColumns="False"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
+                          HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
+                          Background="Transparent" 
+                          RowHeight="36"
+                          BorderThickness="0">
 
-                        <!-- [추가] 모든 컬럼 헤더를 가운데 정렬하고 굵게 만드는 스타일 설정 -->
                         <DataGrid.ColumnHeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -364,7 +464,6 @@
                             </Style>
                         </DataGrid.ColumnHeaderStyle>
 
-                        <!-- 모든 셀 텍스트 가운데 정렬 스타일 -->
                         <DataGrid.Resources>
                             <Style x:Key="CenterAlignedCell" TargetType="TextBlock">
                                 <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -380,10 +479,10 @@
                                         <Grid Width="50" Height="24">
                                             <TextBlock Text="구분" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2,0,0,0"/>
                                             <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
-                                Click="ProcessFilterButton_Click" Cursor="Hand" ToolTip="구분 필터">
+                                        Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                                        Click="ProcessFilterButton_Click" Cursor="Hand" ToolTip="구분 필터">
                                                 <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
-                                  Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                          Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             </Button>
                                         </Grid>
                                     </DataTemplate>
@@ -416,9 +515,9 @@
                                     <DataTemplate>
                                         <Border Style="{StaticResource StatusBorderStyle}" Background="{Binding StatusBgColor}">
                                             <TextBlock Text="{Binding MainProcessImpact}" 
-                                   Foreground="{Binding StatusFgColor}" 
-                                   FontWeight="Bold" 
-                                   FontSize="11"/>
+                                           Foreground="{Binding StatusFgColor}" 
+                                           FontWeight="Bold" 
+                                           FontSize="11"/>
                                         </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

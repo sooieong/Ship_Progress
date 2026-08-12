@@ -40,7 +40,7 @@ namespace Ship_Progress
             {
                 // 주황색 (Orange/Yellow)
                 BarColor = (Application.Current.TryFindResource("HanwhaOrangeBrush") as Brush)
-               ?? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F37321"));
+                ?? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F37321"));
             }
             else
             {
@@ -153,14 +153,25 @@ namespace Ship_Progress
             DrawSCurveChart();
         }
 
+        // 상단 호선 선택 카드 클릭 이벤트 추가
+        private void ShipCard_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Border clickedBorder && clickedBorder.Tag is string shipNo)
+            {
+                SelectedShipNo = shipNo;
+                SelectedSeriesName = shipNo == "H122" ? "B SERIES" : "A SERIES";
+                LoadShipDashboardData(shipNo);
+            }
+        }
+
         // -----------------------------------------------------------
         // 6. 데이터 로드 및 차트 생성 로직
         // -----------------------------------------------------------
         public void LoadShipDashboardData(string shipNo)
         {
             SelectedShipNo = shipNo;
-            SelectedSeriesName = "A SERIES";
-            ExpectedEndDate = "2026-11-20";
+            SelectedSeriesName = shipNo == "H122" ? "B SERIES" : "A SERIES";
+            ExpectedEndDate = shipNo == "H122" ? "2026-12-15" : "2026-11-20";
 
             // S-Curve 차트 그리기
             DrawSCurveChart();
