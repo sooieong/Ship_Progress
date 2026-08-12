@@ -296,10 +296,8 @@
 
                     <TextBlock Grid.Row="0" Text="블록 공정 현황" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,8"/>
 
-                    <!-- 5개 항목 가로 프로그래스 바 리스트 -->
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding BlockProgressList}">
                         <ItemsControl.ItemTemplate>
-                            <!-- Inline DataTemplate에서는 x:Key 속성을 제거합니다 -->
                             <DataTemplate>
                                 <Grid Margin="0,6">
                                     <Grid.RowDefinitions>
@@ -307,37 +305,35 @@
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <!-- 1행: [좌측] 한국어 항목명 / [우측] 진행률 수치 % -->
                                     <Grid Grid.Row="0" Margin="0,0,0,4">
                                         <TextBlock Text="{Binding Title}" 
-                                       FontSize="11" 
-                                       FontWeight="Bold" 
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
-                                       HorizontalAlignment="Left"/>
+                                                   FontSize="11" 
+                                                   FontWeight="Bold" 
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   HorizontalAlignment="Left"/>
 
                                         <TextBlock Text="{Binding ProgressText}" 
-                                       Foreground="{Binding BarColor}" 
-                                       FontSize="13" 
-                                       FontWeight="Bold" 
-                                       HorizontalAlignment="Right"/>
+                                                   Foreground="{Binding BarColor}" 
+                                                   FontSize="13" 
+                                                   FontWeight="Bold" 
+                                                   HorizontalAlignment="Right"/>
                                     </Grid>
 
-                                    <!-- 2행: 순수 진행률 바 (내부 숫자 텍스트 없음) -->
                                     <ProgressBar Grid.Row="1" 
-                                     Height="14" 
-                                     Minimum="0" 
-                                     Maximum="100" 
-                                     Value="{Binding Progress}" 
-                                     Foreground="{Binding BarColor}" 
-                                     Background="#E0E0E0" 
-                                     BorderThickness="0"/>
+                                                 Height="14" 
+                                                 Minimum="0" 
+                                                 Maximum="100" 
+                                                 Value="{Binding Progress}" 
+                                                 Foreground="{Binding BarColor}" 
+                                                 Background="#E0E0E0" 
+                                                 BorderThickness="0"/>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </Grid>
             </Border>
-            
+
             <!-- [3-2] 위험 기자재 현황 표 카드 -->
             <Border Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>
@@ -349,21 +345,61 @@
                     <TextBlock Grid.Row="0" Text="위험 품목 현황" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
                     <DataGrid x:Name="H120RiskDataGrid" Grid.Row="1" 
-                  AutoGenerateColumns="False" 
-                  IsReadOnly="True" 
-                  CanUserSortColumns="False"
-                  HeadersVisibility="Column"
-                  GridLinesVisibility="Horizontal"
-                  HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
-                  Background="Transparent" 
-                  RowHeight="36"
-                  BorderThickness="0">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="구분" Binding="{Binding Category}" Width="70"/>
-                            <DataGridTextColumn Header="기자재명" Binding="{Binding EquipmentName}" Width="*"/>
-                            <DataGridTextColumn Header="지연 일수" Binding="{Binding DelayText}" Width="60"/>
+          AutoGenerateColumns="False" 
+          IsReadOnly="True" 
+          CanUserSortColumns="False"
+          HeadersVisibility="Column"
+          GridLinesVisibility="Horizontal"
+          HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
+          Background="Transparent" 
+          RowHeight="36"
+          BorderThickness="0">
 
-                            <!-- 1. 상태 컬럼 (배지 스타일) -->
+                        <!-- [추가] 모든 컬럼 헤더를 가운데 정렬하고 굵게 만드는 스타일 설정 -->
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+
+                        <!-- 모든 셀 텍스트 가운데 정렬 스타일 -->
+                        <DataGrid.Resources>
+                            <Style x:Key="CenterAlignedCell" TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGrid.Resources>
+
+                        <DataGrid.Columns>
+                            <!-- [구분] 컬럼 -->
+                            <DataGridTemplateColumn Width="65">
+                                <DataGridTemplateColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Grid Width="50" Height="24">
+                                            <TextBlock Text="구분" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2,0,0,0"/>
+                                            <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                                Click="ProcessFilterButton_Click" Cursor="Hand" ToolTip="구분 필터">
+                                                <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
+                                  Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.HeaderTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Category}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- 나머지 컬럼들 -->
+                            <DataGridTextColumn Header="기자재명" Binding="{Binding EquipmentName}" Width="*" ElementStyle="{StaticResource CenterAlignedCell}"/>
+                            <DataGridTextColumn Header="지연 일수" Binding="{Binding DelayText}" Width="60" ElementStyle="{StaticResource CenterAlignedCell}"/>
+
+                            <!-- 1. 상태 컬럼 -->
                             <DataGridTemplateColumn Header="상태" Width="70">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -374,15 +410,15 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- 2. 주공정 영향 컬럼 (상태 색상 연동 적용) -->
+                            <!-- 2. 주공정 영향 컬럼 -->
                             <DataGridTemplateColumn Header="주공정 영향" Width="90">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Style="{StaticResource StatusBorderStyle}" Background="{Binding StatusBgColor}">
                                             <TextBlock Text="{Binding MainProcessImpact}" 
-                           Foreground="{Binding StatusFgColor}" 
-                           FontWeight="Bold" 
-                           FontSize="11"/>
+                                   Foreground="{Binding StatusFgColor}" 
+                                   FontWeight="Bold" 
+                                   FontSize="11"/>
                                         </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

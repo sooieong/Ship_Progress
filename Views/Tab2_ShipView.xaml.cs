@@ -16,10 +16,10 @@ namespace Ship_Progress
     // -----------------------------------------------------------
     public class BlockProgressItem
     {
-        public string Title { get; set; }          // 항목 명칭 (한국어 전용)
-        public double Progress { get; set; }       // 진행률 수치 (0 ~ 100)
+        public string Title { get; set; }         // 항목 명칭 (한국어 전용)
+        public double Progress { get; set; }        // 진행률 수치 (0 ~ 100)
 
-        public Brush BarColor { get; set; }        // 바 및 텍스트 색상
+        public Brush BarColor { get; set; }         // 바 및 텍스트 색상
         public string ProgressText => $"{Progress}%";
 
         public BlockProgressItem(string title, double progress)
@@ -125,6 +125,10 @@ namespace Ship_Progress
             }
         }
 
+        // 필터링을 위한 원본 데이터 및 필터 상태 변수 추가
+        private List<H120RiskItem> _originalH120RiskList = new List<H120RiskItem>();
+        private string _currentCategoryFilter = "전체";
+
         // -----------------------------------------------------------
         // 5. 생성자 및 이벤트 핸들러
         // -----------------------------------------------------------
@@ -178,7 +182,56 @@ namespace Ship_Progress
                 new H120RiskItem("배관", "고압 밸브 블록", 4, "주의", "#FFF3E0", "#E65100", "갑판 대형 장비")
             };
 
-            H120RiskDataGrid.ItemsSource = riskItems;
+            // 원본 데이터 백업 및 필터 초기화
+            _originalH120RiskList = riskItems;
+            _currentCategoryFilter = "전체";
+
+            ApplyCategoryFilter();
+        }
+
+        // -----------------------------------------------------------
+        // [구분] 헤더 버튼 클릭 시 동적 메뉴 생성 및 팝업
+        // -----------------------------------------------------------
+        private void ProcessFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                ContextMenu menu = new ContextMenu();
+
+                var distinctCategories = _originalH120RiskList.Select(x => x.Category).Distinct().OrderBy(x => x).ToList();
+
+                MenuItem allItem = new MenuItem { Header = "전체 보기", Tag = "전체" };
+                allItem.Click += (s, ev) => { _currentCategoryFilter = "전체"; ApplyCategoryFilter(); };
+                menu.Items.Add(allItem);
+
+                foreach (var cat in distinctCategories)
+                {
+                    MenuItem item = new MenuItem { Header = cat, Tag = cat };
+                    item.Click += (s, ev) => { _currentCategoryFilter = cat; ApplyCategoryFilter(); };
+                    menu.Items.Add(item);
+                }
+
+                btn.ContextMenu = menu;
+                menu.PlacementTarget = btn;
+                menu.IsOpen = true;
+            }
+        }
+
+        // -----------------------------------------------------------
+        // 선택된 구분에 따라 DataGrid 필터링 적용
+        // -----------------------------------------------------------
+        private void ApplyCategoryFilter()
+        {
+            if (H120RiskDataGrid == null) return;
+
+            var query = _originalH120RiskList.AsEnumerable();
+
+            if (_currentCategoryFilter != "전체")
+            {
+                query = query.Where(x => x.Category == _currentCategoryFilter);
+            }
+
+            H120RiskDataGrid.ItemsSource = query.ToList();
         }
 
         // S-Curve 캔버스 드로잉 로직 (다크/라이트 모드 리소스 대응 적용)
