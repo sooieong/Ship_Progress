@@ -271,7 +271,7 @@
                                 <DataGridTemplateColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <Grid Width="90" Height="24">
-                                            <TextBlock Text="협력사" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2,0,0,0"/>
+                                            <TextBlock Text="협력사" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="25,0,0,0"/>
                                             <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
                                 Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
                                 Click="VendorFilterButton_Click" Cursor="Hand" ToolTip="협력사 필터">
