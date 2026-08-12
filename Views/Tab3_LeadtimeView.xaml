@@ -407,7 +407,7 @@
 
                     <!-- 카드 타이틀 및 알림 필터 탭 -->
                     <Grid Grid.Row="0" Margin="0,0,0,12">
-                        <TextBlock Text="지연/요청 현황" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="지연 및 보류/대기 현황" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <!-- 전체 버튼 -->
@@ -447,11 +447,11 @@
                             </RadioButton>
 
                             <!-- 결품 버튼 -->
-                            <RadioButton Content="결품" Tag="결품" Checked="NotificationFilter_Checked" Cursor="Hand">
+                            <RadioButton Content="보류/대기" Tag="보류/대기" Checked="NotificationFilter_Checked" Cursor="Hand">
                                 <RadioButton.Template>
                                     <ControlTemplate TargetType="RadioButton">
                                         <Border x:Name="btnBorder" Background="Transparent" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10,4">
-                                            <TextBlock x:Name="btnText" Text="결품" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="btnText" Text="보류/대기" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsChecked" Value="True">

@@ -559,11 +559,11 @@ namespace Ship_Progress.Views
                 new NotificationItem("A SERIES", "H120", "지연", "생산팀", "(주)엔케이밸브", "메인엔진 패키지", "설치 일정을 고려하여 현장 반입 조기화 요청", "2026-08-02 14:30"),
                 new NotificationItem("A SERIES", "H120", "지연", "협력사", "(주)엔케이밸브", "고압 LNG 밸브", "원자재 수급 차질로 인해 납기 4일 연기 요청", "2026-08-02 11:15"),
                 new NotificationItem("A SERIES", "H121", "지연", "협력사", "삼영기계", "BWTS 펌프", "주요 주물 부품 선적 지연으로 7일 지연 발생 통보", "2026-08-01 17:40"),
-                new NotificationItem("A SERIES", "H121", "결품", "생산팀", "KCC글로벌", "스위치보드 배전반", "공장 FAT(공장 수락 검사) 일정 조율 및 서류 검사 가속 요청", "2026-08-01 09:20"),
+                new NotificationItem("A SERIES", "H121", "보류/대기", "생산팀", "KCC글로벌", "스위치보드 배전반", "공장 FAT(공장 수락 검사) 일정 조율 및 서류 검사 가속 요청", "2026-08-01 09:20"),
                 new NotificationItem("A SERIES", "H121", "지연", "협력사", "KCC글로벌", "특수 방오도료", "도료 배합 승인 지연으로 인한 공급 소폭 지연 안내", "2026-07-31 16:50"),
-                new NotificationItem("B SERIES", "H122", "결품", "생산팀", "KCC글로벌", "거주구 판넬 자재", "선실 의장 작업 구역 선행을 위한 자재 투입 앞당김 요청", "2026-07-31 10:05"),
+                new NotificationItem("B SERIES", "H122", "보류/대기", "생산팀", "KCC글로벌", "거주구 판넬 자재", "선실 의장 작업 구역 선행을 위한 자재 투입 앞당김 요청", "2026-07-31 10:05"),
                 new NotificationItem("B SERIES", "H122", "지연", "협력사", "비상발전기코리아", "비상발전기(Emergency Gen) 테스트", "부하 시험 중 일정 조정 안내", "2026-07-30 15:25"),
-                new NotificationItem("B SERIES", "H122", "결품", "협력사", "태광유압", "유압 파이프 자재", "현장 수령 물량 중 일부 규격 변경에 따른 확인 요청", "2026-07-30 08:45")
+                new NotificationItem("B SERIES", "H122", "보류/대기", "협력사", "태광유압", "유압 파이프 자재", "현장 수령 물량 중 일부 규격 변경에 따른 확인 요청", "2026-07-30 08:45")
             };
 
             FilterNotifications(SelectedShipNo, _currentNotificationFilter);
