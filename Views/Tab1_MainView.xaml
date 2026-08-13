@@ -63,7 +63,7 @@
                         <Grid Width="150" Height="85">
                             <lvc:PieChart StartingRotationAngle="270" InnerRadius="48" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" Series="{Binding H121GaugeSeries}" LegendLocation="None"/>
 
-                            <TextBlock Text="82.1%" FontSize="18" FontWeight="Bold" Foreground="#FF9800" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,26"/>
+                            <TextBlock Text="82.1%" FontSize="18" FontWeight="Bold" Foreground="#EAB308" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,26"/>
                         </Grid>
                     </StackPanel>
 
@@ -95,8 +95,25 @@
                 <TextBlock Grid.Row="0" Text="호선별 공정 흐름" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
                 <DataGrid x:Name="ProcessStatusDataGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="False" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{DynamicResource BorderBrush}" Background="Transparent" RowHeight="44" BorderThickness="0">
+
+                    <!-- 🔹 컬럼명: 굵게 + 가운데 정렬 -->
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="호선" Binding="{Binding ShipNo}" Width="80"/>
+                        <!-- 🔹 호선 컬럼: 가운데 정렬 추가 -->
+                        <DataGridTextColumn Header="호선" Binding="{Binding ShipNo}" Width="80">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
                         <DataGridTemplateColumn Header="강재절단" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
@@ -174,10 +191,10 @@
                         <TextBlock Text=" / " FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="4,0,4,0"/>
 
                         <!-- 주의 아이콘 & 주의 건수 -->
-                        <Rectangle Width="10" Height="10" Fill="#FA8C16" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <Rectangle Width="10" Height="10" Fill="#EAB308" VerticalAlignment="Center" Margin="0,0,4,0"/>
                         <TextBlock FontSize="13" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center">
         <Run Text="주의 "/>
-        <Run Text="{Binding TotalWarningCount}" Foreground="#FA8C16"/>
+        <Run Text="{Binding TotalWarningCount}" Foreground="#EAB308"/>
         <Run Text="건"/>
                         </TextBlock>
                     </StackPanel>
@@ -347,28 +364,8 @@
                          StrokeThickness="2" 
                          StrokeLineJoin="Round"/>
 
-                            <!-- 4. 정점 포인트 -->
-                            <ItemsControl ItemsSource="{Binding RadarDataPoints}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Canvas Width="260" Height="220"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemContainerStyle>
-                                    <Style TargetType="ContentPresenter">
-                                        <Setter Property="Canvas.Left" Value="{Binding X}"/>
-                                        <Setter Property="Canvas.Top" Value="{Binding Y}"/>
-                                    </Style>
-                                </ItemsControl.ItemContainerStyle>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Ellipse Width="6" Height="6" Fill="#FFEB3B" Margin="-3,-3,0,0"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
                             <!-- 5. 5대 의장 부문 축 레이블 (기자재, 기관의장, 선체의장, 선실의장, 전기의장) -->
-                            <TextBlock Text="기자재" Canvas.Top="2" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="기자재" Canvas.Top="2" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}"/>
                             <TextBlock Text="기관의장" Margin="190,75,0,0" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
                             <TextBlock Text="선체의장" Margin="170,203,0,0" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
                             <TextBlock Text="선실의장" Margin="0,203,170,0" HorizontalAlignment="Right" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>

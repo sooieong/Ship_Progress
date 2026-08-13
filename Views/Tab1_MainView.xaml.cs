@@ -223,7 +223,7 @@ namespace Ship_Progress
         private void LoadGaugeData()
         {
             H120GaugeSeries = CreateSemiCircleGaugeSeries(87.2, Color.FromRgb(76, 175, 80));
-            H121GaugeSeries = CreateSemiCircleGaugeSeries(82.1, Color.FromRgb(255, 152, 0));
+            H121GaugeSeries = CreateSemiCircleGaugeSeries(82.1, Color.FromRgb(234, 179, 8));
             H122GaugeSeries = CreateSemiCircleGaugeSeries(91.3, Color.FromRgb(76, 175, 80));
         }
 
@@ -243,7 +243,7 @@ namespace Ship_Progress
         private void LoadProcessStatusData()
         {
             var green = new SolidColorBrush(Color.FromRgb(34, 197, 94));
-            var orange = new SolidColorBrush(Color.FromRgb(250, 140, 22));
+            var orange = (SolidColorBrush)Application.Current.Resources["HanwhaOrangeBrush"];
             var gray = new SolidColorBrush(Color.FromRgb(224, 224, 224));
 
             var processList = new List<ProcessStatusItem>
@@ -323,7 +323,7 @@ namespace Ship_Progress
                 {
                     Title = "주의",
                     Values = warningValues,
-                    Fill = new SolidColorBrush(Color.FromRgb(250, 140, 22)),
+                    Fill = new SolidColorBrush(Color.FromRgb(234, 179, 8)),
                     StackMode = StackMode.Percentage,
                     DataLabels = true,
                     LabelPoint = countFormatter,
