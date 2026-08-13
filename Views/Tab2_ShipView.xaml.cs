@@ -305,7 +305,7 @@ namespace Ship_Progress
                 }
             }
 
-            Polyline planPolyline = new Polyline { Stroke = new SolidColorBrush(Color.FromRgb(30, 136, 229)), StrokeThickness = 2 };
+            Polyline planPolyline = new Polyline { Stroke = new SolidColorBrush(Color.FromRgb(76, 175, 80)), StrokeThickness = 2 };
             Polyline actualPolyline = new Polyline { Stroke = new SolidColorBrush(Color.FromRgb(243, 115, 33)), StrokeThickness = 2.5 };
 
             int dateCount = (dateLabels != null && dateLabels.Length > 0) ? dateLabels.Length : planDataValues.Length;

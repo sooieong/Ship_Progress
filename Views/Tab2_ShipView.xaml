@@ -251,7 +251,7 @@
                     <Grid Grid.Row="0" Margin="0,0,0,12">
                         <TextBlock Text="종합 공정률 S-Curve" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Ellipse Width="8" Height="8" Fill="#1E88E5" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <Ellipse Width="8" Height="8" Fill="#4CAF50" VerticalAlignment="Center" Margin="0,0,4,0"/>
                             <TextBlock Text="계획" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,12,0" FontWeight="SemiBold"/>
                             <Ellipse Width="8" Height="8" Fill="{DynamicResource HanwhaOrangeBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
                             <TextBlock Text="실적" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold"/>
@@ -284,11 +284,11 @@
                         <!-- 1. 강재절단 -->
                         <StackPanel HorizontalAlignment="Center">
                             <Grid Width="52" Height="52">
-                                <Ellipse Fill="#22C55E"/>
+                                <Ellipse Fill="#4CAF50"/>
                                 <TextBlock Text="✓" Foreground="White" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Text="강재절단" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,6,0,2"/>
-                            <TextBlock Text="완료" FontSize="10" Foreground="#22C55E" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="완료" FontSize="10" Foreground="#4CAF50" FontWeight="Bold" HorizontalAlignment="Center"/>
                         </StackPanel>
 
                         <!-- 화살표 1 -->
@@ -297,11 +297,11 @@
                         <!-- 2. 블록조립 -->
                         <StackPanel HorizontalAlignment="Center">
                             <Grid Width="52" Height="52">
-                                <Ellipse Fill="#22C55E"/>
+                                <Ellipse Fill="#4CAF50"/>
                                 <TextBlock Text="✓" Foreground="White" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Text="블록조립" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,6,0,2"/>
-                            <TextBlock Text="완료" FontSize="10" Foreground="#22C55E" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="완료" FontSize="10" Foreground="#4CAF50" FontWeight="Bold" HorizontalAlignment="Center"/>
                         </StackPanel>
 
                         <!-- 화살표 2 -->
