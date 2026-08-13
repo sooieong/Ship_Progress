@@ -58,17 +58,39 @@ namespace Ship_Progress.Views
         private double[] currentChartTargets = Array.Empty<double>();
         private double[] currentChartActuals = Array.Empty<double>();
 
+        // 체크박스 상태 변경 시 차트 실시간 갱신 이벤트
+        private void RiskItem_CheckChanged(object sender, RoutedEventArgs e)
+        {
+            var currentItems = GetFilteredLeadtimeList(SelectedShipNo);
+            var selectedItems = currentItems.Where(x => x.IsSelected).ToList();
+
+            // 모든 체크가 해제된 경우 경고창을 띄우고 직전 상태로 되돌림
+            if (selectedItems.Count == 0)
+            {
+                MessageBox.Show("최소 1개 이상의 기자재를 선택해야 합니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                // 방금 해제한 체크박스를 다시 체크 상태로 복구
+                if (sender is CheckBox cb && cb.DataContext is LeadtimeItem item)
+                {
+                    item.IsSelected = true;
+                }
+                return;
+            }
+
+            UpdateChartDataForShip(SelectedShipNo);
+        }
+
         private void UpdateChartDataForShip(string shipNo)
         {
             if (_allLeadtimeList == null) return;
 
-            // 현재 선택된 호선에 해당하는 항목들 중 체크된 항목들만 필터링 (현재 필터 조건 반영)
             var currentItems = GetFilteredLeadtimeList(shipNo);
             var selectedItems = currentItems.Where(x => x.IsSelected).ToList();
 
+            // 방어 코드: 만약 선택된 항목이 없다면 차트를 갱신하지 않음
             if (selectedItems.Count == 0)
             {
-                selectedItems = currentItems;
+                return;
             }
 
             currentChartLabels = selectedItems.Select(x => x.EquipmentName).ToArray();
@@ -203,12 +225,6 @@ namespace Ship_Progress.Views
         private void LeadtimeChartCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             DrawLeadtimeChart();
-        }
-
-        // 체크박스 상태 변경 시 차트 실시간 갱신 이벤트
-        private void RiskItem_CheckChanged(object sender, RoutedEventArgs e)
-        {
-            UpdateChartDataForShip(SelectedShipNo);
         }
 
         // -----------------------------------------------------------
