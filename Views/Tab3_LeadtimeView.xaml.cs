@@ -465,7 +465,7 @@ namespace Ship_Progress.Views
                 double aVal = currentChartActuals[i];      // 현재 입고 (하단 누적)
                 double gapVal = Math.Max(0, tVal - aVal);  // 잔여 필요량 (상단 누적)
 
-                // 1. 하단: 현재 입고 막대 (주황색)
+                // 1. 하단: 현재 입고 막대 (초록색)
                 double aHeight = (aVal / maxBarValue) * chartH;
                 double aY = paddingTop + chartH - aHeight;
 
@@ -473,21 +473,21 @@ namespace Ship_Progress.Views
                 {
                     Width = barWidth,
                     Height = Math.Max(0, aHeight),
-                    Fill = Application.Current.Resources["HanwhaOrangeBrush"] as Brush ?? new SolidColorBrush(Color.FromRgb(243, 115, 33))
+                    Fill = new SolidColorBrush(Color.FromRgb(76, 175, 80))
                 };
                 Canvas.SetLeft(actualBar, centerX - (barWidth / 2.0));
                 Canvas.SetTop(actualBar, aY);
                 LeadtimeChartCanvas.Children.Add(actualBar);
 
-                // 2. 상단: 잔여 필요량 막대 (주황색 막대 바로 위에 이어서 적층, 초록색 계열 또는 목표 색상)
+                // 2. 상단: 목표(잔여분) 막대 (#E0E0E0 회색 적용)
                 double gapHeight = (gapVal / maxBarValue) * chartH;
-                double gapY = aY - gapHeight; // 현재 입고 막대의 상단 끝 지점부터 위로 쌓음
+                double gapY = aY - gapHeight;
 
                 Rectangle targetRemainingBar = new Rectangle
                 {
                     Width = barWidth,
                     Height = Math.Max(0, gapHeight),
-                    Fill = new SolidColorBrush(Color.FromRgb(76, 175, 80)), // 초록색 (목표 잔여분)
+                    Fill = (SolidColorBrush)(new BrushConverter().ConvertFrom("#E0E0E0") ?? new SolidColorBrush(Colors.LightGray)),
                     Cursor = Cursors.Hand
                 };
                 Canvas.SetLeft(targetRemainingBar, centerX - (barWidth / 2.0));
@@ -495,10 +495,10 @@ namespace Ship_Progress.Views
                 LeadtimeChartCanvas.Children.Add(targetRemainingBar);
 
                 // 3. 잔여 필요량 꺾은선(Polyline) 포인트 추가를 위한 위치 계산
-                double lineY = paddingTop + chartH - ((tVal - aVal) / maxGapValue * chartH); // 기존 꺾은선 연동용
+                double lineY = paddingTop + chartH - ((tVal - aVal) / maxGapValue * chartH);
                 gapPolyline.Points.Add(new Point(centerX, lineY));
 
-                // 4. 잔여 필요량 수치 텍스트 표시
+                // 4. 잔여 필요량 수치 텍스트 표시 (빨간색 유지)
                 TextBlock valueLabel = new TextBlock
                 {
                     Text = $"{gapVal:F0}",

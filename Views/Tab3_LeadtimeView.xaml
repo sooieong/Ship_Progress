@@ -269,11 +269,11 @@
                         <TextBlock Text="납기 현황 차트" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <!-- 1. 목표 범례 (초록색) -->
-                            <Ellipse Width="10" Height="10" Fill="#4CAF50" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <Ellipse Width="10" Height="10" Fill="#888888" VerticalAlignment="Center" Margin="0,0,4,0"/>
                             <TextBlock Text="목표" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
 
                             <!-- 2. 현재 입고 범례 (주황색) -->
-                            <Ellipse Width="10" Height="10" Fill="{StaticResource HanwhaOrangeBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <Ellipse Width="10" Height="10" Fill="#4CAF50" VerticalAlignment="Center" Margin="0,0,4,0"/>
                             <TextBlock Text="현재 입고" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
 
                             <!-- 3. 잔여 필요량 범례 (빨간색) -->
