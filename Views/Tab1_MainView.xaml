@@ -407,7 +407,7 @@
                                 <TextBlock Text="{Binding OnTimePercentageText}" 
                                FontSize="18" 
                                FontWeight="Bold" 
-                               Foreground="#22C55E" 
+                               Foreground="#4CAF50" 
                                HorizontalAlignment="Center"/>
                                 <TextBlock Text="정시 납품" 
                                FontSize="11" 
@@ -425,9 +425,9 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Ellipse Grid.Column="0" Width="10" Height="10" Fill="#22C55E" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <Ellipse Grid.Column="0" Width="10" Height="10" Fill="#4CAF50" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                    <TextBlock Text="{Binding OnTimePercentageText}" FontWeight="Bold" FontSize="13" Foreground="#22C55E" Margin="0,0,6,0"/>
+                                    <TextBlock Text="{Binding OnTimePercentageText}" FontWeight="Bold" FontSize="13" Foreground="#4CAF50" Margin="0,0,6,0"/>
                                     <TextBlock Text="정시 납품" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Grid>

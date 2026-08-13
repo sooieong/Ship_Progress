@@ -178,7 +178,7 @@ namespace Ship_Progress
                     {
                         case "위험": return new SolidColorBrush(Color.FromArgb(50, 229, 57, 53));
                         case "주의": return new SolidColorBrush(Color.FromArgb(50, 250, 140, 22));
-                        case "정상": return new SolidColorBrush(Color.FromArgb(50, 34, 197, 94));
+                        case "정상": return new SolidColorBrush(Color.FromArgb(50, 76, 175, 80));
                         default: return Brushes.Transparent;
                     }
                 }
@@ -242,7 +242,7 @@ namespace Ship_Progress
         // -----------------------------------------------------------
         private void LoadProcessStatusData()
         {
-            var green = new SolidColorBrush(Color.FromRgb(34, 197, 94));
+            var green = new SolidColorBrush(Color.FromRgb(76, 175, 80));
             var orange = (SolidColorBrush)Application.Current.Resources["HanwhaOrangeBrush"];
             var gray = new SolidColorBrush(Color.FromRgb(224, 224, 224));
 
@@ -462,7 +462,7 @@ namespace Ship_Progress
                 {
                     Title = "On Time",
                     Values = new ChartValues<double> { onTimeVal },
-                    Fill = new SolidColorBrush(Color.FromRgb(34, 197, 94)),
+                    Fill = new SolidColorBrush(Color.FromRgb(76, 175, 80)),
                     StrokeThickness = 0
                 },
                 new PieSeries
