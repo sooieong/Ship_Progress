@@ -39,8 +39,7 @@ namespace Ship_Progress
             else if (progress >= 60)
             {
                 // 주황색 (Orange/Yellow)
-                BarColor = (Application.Current.TryFindResource("HanwhaOrangeBrush") as Brush)
-                ?? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F37321"));
+                BarColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EAB308"));
             }
             else
             {
