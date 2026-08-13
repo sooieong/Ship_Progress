@@ -232,7 +232,7 @@ namespace Ship_Progress
             return new SeriesCollection
             {
                 new PieSeries { Values = new ChartValues<double> { percentage }, Fill = new SolidColorBrush(activeColor), StrokeThickness = 0 },
-                new PieSeries { Values = new ChartValues<double> { 100 - percentage }, Fill = new SolidColorBrush(Color.FromRgb(220, 224, 230)), StrokeThickness = 0 },
+                new PieSeries { Values = new ChartValues<double> { 100 - percentage }, Fill = new SolidColorBrush(Color.FromRgb(224, 224, 230)), StrokeThickness = 0 },
                 new PieSeries { Values = new ChartValues<double> { 100 }, Fill = Brushes.Transparent, StrokeThickness = 0 }
             };
         }
