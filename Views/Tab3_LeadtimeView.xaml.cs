@@ -452,7 +452,7 @@ namespace Ship_Progress.Views
                 {
                     Width = barWidth,
                     Height = Math.Max(0, tHeight),
-                    Fill = new SolidColorBrush(Color.FromRgb(34, 197, 94))
+                    Fill = new SolidColorBrush(Color.FromRgb(76, 175, 80))
                 };
                 Canvas.SetLeft(targetBar, centerX - barWidth - 2);
                 Canvas.SetTop(targetBar, tY);
@@ -466,7 +466,7 @@ namespace Ship_Progress.Views
                 {
                     Width = barWidth,
                     Height = Math.Max(0, aHeight),
-                    Fill = new SolidColorBrush(Color.FromRgb(251, 140, 0))
+                    Fill = Application.Current.Resources["HanwhaOrangeBrush"] as Brush ?? new SolidColorBrush(Color.FromRgb(243, 115, 33))
                 };
                 Canvas.SetLeft(actualBar, centerX + 2);
                 Canvas.SetTop(actualBar, aY);
