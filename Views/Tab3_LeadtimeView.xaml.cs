@@ -458,23 +458,14 @@ namespace Ship_Progress.Views
                 Canvas.SetTop(xLabel, height - paddingBottom + 8);
                 LeadtimeChartCanvas.Children.Add(xLabel);
 
-                double barWidth = Math.Min(slotWidth * 0.32, 30);
+                // 누적 막대의 두께 설정 (슬롯 너비의 45% 수준)
+                double barWidth = Math.Min(slotWidth * 0.45, 35);
 
-                double tVal = currentChartTargets[i];
-                double tHeight = (tVal / maxBarValue) * chartH;
-                double tY = paddingTop + chartH - tHeight;
+                double tVal = currentChartTargets[i];      // 목표 (전체 누적 높이 기준)
+                double aVal = currentChartActuals[i];      // 현재 입고 (하단 누적)
+                double gapVal = Math.Max(0, tVal - aVal);  // 잔여 필요량 (상단 누적)
 
-                Rectangle targetBar = new Rectangle
-                {
-                    Width = barWidth,
-                    Height = Math.Max(0, tHeight),
-                    Fill = new SolidColorBrush(Color.FromRgb(76, 175, 80))
-                };
-                Canvas.SetLeft(targetBar, centerX - barWidth - 2);
-                Canvas.SetTop(targetBar, tY);
-                LeadtimeChartCanvas.Children.Add(targetBar);
-
-                double aVal = currentChartActuals[i];
+                // 1. 하단: 현재 입고 막대 (주황색)
                 double aHeight = (aVal / maxBarValue) * chartH;
                 double aY = paddingTop + chartH - aHeight;
 
@@ -484,29 +475,30 @@ namespace Ship_Progress.Views
                     Height = Math.Max(0, aHeight),
                     Fill = Application.Current.Resources["HanwhaOrangeBrush"] as Brush ?? new SolidColorBrush(Color.FromRgb(243, 115, 33))
                 };
-                Canvas.SetLeft(actualBar, centerX + 2);
+                Canvas.SetLeft(actualBar, centerX - (barWidth / 2.0));
                 Canvas.SetTop(actualBar, aY);
                 LeadtimeChartCanvas.Children.Add(actualBar);
 
-                double gapVal = Math.Max(0, tVal - aVal);
-                double gapHeight = (gapVal / maxGapValue) * chartH;
-                double gapY = paddingTop + chartH - gapHeight;
+                // 2. 상단: 잔여 필요량 막대 (주황색 막대 바로 위에 이어서 적층, 초록색 계열 또는 목표 색상)
+                double gapHeight = (gapVal / maxBarValue) * chartH;
+                double gapY = aY - gapHeight; // 현재 입고 막대의 상단 끝 지점부터 위로 쌓음
 
-                gapPolyline.Points.Add(new Point(centerX, gapY));
-
-                Ellipse dot = new Ellipse
+                Rectangle targetRemainingBar = new Rectangle
                 {
-                    Width = 8,
-                    Height = 8,
-                    Fill = Application.Current.Resources["HeaderBackgroundBrush"] as Brush ?? Brushes.White,
-                    Stroke = new SolidColorBrush(Color.FromRgb(229, 57, 53)),
-                    StrokeThickness = 2,
+                    Width = barWidth,
+                    Height = Math.Max(0, gapHeight),
+                    Fill = new SolidColorBrush(Color.FromRgb(76, 175, 80)), // 초록색 (목표 잔여분)
                     Cursor = Cursors.Hand
                 };
+                Canvas.SetLeft(targetRemainingBar, centerX - (barWidth / 2.0));
+                Canvas.SetTop(targetRemainingBar, gapY);
+                LeadtimeChartCanvas.Children.Add(targetRemainingBar);
 
-                double currentX = centerX;
-                double currentY = gapY;
+                // 3. 잔여 필요량 꺾은선(Polyline) 포인트 추가를 위한 위치 계산
+                double lineY = paddingTop + chartH - ((tVal - aVal) / maxGapValue * chartH); // 기존 꺾은선 연동용
+                gapPolyline.Points.Add(new Point(centerX, lineY));
 
+                // 4. 잔여 필요량 수치 텍스트 표시
                 TextBlock valueLabel = new TextBlock
                 {
                     Text = $"{gapVal:F0}",
@@ -518,6 +510,20 @@ namespace Ship_Progress.Views
                 Canvas.SetLeft(valueLabel, centerX - (valueLabel.DesiredSize.Width / 2.0));
                 Canvas.SetTop(valueLabel, gapY - 16);
                 LeadtimeChartCanvas.Children.Add(valueLabel);
+
+                // 5. 꺾은선 위 클릭 가능한 포인트(Dot) 및 툴팁 이벤트
+                Ellipse dot = new Ellipse
+                {
+                    Width = 8,
+                    Height = 8,
+                    Fill = Application.Current.Resources["HeaderBackgroundBrush"] as Brush ?? Brushes.White,
+                    Stroke = new SolidColorBrush(Color.FromRgb(229, 57, 53)),
+                    StrokeThickness = 2,
+                    Cursor = Cursors.Hand
+                };
+
+                double currentX = centerX;
+                double currentY = lineY;
 
                 dot.MouseDown += (s, ev) =>
                 {
@@ -538,10 +544,9 @@ namespace Ship_Progress.Views
                 };
 
                 Canvas.SetLeft(dot, centerX - 4);
-                Canvas.SetTop(dot, gapY - 4);
+                Canvas.SetTop(dot, lineY - 4);
                 LeadtimeChartCanvas.Children.Add(dot);
             }
-
             LeadtimeChartCanvas.Children.Add(gapPolyline);
         }
 
