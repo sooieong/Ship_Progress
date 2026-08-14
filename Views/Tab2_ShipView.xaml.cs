@@ -253,7 +253,7 @@ namespace Ship_Progress
         public void LoadShipDashboardData(string shipNo)
         {
             SelectedShipNo = shipNo;
-            SelectedSeriesName = shipNo == "H122" ? "B SERIES" : "A SERIES";
+            SelectedSeriesName = shipNo == "H122" ? "A SERIES" : "A SERIES";
 
             string[] stepNames = { "강재절단", "블록조립", "탑재", "의장", "시운전" };
             int activeIndex = 0;

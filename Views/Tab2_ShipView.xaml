@@ -155,7 +155,7 @@
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
-                                        <TextBlock Text="B SERIES" FontSize="9" HorizontalAlignment="Center">
+                                        <TextBlock Text="A SERIES" FontSize="9" HorizontalAlignment="Center">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
