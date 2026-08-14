@@ -265,14 +265,13 @@ namespace Ship_Progress
         {
             var riskDataList = new List<EquipmentRiskItem>
             {
-                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "의장", IssueDetail = "메인엔진 패키지 입고 지연", DelayDays = "14일", Status = "위험" },
-                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "배관", IssueDetail = "고압 LNG 밸브 수급 소폭 지연", DelayDays = "4일", Status = "주의" },
-                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "기관", IssueDetail = "선박평형수 처리장치(BWTS) 펌프 입고 지연", DelayDays = "7일", Status = "주의" },
-                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "전기", IssueDetail = "스위치보드 배전반 서류 검사 지연", DelayDays = "3일", Status = "정상" },
-                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "도장", IssueDetail = "특수 방오도료 수급 소폭 지연", DelayDays = "2일", Status = "정상" },
-                new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "의장", IssueDetail = "선실 거주구 판넬 자재 입고 소폭 지연", DelayDays = "2일", Status = "정상" },
-                new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "기관", IssueDetail = "비상발전기(Emergency Gen) 테스트 일정 조정", DelayDays = "5일", Status = "주의" },
-                new EquipmentRiskItem { Series = "B SERIES", ShipNo = "H122", Process = "배관", IssueDetail = "유압 파이프 자재 현장 수령 소폭 지연", DelayDays = "1일", Status = "정상" }
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "기관", IssueDetail = "고압 피팅 단조품 해외 수입 원자재(SUS316L) 수급 차질 및 공장 정밀 가공 밀림", DelayDays = "8일", Status = "주의" },
+new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "기관", IssueDetail = "소조립 맞춤 굽힘 가공 시 파이프 내경 변형 발생에 따른 재가공 작업으로 출고 지연", DelayDays = "10일", Status = "위험" },
+new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "기관", IssueDetail = "밸브 디스크 수압 기밀 시험 중 미세 누설 발생으로 가스켓 재장착 및 재검사 진행", DelayDays = "9일", Status = "주의" },
+new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "선실", IssueDetail = "친환경 도료 해외 수입 수지 원료 공급 연기와 공장 배합 작업 적체로 2차 마감재 출고 지연", DelayDays = "8일", Status = "주의" },
+new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "선실", IssueDetail = "갑판 후판 구조물 절단용 레이저 가공기 고장 수리 및 결합부 챔퍼 가공 순연", DelayDays = "11일", Status = "위험" },
+new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "전기", IssueDetail = "마린 멀티코어 케이블 피복 절연 내전압 시험 중 특정 코어 통전 불량으로 재가공 지연", DelayDays = "10일", Status = "위험" },
+new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "전기", IssueDetail = "고압 피팅 단조품 해외 수입 원자재(SUS316L) 수급 차질 및 공장 정밀 가공 밀림", DelayDays = "7일", Status = "주의" }
             };
 
             // 원본 데이터 백업
