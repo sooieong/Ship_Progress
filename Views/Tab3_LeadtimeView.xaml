@@ -293,7 +293,7 @@
                 </Grid>
             </Border>
 
-            <!-- [2-2] 우측: 위험 기자재 현황 표 카드 (3행에서 이동) -->
+            <!-- [2-2] 우측: 위험 기자재 현황 표 카드 -->
             <Border Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -301,20 +301,35 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="납기 현황 DB" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
+                    <!-- 상단 타이틀 + 검색창 + 페이지네이션 영역 -->
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                        <TextBlock Text="납기 현황 DB" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <!-- 기자재명 검색 텍스트박스 -->
+                            <TextBox x:Name="SearchTextBox" Width="130" Height="24" FontSize="11" VerticalContentAlignment="Center" Padding="4,0" Margin="0,0,8,0"
+                         TextChanged="SearchTextBox_TextChanged"
+                         ToolTip="기자재명 검색"/>
+
+                            <!-- 페이지네이션 컨트롤 (가장 우측) -->
+                            <Button Content="◀" Click="PrevPage_Click" FontSize="9" Padding="4,2" Margin="0,0,4,0" Cursor="Hand"/>
+                            <TextBlock x:Name="PageInfoTextBlock" Text="1 / 1" VerticalAlignment="Center" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="2,0"/>
+                            <Button Content="▶" Click="NextPage_Click" FontSize="9" Padding="4,2" Margin="4,0,0,0" Cursor="Hand"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 납기 현황 DataGrid -->
                     <DataGrid x:Name="LeadtimeRiskDataGrid" Grid.Row="1" 
-          AutoGenerateColumns="False" 
-          IsReadOnly="False" 
-          CanUserSortColumns="True"
-          HeadersVisibility="Column"
-          GridLinesVisibility="Horizontal"
-          HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
-          Background="Transparent" 
-          RowHeight="36"
-          BorderThickness="0">
-
-                        <!-- 모든 컬럼 헤더 가운데 정렬 및 굵게 설정 -->
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="False" 
+                  CanUserSortColumns="True"
+                  HeadersVisibility="Column"
+                  GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
+                  Background="Transparent" 
+                  RowHeight="36"
+                  BorderThickness="0">
+                        <!-- (Columns 및 스타일 설정은 기존과 동일) -->
                         <DataGrid.ColumnHeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -323,7 +338,6 @@
                             </Style>
                         </DataGrid.ColumnHeaderStyle>
 
-                        <!-- 모든 셀 텍스트 가운데 정렬 스타일 -->
                         <DataGrid.Resources>
                             <Style x:Key="CenterAlignedCell" TargetType="TextBlock">
                                 <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -337,23 +351,23 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" 
-                              HorizontalAlignment="Center" VerticalAlignment="Center"
-                              Checked="RiskItem_CheckChanged" Unchecked="RiskItem_CheckChanged"/>
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Checked="RiskItem_CheckChanged" Unchecked="RiskItem_CheckChanged"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- 1. [구분] 컬럼 (필터 버튼 포함, 폭 65) -->
+                            <!-- [구분] 컬럼 -->
                             <DataGridTemplateColumn Width="65">
                                 <DataGridTemplateColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <Grid Width="50" Height="24">
                                             <TextBlock Text="구분" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2,0,0,0"/>
                                             <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
-                                Click="CategoryFilterButton_Click" Cursor="Hand" ToolTip="구분 필터">
+                                        Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                                        Click="CategoryFilterButton_Click" Cursor="Hand" ToolTip="구분 필터">
                                                 <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
-                                  Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                          Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             </Button>
                                         </Grid>
                                     </DataTemplate>
@@ -368,17 +382,17 @@
                             <!-- 기자재명 컬럼 -->
                             <DataGridTextColumn Header="기자재명" Binding="{Binding EquipmentName}" Width="*" ElementStyle="{StaticResource CenterAlignedCell}"/>
 
-                            <!-- 2. [협력사] 컬럼 (필터 버튼 포함, 폭 105) -->
+                            <!-- [협력사] 컬럼 -->
                             <DataGridTemplateColumn Width="105">
                                 <DataGridTemplateColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <Grid Width="90" Height="24">
                                             <TextBlock Text="협력사" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="25,0,0,0"/>
                                             <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
-                                Click="VendorFilterButton_Click" Cursor="Hand" ToolTip="협력사 필터">
+                                        Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                                        Click="VendorFilterButton_Click" Cursor="Hand" ToolTip="협력사 필터">
                                                 <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
-                                  Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                          Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             </Button>
                                         </Grid>
                                     </DataTemplate>
@@ -393,8 +407,8 @@
                             <!-- 납기일 컬럼 -->
                             <DataGridTextColumn Header="납기일" Binding="{Binding DeliveryDate}" Width="90" ElementStyle="{StaticResource CenterAlignedCell}"/>
 
-                            <!-- 잔여일수 컬럼 -->
-                            <DataGridTextColumn Header="잔여일수" Binding="{Binding RemainingDaysText}" Width="70" ElementStyle="{StaticResource CenterAlignedCell}"/>
+                            <!-- 지연일수 컬럼 -->
+                            <DataGridTextColumn Header="지연일수" Binding="{Binding RemainingDaysText}" Width="70" ElementStyle="{StaticResource CenterAlignedCell}"/>
 
                             <!-- 상태 컬럼 -->
                             <DataGridTemplateColumn Header="상태" Width="65">
@@ -470,7 +484,7 @@
                     </UniformGrid>
                 </Grid>
             </Border>
-            
+
             <!-- [3-2] 우측: 결품/지연 알림 영역 -->
             <Border Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>

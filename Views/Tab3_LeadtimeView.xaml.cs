@@ -32,27 +32,6 @@ namespace Ship_Progress.Views
             set { _selectedSeriesName = value; OnPropertyChanged(); }
         }
 
-        private double _onTimeRate = 90;
-        public double OnTimeRate
-        {
-            get => _onTimeRate;
-            set { _onTimeRate = value; OnPropertyChanged(); }
-        }
-
-        private int _avgLeadTime = 7;
-        public int AvgLeadTime
-        {
-            get => _avgLeadTime;
-            set { _avgLeadTime = value; OnPropertyChanged(); }
-        }
-
-        private int _riskCount = 3;
-        public int RiskCount
-        {
-            get => _riskCount;
-            set { _riskCount = value; OnPropertyChanged(); }
-        }
-
         // -----------------------------------------------------------
         // 2. 3행 좌측 3개 독립 도넛 차트 바인딩 프로퍼티
         // -----------------------------------------------------------
@@ -87,7 +66,7 @@ namespace Ship_Progress.Views
         public Brush ReceiveColor { get => _receiveColor; set { _receiveColor = value; OnPropertyChanged(); } }
 
         // -----------------------------------------------------------
-        // 3. 2행 납기 현황 차트용 데이터 및 설정
+        // 3. 2행 납기 현황 차트용 데이터 캐시
         // -----------------------------------------------------------
         private string[] currentChartLabels = Array.Empty<string>();
         private double[] currentChartTargets = Array.Empty<double>();
@@ -96,22 +75,6 @@ namespace Ship_Progress.Views
         // 체크박스 상태 변경 시 차트 실시간 갱신 이벤트
         private void RiskItem_CheckChanged(object sender, RoutedEventArgs e)
         {
-            var currentItems = GetFilteredLeadtimeList(SelectedShipNo);
-            var selectedItems = currentItems.Where(x => x.IsSelected).ToList();
-
-            // 모든 체크가 해제된 경우 경고창을 띄우고 직전 상태로 되돌림
-            if (selectedItems.Count == 0)
-            {
-                MessageBox.Show("최소 1개 이상의 기자재를 선택해야 합니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
-
-                // 방금 해제한 체크박스를 다시 체크 상태로 복구
-                if (sender is CheckBox cb && cb.DataContext is LeadtimeItem item)
-                {
-                    item.IsSelected = true;
-                }
-                return;
-            }
-
             UpdateChartDataForShip(SelectedShipNo);
         }
 
@@ -120,19 +83,24 @@ namespace Ship_Progress.Views
             if (_allLeadtimeList == null) return;
 
             var currentItems = GetFilteredLeadtimeList(shipNo);
-            var selectedItems = currentItems.Where(x => x.IsSelected).ToList();
 
-            // 방어 코드: 만약 선택된 항목이 없다면 차트를 갱신하지 않음
+            // [변경됨] 선택(IsSelected)되었고, 상태가 '위험', '주의', '납품 예정'인 항목만 차트에 표시
+            var selectedItems = currentItems
+                .Where(x => x.IsSelected && (x.Status == "위험" || x.Status == "주의" || x.Status == "납품 예정"))
+                .ToList();
+
             if (selectedItems.Count == 0)
             {
+                currentChartLabels = Array.Empty<string>();
+                currentChartTargets = Array.Empty<double>();
+                currentChartActuals = Array.Empty<double>();
+                DrawLeadtimeChart();
                 return;
             }
 
             currentChartLabels = selectedItems.Select(x => x.EquipmentName).ToArray();
-
-            // 임시 목표/현재입고 수치 부여
-            currentChartTargets = selectedItems.Select(x => (double)(x.RemainingDays * 30 + 200)).ToArray();
-            currentChartActuals = selectedItems.Select(x => (double)(x.RemainingDays * 20 + 100)).ToArray();
+            currentChartTargets = selectedItems.Select(x => (double)x.Target).ToArray();
+            currentChartActuals = selectedItems.Select(x => (double)x.CurrentStock).ToArray();
 
             DrawLeadtimeChart();
         }
@@ -147,21 +115,21 @@ namespace Ship_Progress.Views
 
             if (shipNo == "H120")
             {
-                orderVal = 750;   // 96.6%
-                inspectVal = 692; // 89.2%
-                receiveVal = 685; // 88.3%
+                orderVal = 750;
+                inspectVal = 692;
+                receiveVal = 685;
             }
             else if (shipNo == "H121")
             {
-                orderVal = 702;   // 90.5%
-                inspectVal = 520; // 67.0%
-                receiveVal = 458; // 59.0%
+                orderVal = 702;
+                inspectVal = 520;
+                receiveVal = 458;
             }
             else if (shipNo == "H122")
             {
-                orderVal = 621;   // 80.0%
-                inspectVal = 342; // 44.1%
-                receiveVal = 241; // 31.1%
+                orderVal = 621;
+                inspectVal = 342;
+                receiveVal = 241;
             }
 
             double orderPct = (orderVal / total) * 100.0;
@@ -204,23 +172,24 @@ namespace Ship_Progress.Views
         private Brush GetStatusBrush(double percent)
         {
             if (percent >= 80.0)
-                return new SolidColorBrush(Color.FromRgb(76, 175, 80));   // 초록색 (#4CAF50)
+                return new SolidColorBrush(Color.FromRgb(76, 175, 80));
             else if (percent >= 50.0)
-                return new SolidColorBrush(Color.FromRgb(234, 179, 8));   // 머스타드색 (#EAB308)
+                return new SolidColorBrush(Color.FromRgb(234, 179, 8));
             else
-                return new SolidColorBrush(Color.FromRgb(229, 57, 53));   // 빨간색 (#E53935)
+                return new SolidColorBrush(Color.FromRgb(229, 57, 53));
         }
 
         // -----------------------------------------------------------
-        // 5. 3행 하단 좌측 표 모델 및 원본 리스트 / 필터 상태 변수
+        // 5. 납기 현황 DB 모델 및 데이터 리스트
         // -----------------------------------------------------------
         private List<LeadtimeItem> _allLeadtimeList;
         private string _currentCategoryFilter = "전체";
         private string _currentVendorFilter = "전체";
+        private string _currentSearchKeyword = string.Empty;
 
         public class LeadtimeItem : INotifyPropertyChanged
         {
-            private bool _isSelected = true; // 기본 체크 상태
+            private bool _isSelected = true;
             public bool IsSelected
             {
                 get => _isSelected;
@@ -232,34 +201,43 @@ namespace Ship_Progress.Views
             public string Category { get; set; }
             public string EquipmentName { get; set; }
             public string Vendor { get; set; }
+            public int Target { get; set; }
+            public int CurrentStock { get; set; }
+            public int RemainingNeed => Math.Max(0, Target - CurrentStock);
             public string DeliveryDate { get; set; }
-            public int RemainingDays { get; set; }
-            public string RemainingDaysText => $"{RemainingDays}일";
+            public string RemainingDaysText { get; set; }
+
+            public int RemainingDaysValue => int.TryParse(RemainingDaysText.Replace("일", "").Trim(), out int val) ? val : 0;
+
             public string Status { get; set; }
 
             public Brush StatusBgColor => Status switch
             {
                 "위험" => new SolidColorBrush(Color.FromArgb(40, 229, 57, 53)),
                 "주의" => new SolidColorBrush(Color.FromArgb(40, 251, 140, 0)),
-                _ => new SolidColorBrush(Color.FromArgb(40, 67, 160, 71))
+                "납품 완료" => new SolidColorBrush(Color.FromArgb(40, 67, 160, 71)),
+                _ => new SolidColorBrush(Color.FromArgb(40, 150, 150, 150))
             };
 
             public Brush StatusFgColor => Status switch
             {
                 "위험" => new SolidColorBrush(Color.FromRgb(229, 57, 53)),
                 "주의" => new SolidColorBrush(Color.FromRgb(251, 140, 0)),
-                _ => new SolidColorBrush(Color.FromRgb(67, 160, 71))
+                "납품 완료" => new SolidColorBrush(Color.FromRgb(67, 160, 71)),
+                _ => new SolidColorBrush(Color.FromRgb(100, 100, 100))
             };
 
-            public LeadtimeItem(string series, string shipNo, string category, string equipmentName, string vendor, string deliveryDate, int remainingDays, string status)
+            public LeadtimeItem(string series, string shipNo, string category, string equipmentName, string vendor, int target, int currentStock, string deliveryDate, string remainingDaysText, string status)
             {
                 Series = series;
                 ShipNo = shipNo;
                 Category = category;
                 EquipmentName = equipmentName;
                 Vendor = vendor;
+                Target = target;
+                CurrentStock = currentStock;
                 DeliveryDate = deliveryDate;
-                RemainingDays = remainingDays;
+                RemainingDaysText = remainingDaysText;
                 Status = status;
             }
 
@@ -271,7 +249,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 6. 3행 하단 우측 알림 리스트 모델 및 원본 리스트
+        // 6. 알림 리스트 모델 및 데이터 리스트
         // -----------------------------------------------------------
         private List<NotificationItem> _allNotificationList;
         private string _currentNotificationFilter = "전체";
@@ -289,14 +267,6 @@ namespace Ship_Progress.Views
 
             public string IssuerText => $"발신: {Issuer} ({Vendor})";
 
-            public Brush CategoryBgBrush => Category == "지연"
-                ? new SolidColorBrush(Color.FromArgb(40, 229, 57, 53))
-                : new SolidColorBrush(Color.FromArgb(40, 251, 140, 0));
-
-            public Brush CategoryFgBrush => Category == "지연"
-                ? new SolidColorBrush(Color.FromRgb(229, 57, 53))
-                : new SolidColorBrush(Color.FromRgb(251, 140, 0));
-
             public NotificationItem(string series, string shipNo, string category, string issuer, string vendor, string equipmentName, string noticeMessage, string registerDate)
             {
                 Series = series;
@@ -311,7 +281,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 7. 생성자 및 이벤트 핸들러
+        // 7. 생성자 및 초기화
         // -----------------------------------------------------------
         public Tab3_LeadtimeView()
         {
@@ -338,18 +308,23 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 8. 상단 호선 선택 카드 클릭 이벤트
+        // 8. 호선 선택 카드 클릭 이벤트
         // -----------------------------------------------------------
         private void ShipCard_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is Border clickedBorder && clickedBorder.Tag is string shipNo)
             {
                 SelectedShipNo = shipNo;
-                SelectedSeriesName = shipNo == "H122" ? "A SERIES" : "A SERIES";
+                SelectedSeriesName = "A SERIES";
 
-                // 호선 변경 시 필터 초기화
                 _currentCategoryFilter = "전체";
                 _currentVendorFilter = "전체";
+                _currentSearchKeyword = string.Empty;
+
+                if (SearchTextBox != null)
+                {
+                    SearchTextBox.Text = string.Empty;
+                }
 
                 FilterDataByShip(shipNo);
                 FilterNotifications(shipNo, _currentNotificationFilter);
@@ -358,18 +333,77 @@ namespace Ship_Progress.Views
             }
         }
 
+        // -----------------------------------------------------------
+        // 페이징 및 필터링 관련 로직
+        // -----------------------------------------------------------
+        private int _currentPage = 1;
+        private const int _pageSize = 5; // 한 페이지당 5개 표시
+        private List<LeadtimeItem> _currentFilteredList = new List<LeadtimeItem>();
+
         private void FilterDataByShip(string shipNo)
         {
             if (_allLeadtimeList == null) return;
 
-            var filteredList = GetFilteredLeadtimeList(shipNo);
+            // 조건에 맞는 전체 목록을 먼저 캐시
+            _currentFilteredList = GetFilteredLeadtimeList(shipNo);
+
+            // 첫 페이지로 초기화 후 페이징 적용된 데이터 바인딩
+            _currentPage = 1;
+            UpdatePagedDataGrid();
+        }
+
+        // 페이징 적용 및 DataGrid 갱신 메서드
+        private void UpdatePagedDataGrid()
+        {
+            if (_currentFilteredList == null) return;
+
+            int totalItems = _currentFilteredList.Count;
+            int totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)_pageSize));
+
+            // 현재 페이지 번호 범위 보정
+            if (_currentPage > totalPages) _currentPage = totalPages;
+            if (_currentPage < 1) _currentPage = 1;
+
+            // 5개씩 끊어서 가져오기
+            var pagedData = _currentFilteredList
+                .Skip((_currentPage - 1) * _pageSize)
+                .Take(_pageSize)
+                .ToList();
 
             if (LeadtimeRiskDataGrid != null)
             {
-                LeadtimeRiskDataGrid.ItemsSource = filteredList;
+                LeadtimeRiskDataGrid.ItemsSource = pagedData;
+            }
+
+            // 페이지 정보 텍스트블록 업데이트 (예: 1 / 3)
+            if (PageInfoTextBlock != null)
+            {
+                PageInfoTextBlock.Text = $"{_currentPage} / {totalPages}";
             }
         }
 
+        // 이전 페이지 버튼 클릭 이벤트
+        private void PrevPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentPage > 1)
+            {
+                _currentPage--;
+                UpdatePagedDataGrid();
+            }
+        }
+
+        // 다음 페이지 버튼 클릭 이벤트
+        private void NextPage_Click(object sender, RoutedEventArgs e)
+        {
+            int totalPages = Math.Max(1, (int)Math.Ceiling(_currentFilteredList.Count / (double)_pageSize));
+            if (_currentPage < totalPages)
+            {
+                _currentPage++;
+                UpdatePagedDataGrid();
+            }
+        }
+
+        // 통합 필터링 메서드 (구분, 협력사, 검색어 통합 적용)
         private List<LeadtimeItem> GetFilteredLeadtimeList(string shipNo)
         {
             var query = _allLeadtimeList.Where(x => x.ShipNo == shipNo);
@@ -382,12 +416,42 @@ namespace Ship_Progress.Views
             {
                 query = query.Where(x => x.Vendor == _currentVendorFilter);
             }
+            if (!string.IsNullOrWhiteSpace(_currentSearchKeyword))
+            {
+                query = query.Where(x => x.EquipmentName != null && x.EquipmentName.Contains(_currentSearchKeyword));
+            }
 
-            return query.ToList();
+            return query
+                .OrderByDescending(x => x.RemainingDaysValue)
+                .ThenBy(x => GetStatusSortOrder(x.Status))
+                .ToList();
+        }
+
+        // 실시간 검색 텍스트박스 입력 이벤트
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox tb)
+            {
+                _currentSearchKeyword = tb.Text.Trim();
+                FilterDataByShip(SelectedShipNo);
+            }
+        }
+
+        // 상태별 2차 정렬 순서 부여 헬퍼 메서드
+        private int GetStatusSortOrder(string status)
+        {
+            return status switch
+            {
+                "납품 예정" => 0,
+                "위험" => 1,
+                "주의" => 1,
+                "납품 완료" => 2,
+                _ => 3
+            };
         }
 
         // -----------------------------------------------------------
-        // [구분] 및 [협력사] 컬럼 필터 버튼 클릭 및 동적 메뉴 생성 이벤트
+        // 필터 메뉴 관리
         // -----------------------------------------------------------
         private void CategoryFilterButton_Click(object sender, RoutedEventArgs e)
         {
@@ -469,7 +533,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 9. 2행 중단 차트 드로잉 로직
+        // 9. 납기 현황 차트 드로잉 (목표, 현재 입고, 잔여 필요량 기준)
         // -----------------------------------------------------------
         private void DrawLeadtimeChart()
         {
@@ -498,12 +562,12 @@ namespace Ship_Progress.Views
 
             Brush textBrush = Application.Current.Resources["PrimaryTextBrush"] as Brush ?? Brushes.Black;
 
-            double maxBarValue = 600;
-            double maxGapValue = 300;
+            double maxBarValue = 400;
+            double maxGapValue = 200;
 
             for (int i = 0; i <= 4; i++)
             {
-                double yVal = i * 150;
+                double yVal = i * 100;
                 double yPos = paddingTop + chartH - (yVal / maxBarValue * chartH);
 
                 Line gridLine = new Line
@@ -526,7 +590,7 @@ namespace Ship_Progress.Views
 
             for (int i = 0; i <= 4; i++)
             {
-                double gVal = i * 75;
+                double gVal = i * 50;
                 double yPos = paddingTop + chartH - (gVal / maxGapValue * chartH);
 
                 TextBlock rightYLabel = new TextBlock
@@ -569,13 +633,12 @@ namespace Ship_Progress.Views
                 Canvas.SetTop(xLabel, height - paddingBottom + 8);
                 LeadtimeChartCanvas.Children.Add(xLabel);
 
-                double barWidth = Math.Min(slotWidth * 0.45, 35);
+                double barWidth = Math.Min(slotWidth * 0.45, 30);
 
-                double tVal = currentChartTargets[i];      // 목표 (전체 누적 높이 기준)
-                double aVal = currentChartActuals[i];      // 현재 입고 (하단 누적)
-                double gapVal = Math.Max(0, tVal - aVal);  // 잔여 필요량 (상단 누적)
+                double tVal = currentChartTargets[i];
+                double aVal = currentChartActuals[i];
+                double gapVal = Math.Max(0, tVal - aVal);
 
-                // 1. 하단: 현재 입고 막대 (초록색)
                 double aHeight = (aVal / maxBarValue) * chartH;
                 double aY = paddingTop + chartH - aHeight;
 
@@ -589,7 +652,6 @@ namespace Ship_Progress.Views
                 Canvas.SetTop(actualBar, aY);
                 LeadtimeChartCanvas.Children.Add(actualBar);
 
-                // 2. 상단: 목표(잔여분) 막대 (#E0E0E0 회색 적용)
                 double gapHeight = (gapVal / maxBarValue) * chartH;
                 double gapY = aY - gapHeight;
 
@@ -604,11 +666,9 @@ namespace Ship_Progress.Views
                 Canvas.SetTop(targetRemainingBar, gapY);
                 LeadtimeChartCanvas.Children.Add(targetRemainingBar);
 
-                // 3. 잔여 필요량 꺾은선(Polyline) 포인트 추가를 위한 위치 계산
-                double lineY = paddingTop + chartH - ((tVal - aVal) / maxGapValue * chartH);
+                double lineY = paddingTop + chartH - (gapVal / maxGapValue * chartH);
                 gapPolyline.Points.Add(new Point(centerX, lineY));
 
-                // 4. 잔여 필요량 수치 텍스트 표시
                 TextBlock valueLabel = new TextBlock
                 {
                     Text = $"{gapVal:F0}",
@@ -621,12 +681,11 @@ namespace Ship_Progress.Views
                 Canvas.SetTop(valueLabel, gapY - 16);
                 LeadtimeChartCanvas.Children.Add(valueLabel);
 
-                // 5. 꺾은선 위 클릭 가능한 포인트(Dot) 및 툴팁 이벤트
                 Ellipse dot = new Ellipse
                 {
                     Width = 8,
                     Height = 8,
-                    Fill = Application.Current.Resources["HeaderBackgroundBrush"] as Brush ?? Brushes.White,
+                    Fill = Brushes.White,
                     Stroke = new SolidColorBrush(Color.FromRgb(229, 57, 53)),
                     StrokeThickness = 2,
                     Cursor = Cursors.Hand
@@ -639,7 +698,7 @@ namespace Ship_Progress.Views
                 {
                     if (LeadtimeTooltip != null && LeadtimeTooltipText != null)
                     {
-                        LeadtimeTooltipText.Text = $"{currentChartLabels[i]} 잔여 필요량: {gapVal:F0} (목표: {tVal}, 현재입고: {aVal})";
+                        LeadtimeTooltipText.Text = $"{currentChartLabels[i]} 잔여 필요량: {gapVal} (목표: {tVal}, 현재입고: {aVal})";
                         LeadtimeTooltip.Visibility = Visibility.Visible;
                         LeadtimeTooltip.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
 
@@ -661,40 +720,54 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 10. 3행 하단 좌측 표 데이터 로드 로직
+        // 10. 납기 현황 DB 데이터 로드
         // -----------------------------------------------------------
         private void LoadLeadtimeTableData()
         {
             _allLeadtimeList = new List<LeadtimeItem>
             {
-                new LeadtimeItem("A SERIES", "H120", "의장", "메인엔진 패키지", "(주)엔케이밸브", "2026-03-10", 5, "주의"),
-                new LeadtimeItem("A SERIES", "H120", "배관", "고압 LNG 밸브", "(주)엔케이밸브", "2026-03-05", 1, "위험"),
-                new LeadtimeItem("A SERIES", "H121", "기관", "BWTS 펌프", "삼영기계", "2026-03-15", 10, "정상"),
-                new LeadtimeItem("A SERIES", "H121", "전기", "스위치보드 배전반", "KCC글로벌", "2026-03-12", 8, "정상"),
-                new LeadtimeItem("A SERIES", "H121", "도장", "특수 방오도료", "KCC글로벌", "2026-03-08", 3, "주의"),
-                new LeadtimeItem("B SERIES", "H122", "의장", "거주구 판넬 자재", "KCC글로벌", "2026-03-20", 15, "정상"),
-                new LeadtimeItem("B SERIES", "H122", "기관", "비상발전기 세트", "비상발전기코리아", "2026-03-04", 0, "위험"),
-                new LeadtimeItem("B SERIES", "H122", "배관", "유압 파이프 자재", "태광유압", "2026-03-14", 9, "정상")
+                new LeadtimeItem("A SERIES", "H120", "기관", "배관 팽창 루프 서포트", "세진중공업", 65, 10, "2026-08-13", "8일", "주의"),
+                new LeadtimeItem("A SERIES", "H120", "기관", "선저 배수 플러그 소켓", "세진중공업", 70, 70, "2026-04-13", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "기관", "러그형 버터플라이 밸브", "삼진정공", 280, 280, "2026-07-26", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "기관", "갑판 드레인 스커퍼 및 배관 피팅", "성광벤드", 120, 0, "2026-09-25", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H120", "기관", "래싱 브릿지 Cross Bar", "오리엔탈정공", 320, 320, "2026-05-21", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선체", "곡형 핸드 그립", "동성하이텍", 280, 280, "2026-04-21", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선체", "워터 타이트 맨홀 커버", "강림중공업", 240, 240, "2026-05-27", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선체", "아이 플레이트 (20톤 이상)", "삼우중공업", 150, 150, "2026-07-08", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선체", "수직 사다리 (직형 A타입)", "동성하이텍", 260, 260, "2026-04-01", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선체", "미끄럼 방지 바 (2형) 10EA", "동성하이텍", 210, 210, "2026-04-23", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선실", "현수사다리 거치 브라켓", "강림중공업", 2, 0, "2026-08-10", "11일", "위험"),
+                new LeadtimeItem("A SERIES", "H120", "선실", "거주구 창문 코밍 (사각)", "스타코 (STACO)", 52, 20, "2026-08-13", "8일", "주의"),
+                new LeadtimeItem("A SERIES", "H120", "선실", "청동 소화전 각밸브", "스타코 (STACO)", 180, 180, "2026-05-11", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선실", "A급 내화 정전기 방지 카펫", "스타코 (STACO)", 350, 350, "2026-07-12", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선실", "주방/세탁실 미끄럼방지 타일", "스타코 (STACO)", 220, 220, "2026-07-14", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "전기", "전장 단로기 부착 브라켓", "현대일렉트릭", 260, 100, "2026-08-16", "10일", "위험"),
+                new LeadtimeItem("A SERIES", "H120", "전기", "세면대/수도 배관 서포트", "대양전기공업", 50, 25, "2026-08-14", "7일", "주의"),
+                new LeadtimeItem("A SERIES", "H120", "전기", "케이블 윈치 러그", "대한전선", 52, 52, "2026-05-03", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "전기", "대형 LED 투광등", "대양전기공업", 130, 130, "2026-05-07", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "전기", "비상 유도 표지등", "대양전기공업", 140, 140, "2026-05-15", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "전기", "자동 전화기 (탁상/벽걸이)", "대양전기공업", 100, 100, "2026-07-02", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "전기", "정온식/차동식 열 감지기", "한화시스템", 240, 240, "2026-07-24", "-", "납품 완료"),
+
+                new LeadtimeItem("A SERIES", "H121", "기관", "BWTS 펌프 메인", "삼영기계", 150, 80, "2026-08-20", "15일", "주의"),
+                new LeadtimeItem("A SERIES", "H121", "전기", "스위치보드 배전반", "KCC글로벌", 200, 190, "2026-08-10", "5일", "정상"),
+                new LeadtimeItem("B SERIES", "H122", "기관", "비상발전기 세트", "비상발전기코리아", 100, 30, "2026-08-05", "20일", "위험")
             };
 
             FilterDataByShip(SelectedShipNo);
         }
 
         // -----------------------------------------------------------
-        // 11. 3행 하단 우측 알림 리스트 데이터 로드 로직
+        // 11. 알림 리스트 데이터 로드
         // -----------------------------------------------------------
         private void LoadNotificationData()
         {
             _allNotificationList = new List<NotificationItem>
             {
-                new NotificationItem("A SERIES", "H120", "지연", "생산팀", "(주)엔케이밸브", "메인엔진 패키지", "설치 일정을 고려하여 현장 반입 조기화 요청", "2026-08-02 14:30"),
-                new NotificationItem("A SERIES", "H120", "지연", "협력사", "(주)엔케이밸브", "고압 LNG 밸브", "원자재 수급 차질로 인해 납기 4일 연기 요청", "2026-08-02 11:15"),
-                new NotificationItem("A SERIES", "H121", "지연", "협력사", "삼영기계", "BWTS 펌프", "주요 주물 부품 선적 지연으로 7일 지연 발생 통보", "2026-08-01 17:40"),
-                new NotificationItem("A SERIES", "H121", "보류/대기", "생산팀", "KCC글로벌", "스위치보드 배전반", "공장 FAT(공장 수락 검사) 일정 조율 및 서류 검사 가속 요청", "2026-08-01 09:20"),
-                new NotificationItem("A SERIES", "H121", "지연", "협력사", "KCC글로벌", "특수 방오도료", "도료 배합 승인 지연으로 인한 공급 소폭 지연 안내", "2026-07-31 16:50"),
-                new NotificationItem("B SERIES", "H122", "보류/대기", "생산팀", "KCC글로벌", "거주구 판넬 자재", "선실 의장 작업 구역 선행을 위한 자재 투입 앞당김 요청", "2026-07-31 10:05"),
-                new NotificationItem("B SERIES", "H122", "지연", "협력사", "비상발전기코리아", "비상발전기(Emergency Gen) 테스트", "부하 시험 중 일정 조정 안내", "2026-07-30 15:25"),
-                new NotificationItem("B SERIES", "H122", "보류/대기", "협력사", "태광유압", "유압 파이프 자재", "현장 수령 물량 중 일부 규격 변경에 따른 확인 요청", "2026-07-30 08:45")
+                new NotificationItem("A SERIES", "H120", "지연", "생산팀", "(주)엔케이밸브", "배관 팽창 루프 서포트", "설치 일정을 고려하여 현장 반입 조기화 요청", "2026-08-02 14:30"),
+                new NotificationItem("A SERIES", "H120", "지연", "협력사", "강림중공업", "현수사다리 거치 브라켓", "부품 수급 차질로 인한 납기 지연 확인", "2026-08-02 11:15"),
+                new NotificationItem("A SERIES", "H121", "지연", "협력사", "삼영기계", "BWTS 펌프 메인", "주요 주물 부품 선적 지연 통보", "2026-08-01 17:40"),
+                new NotificationItem("B SERIES", "H122", "보류/대기", "생산팀", "비상발전기코리아", "비상발전기 세트", "부하 시험 일정 조율 요청", "2026-07-30 15:25")
             };
 
             FilterNotifications(SelectedShipNo, _currentNotificationFilter);
