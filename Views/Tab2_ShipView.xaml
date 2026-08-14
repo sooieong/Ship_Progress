@@ -561,7 +561,7 @@
                             </DataGridTemplateColumn>
 
                             <!-- 나머지 컬럼들 -->
-                            <DataGridTextColumn Header="기자재명" Binding="{Binding EquipmentName}" Width="*" ElementStyle="{StaticResource CenterAlignedCell}"/>
+                            <DataGridTextColumn Header="문제 내용" Binding="{Binding EquipmentName}" Width="*" ElementStyle="{StaticResource CenterAlignedCell}"/>
                             <DataGridTextColumn Header="지연 일수" Binding="{Binding DelayText}" Width="60" ElementStyle="{StaticResource CenterAlignedCell}"/>
 
                             <!-- 1. 상태 컬럼 -->
