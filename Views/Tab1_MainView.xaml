@@ -51,7 +51,7 @@
                             <lvc:PieChart StartingRotationAngle="270" InnerRadius="48" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" Series="{Binding H120GaugeSeries}" LegendLocation="None"/>
 
                             <!-- Bottom Margin을 24~28 정도로 늘려 수치를 위로 올려 반원 내부 중심에 맞춥니다 -->
-                            <TextBlock Text="87.2%" FontSize="18" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,26"/>
+                            <TextBlock Text="80.2%" FontSize="18" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,26"/>
                         </Grid>
                     </StackPanel>
 
@@ -63,19 +63,19 @@
                         <Grid Width="150" Height="85">
                             <lvc:PieChart StartingRotationAngle="270" InnerRadius="48" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" Series="{Binding H121GaugeSeries}" LegendLocation="None"/>
 
-                            <TextBlock Text="82.1%" FontSize="18" FontWeight="Bold" Foreground="#EAB308" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,26"/>
+                            <TextBlock Text="58.8%" FontSize="18" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,26"/>
                         </Grid>
                     </StackPanel>
 
                     <!-- H122 -->
                     <StackPanel HorizontalAlignment="Center">
                         <TextBlock Text="H122" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
-                        <TextBlock Text="B SERIES" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,2,0,20"/>
+                        <TextBlock Text="A SERIES" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,2,0,20"/>
 
                         <Grid Width="150" Height="85">
                             <lvc:PieChart StartingRotationAngle="270" InnerRadius="48" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" Series="{Binding H122GaugeSeries}" LegendLocation="None"/>
 
-                            <TextBlock Text="91.3%" FontSize="18" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,26"/>
+                            <TextBlock Text="22.4%" FontSize="18" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,26"/>
                         </Grid>
                     </StackPanel>
                 </UniformGrid>

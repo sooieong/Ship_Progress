@@ -224,9 +224,9 @@ namespace Ship_Progress
         // -----------------------------------------------------------
         private void LoadGaugeData()
         {
-            H120GaugeSeries = CreateSemiCircleGaugeSeries(87.2, Color.FromRgb(76, 175, 80));
-            H121GaugeSeries = CreateSemiCircleGaugeSeries(82.1, Color.FromRgb(234, 179, 8));
-            H122GaugeSeries = CreateSemiCircleGaugeSeries(91.3, Color.FromRgb(76, 175, 80));
+            H120GaugeSeries = CreateSemiCircleGaugeSeries(80.2, Color.FromRgb(76, 175, 80));
+            H121GaugeSeries = CreateSemiCircleGaugeSeries(58.8, Color.FromRgb(76, 175, 80));
+            H122GaugeSeries = CreateSemiCircleGaugeSeries(22.4, Color.FromRgb(76, 175, 80));
         }
 
         private SeriesCollection CreateSemiCircleGaugeSeries(double percentage, Color activeColor)
