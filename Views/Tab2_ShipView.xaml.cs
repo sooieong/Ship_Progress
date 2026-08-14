@@ -11,14 +11,10 @@ using System.Windows.Shapes;
 
 namespace Ship_Progress
 {
-    // -----------------------------------------------------------
-    // 블록별 공정 현황 데이터 모델 클래스 (한국어/수치 전용)
-    // -----------------------------------------------------------
     public class BlockProgressItem
     {
         public string Title { get; set; }
         public double Progress { get; set; }
-
         public Brush BarColor { get; set; }
         public string ProgressText => $"{Progress}%";
 
@@ -42,19 +38,55 @@ namespace Ship_Progress
         }
     }
 
+    // 공정 단계별 상태 모델 클래스 추가
+    public class ProcessStepItem : INotifyPropertyChanged
+    {
+        private string _stepName;
+        public string StepName
+        {
+            get => _stepName;
+            set { _stepName = value; OnPropertyChanged(); }
+        }
+
+        private string _statusText; // "완료", "진행중", "대기"
+        public string StatusText
+        {
+            get => _statusText;
+            set { _statusText = value; OnPropertyChanged(); OnPropertyChanged(); }
+        }
+
+        private Brush _circleColor;
+        public Brush CircleColor
+        {
+            get => _circleColor;
+            set { _circleColor = value; OnPropertyChanged(); }
+        }
+
+        private Brush _statusTextColor;
+        public Brush StatusTextColor
+        {
+            get => _statusTextColor;
+            set { _statusTextColor = value; OnPropertyChanged(); }
+        }
+
+        private bool _isCurrentActive; // 현재 진행중 여부 (애니메이션 대상)
+        public bool IsCurrentActive
+        {
+            get => _isCurrentActive;
+            set { _isCurrentActive = value; OnPropertyChanged(); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
     public partial class Tab2_ShipView : UserControl, INotifyPropertyChanged
     {
-        // -----------------------------------------------------------
-        // 1. S-Curve 데이터 세트 및 설정
-        // -----------------------------------------------------------
         private readonly string[] dateLabels = { "2026.05", "2026.06", "2026.07", "2026.08", "2026.09", "2026.10", "2026.11" };
-        private readonly double[] planData = { 15.0, 30.0, 48.0, 65.0, 80.0, 92.0, 100.0 };
-        private readonly double[] actualData = { 12.0, 26.0, 42.0, 62.0 };
-        private const int CurrentMonthIndex = 3;
 
-        // -----------------------------------------------------------
-        // 2. 1행 & 2행 KPI 동적 바인딩 프로퍼티
-        // -----------------------------------------------------------
         private string _selectedShipNo = "H120";
         public string SelectedShipNo
         {
@@ -104,9 +136,6 @@ namespace Ship_Progress
             set { _progressRate = value; OnPropertyChanged(); }
         }
 
-        // -----------------------------------------------------------
-        // 3. 3행 하단 블록별 공정 현황 바인딩 프로퍼티
-        // -----------------------------------------------------------
         private List<BlockProgressItem> _blockProgressList;
         public List<BlockProgressItem> BlockProgressList
         {
@@ -114,9 +143,14 @@ namespace Ship_Progress
             set { _blockProgressList = value; OnPropertyChanged(); }
         }
 
-        // -----------------------------------------------------------
-        // 4. 위험 기자재 모델 클래스
-        // -----------------------------------------------------------
+        // 공정 단계 리스트 프로퍼티 추가
+        private List<ProcessStepItem> _processStepsList;
+        public List<ProcessStepItem> ProcessStepsList
+        {
+            get => _processStepsList;
+            set { _processStepsList = value; OnPropertyChanged(); }
+        }
+
         public class H120RiskItem
         {
             public string Category { get; set; }
@@ -126,7 +160,6 @@ namespace Ship_Progress
             public Brush StatusBgColor { get; set; }
             public Brush StatusFgColor { get; set; }
             public string MainProcessImpact { get; set; }
-
             public string DelayText => $"{DelayDays}일";
 
             public H120RiskItem(string category, string equipmentName, int delayDays, string status, string statusBgHex, string statusFgHex, string mainProcessImpact)
@@ -135,11 +168,9 @@ namespace Ship_Progress
                 EquipmentName = equipmentName;
                 DelayDays = delayDays;
                 Status = status;
-
                 var converter = new BrushConverter();
                 StatusBgColor = (Brush)converter.ConvertFromString(statusBgHex);
                 StatusFgColor = (Brush)converter.ConvertFromString(statusFgHex);
-
                 MainProcessImpact = mainProcessImpact;
             }
         }
@@ -147,9 +178,6 @@ namespace Ship_Progress
         private List<H120RiskItem> _originalH120RiskList = new List<H120RiskItem>();
         private string _currentCategoryFilter = "전체";
 
-        // -----------------------------------------------------------
-        // 5. 생성자 및 이벤트 핸들러
-        // -----------------------------------------------------------
         public Tab2_ShipView()
         {
             InitializeComponent();
@@ -179,15 +207,15 @@ namespace Ship_Progress
             }
         }
 
-        // -----------------------------------------------------------
-        // 6. 데이터 로드 및 차트 생성 로직 (호선별 분기 적용)
-        // -----------------------------------------------------------
         public void LoadShipDashboardData(string shipNo)
         {
             SelectedShipNo = shipNo;
             SelectedSeriesName = shipNo == "H122" ? "B SERIES" : "A SERIES";
 
-            // 호선별 데이터 분기 설정 (종합 공정률, 인도예정일, 시작일, 예상완료일, 진행률)
+            // 전체 공정 단계 명칭 고정 (총 5개 핵심 공정)
+            string[] stepNames = { "강재절단", "블록조립", "탑재", "의장", "시운전" };
+            int activeIndex = 0;
+
             if (shipNo == "H120")
             {
                 OverallProgress = "80.2";
@@ -195,6 +223,7 @@ namespace Ship_Progress
                 StartDate = "2026-05-05";
                 MidExpectedEndDate = "2026-09-30";
                 ProgressRate = "62%";
+                activeIndex = 3; // 의장 단계에서 반짝
             }
             else if (shipNo == "H121")
             {
@@ -203,6 +232,7 @@ namespace Ship_Progress
                 StartDate = "2026-05-15";
                 MidExpectedEndDate = "2026-10-15";
                 ProgressRate = "54%";
+                activeIndex = 2; // 탑재 단계에서 반짝
             }
             else if (shipNo == "H122")
             {
@@ -211,12 +241,50 @@ namespace Ship_Progress
                 StartDate = "2026-06-01";
                 MidExpectedEndDate = "2026-11-30";
                 ProgressRate = "78%";
+                activeIndex = 1; // 블록조립 단계에서 반짝
             }
 
-            // S-Curve 차트 그리기
+            // 공정 단계 데이터 동적 구성 (왼쪽: 완료/초록, 기준: 진행중/주황+반짝, 오른쪽: 대기/회색)
+            var newSteps = new List<ProcessStepItem>();
+            var greenBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4CAF50"));
+            var orangeBrush = Application.Current.Resources["HanwhaOrangeBrush"] as Brush ?? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F37321"));
+            var grayBrush = Application.Current.Resources["BorderBrush"] as Brush ?? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#B0B0B0"));
+            var primaryTextBrush = Application.Current.Resources["PrimaryTextBrush"] as Brush ?? Brushes.Black;
+
+            for (int i = 0; i < stepNames.Length; i++)
+            {
+                var step = new ProcessStepItem { StepName = stepNames[i] };
+
+                if (i < activeIndex)
+                {
+                    // 왼쪽: 완료
+                    step.StatusText = "완료";
+                    step.CircleColor = greenBrush;
+                    step.StatusTextColor = greenBrush;
+                    step.IsCurrentActive = false;
+                }
+                else if (i == activeIndex)
+                {
+                    // 기준: 진행중 (주황색 및 깜빡임)
+                    step.StatusText = "진행중";
+                    step.CircleColor = orangeBrush;
+                    step.StatusTextColor = orangeBrush;
+                    step.IsCurrentActive = true;
+                }
+                else
+                {
+                    // 오른쪽: 대기
+                    step.StatusText = "대기";
+                    step.CircleColor = grayBrush;
+                    step.StatusTextColor = primaryTextBrush;
+                    step.IsCurrentActive = false;
+                }
+                newSteps.Add(step);
+            }
+            ProcessStepsList = newSteps;
+
             DrawSCurveChart();
 
-            // 블록 공정 리스트
             BlockProgressList = new List<BlockProgressItem>
             {
                 new BlockProgressItem("기관실 대형 주기계", 100),
@@ -226,7 +294,6 @@ namespace Ship_Progress
                 new BlockProgressItem("화물창", 45)
             };
 
-            // 위험 품목 현황 데이터
             var riskItems = new List<H120RiskItem>
             {
                 new H120RiskItem("의장", "메인 배전반 (MSBD)", 14, "위험", "#FFEBEE", "#D32F2F", "추진 계통"),
@@ -235,7 +302,6 @@ namespace Ship_Progress
 
             _originalH120RiskList = riskItems;
             _currentCategoryFilter = "전체";
-
             ApplyCategoryFilter();
         }
 
@@ -244,7 +310,6 @@ namespace Ship_Progress
             if (sender is Button btn)
             {
                 ContextMenu menu = new ContextMenu();
-
                 var distinctCategories = _originalH120RiskList.Select(x => x.Category).Distinct().OrderBy(x => x).ToList();
 
                 MenuItem allItem = new MenuItem { Header = "전체 보기", Tag = "전체" };
@@ -267,14 +332,11 @@ namespace Ship_Progress
         private void ApplyCategoryFilter()
         {
             if (H120RiskDataGrid == null) return;
-
             var query = _originalH120RiskList.AsEnumerable();
-
             if (_currentCategoryFilter != "전체")
             {
                 query = query.Where(x => x.Category == _currentCategoryFilter);
             }
-
             H120RiskDataGrid.ItemsSource = query.ToList();
         }
 
@@ -306,7 +368,6 @@ namespace Ship_Progress
             double chartH = height - paddingTop - paddingBottom;
 
             Brush textBrush = Application.Current.Resources["PrimaryTextBrush"] as Brush ?? Brushes.Black;
-            Brush gridLineBrush = Application.Current.Resources["BorderBrush"] as Brush ?? new SolidColorBrush(Color.FromRgb(235, 235, 235));
 
             for (int i = 0; i <= 5; i++)
             {
@@ -327,7 +388,6 @@ namespace Ship_Progress
                 for (int m = 0; m < dateLabels.Length; m++)
                 {
                     double xPos = paddingLeft + (m / (double)(dateLabels.Length - 1) * chartW);
-
                     TextBlock xLabel = new TextBlock { Text = dateLabels[m], FontSize = 10, Foreground = textBrush, FontWeight = FontWeights.SemiBold };
                     Canvas.SetLeft(xLabel, xPos - 12);
                     Canvas.SetTop(xLabel, height - paddingBottom + 6);

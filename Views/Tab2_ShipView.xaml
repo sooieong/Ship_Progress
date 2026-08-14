@@ -266,104 +266,161 @@
                 </Grid>
             </Border>
 
-            <!-- [2-2] 현재 진행 중인 공정 단계 카드 -->
+            <!-- [2-2] 현재 진행 중인 공정 단계 카드 수정 부분 -->
             <Border Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
-                        <!-- 연결선 영역을 위한 행 추가 -->
                         <RowDefinition Height="16"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Text="현재 진행 중인 공정 단계" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
-                    <UniformGrid Grid.Row="1" Columns="9" VerticalAlignment="Center">
-                        <!-- 1. 강재절단 -->
-                        <StackPanel HorizontalAlignment="Center">
-                            <Grid Width="52" Height="52">
-                                <Ellipse Fill="#4CAF50"/>
-                                <TextBlock Text="✓" Foreground="White" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Grid>
-                            <TextBlock Text="강재절단" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,6,0,2"/>
-                            <TextBlock Text="완료" FontSize="10" Foreground="#4CAF50" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        </StackPanel>
+                    <!-- 공정 단계 아이콘 리스트 영역 -->
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding ProcessStepsList}" VerticalAlignment="Center">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="5"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Center">
+                                    <!-- 원형 아이콘 영역 -->
+                                    <Grid Width="52" Height="52" HorizontalAlignment="Center">
+                                        <Ellipse Fill="{Binding CircleColor}">
+                                            <Ellipse.Style>
+                                                <Style TargetType="Ellipse">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCurrentActive}" Value="True">
+                                                            <DataTrigger.EnterActions>
+                                                                <BeginStoryboard>
+                                                                    <Storyboard>
+                                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                             From="1.0" To="0.3" 
+                                                                             Duration="0:0:0.8" 
+                                                                             AutoReverse="True" 
+                                                                             RepeatBehavior="Forever"/>
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </DataTrigger.EnterActions>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Ellipse.Style>
+                                        </Ellipse>
 
-                        <!-- 화살표 1 -->
-                        <TextBlock Text="›" FontSize="22" FontWeight="Bold" Foreground="#B0B0B0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-18,0,0"/>
+                                        <!-- 공정 단계별 고유 아이콘 심볼 표시 -->
+                                        <TextBlock Foreground="White" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value=""/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding StatusText}" Value="완료">
+                                                            <Setter Property="Text" Value="✓"/>
+                                                            <Setter Property="FontSize" Value="22"/>
+                                                        </DataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding StepName}" Value="강재절단"/>
+                                                                <Condition Binding="{Binding StatusText}" Value="진행중"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Text" Value="✂"/>
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding StepName}" Value="블록조립"/>
+                                                                <Condition Binding="{Binding StatusText}" Value="진행중"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Text" Value="☷"/>
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding StepName}" Value="탑재"/>
+                                                                <Condition Binding="{Binding StatusText}" Value="진행중"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Text" Value="🏗"/>
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding StepName}" Value="의장"/>
+                                                                <Condition Binding="{Binding StatusText}" Value="진행중"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Text" Value="🛠️"/>
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding StepName}" Value="시운전"/>
+                                                                <Condition Binding="{Binding StatusText}" Value="진행중"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Text" Value="⚓"/>
+                                                        </MultiDataTrigger>
 
-                        <!-- 2. 블록조립 -->
-                        <StackPanel HorizontalAlignment="Center">
-                            <Grid Width="52" Height="52">
-                                <Ellipse Fill="#4CAF50"/>
-                                <TextBlock Text="✓" Foreground="White" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Grid>
-                            <TextBlock Text="블록조립" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,6,0,2"/>
-                            <TextBlock Text="완료" FontSize="10" Foreground="#4CAF50" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        </StackPanel>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding StepName}" Value="강재절단"/>
+                                                                <Condition Binding="{Binding StatusText}" Value="대기"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Text" Value="✂"/>
+                                                            <Setter Property="Foreground" Value="#666666"/>
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding StepName}" Value="블록조립"/>
+                                                                <Condition Binding="{Binding StatusText}" Value="대기"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Text" Value="☷"/>
+                                                            <Setter Property="Foreground" Value="#666666"/>
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding StepName}" Value="탑재"/>
+                                                                <Condition Binding="{Binding StatusText}" Value="대기"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Text" Value="🏗"/>
+                                                            <Setter Property="Foreground" Value="#666666"/>
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding StepName}" Value="의장"/>
+                                                                <Condition Binding="{Binding StatusText}" Value="대기"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Text" Value="🛠️"/>
+                                                            <Setter Property="Foreground" Value="#666666"/>
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding StepName}" Value="시운전"/>
+                                                                <Condition Binding="{Binding StatusText}" Value="대기"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Text" Value="⚓"/>
+                                                            <Setter Property="Foreground" Value="#666666"/>
+                                                        </MultiDataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
 
-                        <!-- 화살표 2 -->
-                        <TextBlock Text="›" FontSize="22" FontWeight="Bold" Foreground="#B0B0B0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-18,0,0"/>
+                                    <!-- 공정 이름 -->
+                                    <TextBlock Text="{Binding StepName}" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,6,0,2"/>
 
-                        <!-- 3. 탑재 (진행중) -->
-                        <StackPanel HorizontalAlignment="Center">
-                            <Grid Width="56" Height="56">
-                                <Ellipse Fill="{DynamicResource HanwhaOrangeBrush}">
-                                    <Ellipse.Triggers>
-                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                                     From="1.0" To="0.3" 
-                                                                     Duration="0:0:0.8" 
-                                                                     AutoReverse="True" 
-                                                                     RepeatBehavior="Forever"/>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger>
-                                    </Ellipse.Triggers>
-                                </Ellipse>
-                                <TextBlock Text="🏗" FontSize="24" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Grid>
-                            <TextBlock Text="탑재" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,2"/>
-                            <TextBlock Text="진행중" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource HanwhaOrangeBrush}" HorizontalAlignment="Center"/>
-                        </StackPanel>
+                                    <!-- 하단 상태 텍스트 (완료 / 진행중 / 대기) -->
+                                    <TextBlock Text="{Binding StatusText}" FontSize="10" Foreground="{Binding StatusTextColor}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                        <!-- 화살표 3 -->
-                        <TextBlock Text="›" FontSize="22" FontWeight="Bold" Foreground="#B0B0B0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-18,0,0"/>
-
-                        <!-- 4. 의장 -->
-                        <StackPanel HorizontalAlignment="Center">
-                            <Grid Width="52" Height="52">
-                                <Ellipse Fill="{DynamicResource BorderBrush}"/>
-                                <TextBlock Text="🛠️" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Grid>
-                            <TextBlock Text="의장" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,6,0,2"/>
-                            <TextBlock Text="대기" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
-                        </StackPanel>
-
-                        <!-- 화살표 4 -->
-                        <TextBlock Text="›" FontSize="22" FontWeight="Bold" Foreground="#B0B0B0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-18,0,0"/>
-
-                        <!-- 5. 시운전 -->
-                        <StackPanel HorizontalAlignment="Center">
-                            <Grid Width="52" Height="52">
-                                <Ellipse Fill="{DynamicResource BorderBrush}"/>
-                                <TextBlock Text="⚓" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Grid>
-                            <TextBlock Text="시운전" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,6,0,2"/>
-                            <TextBlock Text="대기" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </UniformGrid>
-
-                    <!-- 탑재 아이콘과 하단 박스를 이어주는 세로 연결선 -->
+                    <!-- 세로 연결선 -->
                     <Line Grid.Row="2" 
-                          X1="0" Y1="-15" X2="0" Y2="16" 
-                          Stroke="{DynamicResource BorderBrush}" 
-                          StrokeThickness="1" 
-                          HorizontalAlignment="Center" 
-                          VerticalAlignment="Center"/>
+              X1="0" Y1="-15" X2="0" Y2="16" 
+              Stroke="{DynamicResource BorderBrush}" 
+              StrokeThickness="1" 
+              HorizontalAlignment="Center" 
+              VerticalAlignment="Center"/>
 
                     <!-- 하단 일정 및 진행률 수치 영역 -->
                     <Border Grid.Row="3" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12,8">
