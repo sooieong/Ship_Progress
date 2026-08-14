@@ -8,6 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using LiveCharts;
+using LiveCharts.Wpf;
 
 namespace Ship_Progress.Views
 {
@@ -52,7 +54,40 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 2. 2행 납기 현황 차트용 데이터 및 설정
+        // 2. 3행 좌측 3개 독립 도넛 차트 바인딩 프로퍼티
+        // -----------------------------------------------------------
+        private SeriesCollection _orderGaugeSeries;
+        public SeriesCollection OrderGaugeSeries { get => _orderGaugeSeries; set { _orderGaugeSeries = value; OnPropertyChanged(); } }
+
+        private SeriesCollection _inspectGaugeSeries;
+        public SeriesCollection InspectGaugeSeries { get => _inspectGaugeSeries; set { _inspectGaugeSeries = value; OnPropertyChanged(); } }
+
+        private SeriesCollection _receiveGaugeSeries;
+        public SeriesCollection ReceiveGaugeSeries { get => _receiveGaugeSeries; set { _receiveGaugeSeries = value; OnPropertyChanged(); } }
+
+        private string _orderPercentText = "0%";
+        public string OrderPercentText { get => _orderPercentText; set { _orderPercentText = value; OnPropertyChanged(); } }
+        private string _orderSubText = "0건 / 776건";
+        public string OrderSubText { get => _orderSubText; set { _orderSubText = value; OnPropertyChanged(); } }
+        private Brush _orderColor = Brushes.Gray;
+        public Brush OrderColor { get => _orderColor; set { _orderColor = value; OnPropertyChanged(); } }
+
+        private string _inspectPercentText = "0%";
+        public string InspectPercentText { get => _inspectPercentText; set { _inspectPercentText = value; OnPropertyChanged(); } }
+        private string _inspectSubText = "0건 / 776건";
+        public string InspectSubText { get => _inspectSubText; set { _inspectSubText = value; OnPropertyChanged(); } }
+        private Brush _inspectColor = Brushes.Gray;
+        public Brush InspectColor { get => _inspectColor; set { _inspectColor = value; OnPropertyChanged(); } }
+
+        private string _receivePercentText = "0%";
+        public string ReceivePercentText { get => _receivePercentText; set { _receivePercentText = value; OnPropertyChanged(); } }
+        private string _receiveSubText = "0건 / 776건";
+        public string ReceiveSubText { get => _receiveSubText; set { _receiveSubText = value; OnPropertyChanged(); } }
+        private Brush _receiveColor = Brushes.Gray;
+        public Brush ReceiveColor { get => _receiveColor; set { _receiveColor = value; OnPropertyChanged(); } }
+
+        // -----------------------------------------------------------
+        // 3. 2행 납기 현황 차트용 데이터 및 설정
         // -----------------------------------------------------------
         private string[] currentChartLabels = Array.Empty<string>();
         private double[] currentChartTargets = Array.Empty<double>();
@@ -103,7 +138,81 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 3. 3행 하단 좌측 표 모델 및 원본 리스트 / 필터 상태 변수
+        // 4. 호선별 3개 도넛 차트 데이터 및 색상 동적 갱신 로직
+        // -----------------------------------------------------------
+        private void UpdateSupplyChartData(string shipNo)
+        {
+            double total = 776.0;
+            double orderVal = 0, inspectVal = 0, receiveVal = 0;
+
+            if (shipNo == "H120")
+            {
+                orderVal = 750;   // 96.6%
+                inspectVal = 692; // 89.2%
+                receiveVal = 685; // 88.3%
+            }
+            else if (shipNo == "H121")
+            {
+                orderVal = 702;   // 90.5%
+                inspectVal = 520; // 67.0%
+                receiveVal = 458; // 59.0%
+            }
+            else if (shipNo == "H122")
+            {
+                orderVal = 621;   // 80.0%
+                inspectVal = 342; // 44.1%
+                receiveVal = 241; // 31.1%
+            }
+
+            double orderPct = (orderVal / total) * 100.0;
+            double inspectPct = (inspectVal / total) * 100.0;
+            double receivePct = (receiveVal / total) * 100.0;
+
+            OrderPercentText = $"{orderPct:F1}%";
+            OrderSubText = $"{orderVal}건";
+            OrderColor = GetStatusBrush(orderPct);
+
+            InspectPercentText = $"{inspectPct:F1}%";
+            InspectSubText = $"{inspectVal}건";
+            InspectColor = GetStatusBrush(inspectPct);
+
+            ReceivePercentText = $"{receivePct:F1}%";
+            ReceiveSubText = $"{receiveVal}건";
+            ReceiveColor = GetStatusBrush(receivePct);
+
+            Brush bgBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#E0E0E0") ?? Brushes.LightGray);
+
+            OrderGaugeSeries = new SeriesCollection
+            {
+                new PieSeries { Values = new ChartValues<double> { orderVal }, Fill = OrderColor, DataLabels = false, StrokeThickness = 0 },
+                new PieSeries { Values = new ChartValues<double> { Math.Max(0, total - orderVal) }, Fill = bgBrush, DataLabels = false, StrokeThickness = 0 }
+            };
+
+            InspectGaugeSeries = new SeriesCollection
+            {
+                new PieSeries { Values = new ChartValues<double> { inspectVal }, Fill = InspectColor, DataLabels = false, StrokeThickness = 0 },
+                new PieSeries { Values = new ChartValues<double> { Math.Max(0, total - inspectVal) }, Fill = bgBrush, DataLabels = false, StrokeThickness = 0 }
+            };
+
+            ReceiveGaugeSeries = new SeriesCollection
+            {
+                new PieSeries { Values = new ChartValues<double> { receiveVal }, Fill = ReceiveColor, DataLabels = false, StrokeThickness = 0 },
+                new PieSeries { Values = new ChartValues<double> { Math.Max(0, total - receiveVal) }, Fill = bgBrush, DataLabels = false, StrokeThickness = 0 }
+            };
+        }
+
+        private Brush GetStatusBrush(double percent)
+        {
+            if (percent >= 80.0)
+                return new SolidColorBrush(Color.FromRgb(76, 175, 80));   // 초록색 (#4CAF50)
+            else if (percent >= 50.0)
+                return new SolidColorBrush(Color.FromRgb(234, 179, 8));   // 머스타드색 (#EAB308)
+            else
+                return new SolidColorBrush(Color.FromRgb(229, 57, 53));   // 빨간색 (#E53935)
+        }
+
+        // -----------------------------------------------------------
+        // 5. 3행 하단 좌측 표 모델 및 원본 리스트 / 필터 상태 변수
         // -----------------------------------------------------------
         private List<LeadtimeItem> _allLeadtimeList;
         private string _currentCategoryFilter = "전체";
@@ -162,7 +271,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 4. 3행 하단 우측 알림 리스트 모델 및 원본 리스트
+        // 6. 3행 하단 우측 알림 리스트 모델 및 원본 리스트
         // -----------------------------------------------------------
         private List<NotificationItem> _allNotificationList;
         private string _currentNotificationFilter = "전체";
@@ -202,7 +311,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 5. 생성자 및 이벤트 핸들러
+        // 7. 생성자 및 이벤트 핸들러
         // -----------------------------------------------------------
         public Tab3_LeadtimeView()
         {
@@ -220,6 +329,7 @@ namespace Ship_Progress.Views
             LoadLeadtimeTableData();
             LoadNotificationData();
             UpdateChartDataForShip(SelectedShipNo);
+            UpdateSupplyChartData(SelectedShipNo);
         }
 
         private void LeadtimeChartCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -228,7 +338,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 6. 상단 호선 선택 카드 클릭 이벤트
+        // 8. 상단 호선 선택 카드 클릭 이벤트
         // -----------------------------------------------------------
         private void ShipCard_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -244,6 +354,7 @@ namespace Ship_Progress.Views
                 FilterDataByShip(shipNo);
                 FilterNotifications(shipNo, _currentNotificationFilter);
                 UpdateChartDataForShip(shipNo);
+                UpdateSupplyChartData(shipNo);
             }
         }
 
@@ -358,7 +469,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 8. 2행 중단 차트 드로잉 로직
+        // 9. 2행 중단 차트 드로잉 로직
         // -----------------------------------------------------------
         private void DrawLeadtimeChart()
         {
@@ -458,7 +569,6 @@ namespace Ship_Progress.Views
                 Canvas.SetTop(xLabel, height - paddingBottom + 8);
                 LeadtimeChartCanvas.Children.Add(xLabel);
 
-                // 누적 막대의 두께 설정 (슬롯 너비의 45% 수준)
                 double barWidth = Math.Min(slotWidth * 0.45, 35);
 
                 double tVal = currentChartTargets[i];      // 목표 (전체 누적 높이 기준)
@@ -498,7 +608,7 @@ namespace Ship_Progress.Views
                 double lineY = paddingTop + chartH - ((tVal - aVal) / maxGapValue * chartH);
                 gapPolyline.Points.Add(new Point(centerX, lineY));
 
-                // 4. 잔여 필요량 수치 텍스트 표시 (빨간색 유지)
+                // 4. 잔여 필요량 수치 텍스트 표시
                 TextBlock valueLabel = new TextBlock
                 {
                     Text = $"{gapVal:F0}",
@@ -551,7 +661,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 9. 3행 하단 좌측 표 데이터 로드 로직
+        // 10. 3행 하단 좌측 표 데이터 로드 로직
         // -----------------------------------------------------------
         private void LoadLeadtimeTableData()
         {
@@ -571,7 +681,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 10. 3행 하단 우측 알림 리스트 데이터 로드 로직
+        // 11. 3행 하단 우측 알림 리스트 데이터 로드 로직
         // -----------------------------------------------------------
         private void LoadNotificationData()
         {
@@ -591,7 +701,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 11. INotifyPropertyChanged 구현
+        // 12. INotifyPropertyChanged 구현
         // -----------------------------------------------------------
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)

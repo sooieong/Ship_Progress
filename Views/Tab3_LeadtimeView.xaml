@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
              Loaded="UserControl_Loaded"
              d:DesignHeight="750" d:DesignWidth="1100">
@@ -421,7 +422,7 @@
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- [3-1] 좌측: 기자재 공정 현황 요약 카드 -->
+            <!-- [3-1] 좌측: 발주완료, 검사완료, 입고 3개 도넛 차트 영역 -->
             <Border Grid.Column="0" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -429,73 +430,47 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- 카드 타이틀 -->
                     <TextBlock Grid.Row="0" Text="기자재 공정 현황 요약" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
-                    <!-- 5열 요약 정보 그리드 -->
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <!-- 3개의 도넛 차트를 가로로 나란히 배치 -->
+                    <UniformGrid Grid.Row="1" Columns="3" VerticalAlignment="Center">
 
-                        <!-- 1. 전체 기자재 -->
-                        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="전체 기자재" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                            <TextBlock Text="📦" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="1,248" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                                <TextBlock Text="건" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
-                            </StackPanel>
+                        <!-- 1. 발주 완료 차트 -->
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="발주 완료" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                            <Grid Width="100" Height="100">
+                                <!-- 아래와 같이 StartingRotationAngle="270" 추가 -->
+                                <lvc:PieChart StartingRotationAngle="0" InnerRadius="35" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" LegendLocation="None" Series="{Binding OrderGaugeSeries}"/>
+                                <TextBlock Text="{Binding OrderPercentText}" FontSize="15" FontWeight="Bold" Foreground="{Binding OrderColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                            <TextBlock Text="{Binding OrderSubText}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
                         </StackPanel>
-                        <Border Grid.Column="0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" HorizontalAlignment="Right" Margin="0,10"/>
 
-                        <!-- 2. 발주 완료 -->
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="발주 완료" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                            <TextBlock Text="📋" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBlock Text="1,182" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                                    <TextBlock Text="건" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
-                                </StackPanel>
-                                <TextBlock Text="(94.7%)" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Opacity="0.8" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-                            </StackPanel>
+                        <!-- 2. 검사 완료 차트 -->
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="검사 완료" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                            <Grid Width="100" Height="100">
+                                <!-- StartingRotationAngle="0" 추가 -->
+                                <lvc:PieChart StartingRotationAngle="0" InnerRadius="35" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" LegendLocation="None" Series="{Binding InspectGaugeSeries}"/>
+                                <TextBlock Text="{Binding InspectPercentText}" FontSize="15" FontWeight="Bold" Foreground="{Binding InspectColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                            <TextBlock Text="{Binding InspectSubText}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
                         </StackPanel>
-                        <Border Grid.Column="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" HorizontalAlignment="Right" Margin="0,10"/>
 
-                        <!-- 3. 제작 중 -->
-                        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="검사 완료" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                            <TextBlock Text="🏭" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBlock Text="892" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                                    <TextBlock Text="건" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
-                                </StackPanel>
-                                <TextBlock Text="(71.5%)" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Opacity="0.8" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-                            </StackPanel>
+                        <!-- 3. 입고 차트 -->
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="입고" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                            <Grid Width="100" Height="100">
+                                <!-- StartingRotationAngle="0" 추가 -->
+                                <lvc:PieChart StartingRotationAngle="0" InnerRadius="35" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" LegendLocation="None" Series="{Binding ReceiveGaugeSeries}"/>
+                                <TextBlock Text="{Binding ReceivePercentText}" FontSize="15" FontWeight="Bold" Foreground="{Binding ReceiveColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                            <TextBlock Text="{Binding ReceiveSubText}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
                         </StackPanel>
-                        <Border Grid.Column="2" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" HorizontalAlignment="Right" Margin="0,10"/>
-
-                        <!-- 4. 출하 준비 -->
-                        <StackPanel Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock Text="입고" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                            <TextBlock Text="🚚" FontSize="22" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBlock Text="463" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                                    <TextBlock Text="건" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
-                                </StackPanel>
-                                <TextBlock Text="(37.1%)" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Opacity="0.8" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Grid>
+                    </UniformGrid>
                 </Grid>
             </Border>
-
+            
             <!-- [3-2] 우측: 결품/지연 알림 영역 -->
             <Border Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                 <Grid>
