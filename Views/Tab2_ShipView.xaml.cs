@@ -85,7 +85,7 @@ namespace Ship_Progress
 
     public partial class Tab2_ShipView : UserControl, INotifyPropertyChanged
     {
-        private readonly string[] dateLabels = { "2026.05", "2026.06", "2026.07", "2026.08", "2026.09", "2026.10", "2026.11" };
+        private string[] dateLabels;
 
         private string _selectedShipNo = "H120";
         public string SelectedShipNo
@@ -212,36 +212,42 @@ namespace Ship_Progress
             SelectedShipNo = shipNo;
             SelectedSeriesName = shipNo == "H122" ? "B SERIES" : "A SERIES";
 
-            // 전체 공정 단계 명칭 고정 (총 5개 핵심 공정)
+            // 공정 단계 명칭 고정
             string[] stepNames = { "강재절단", "블록조립", "탑재", "의장", "시운전" };
             int activeIndex = 0;
+
+            double[] planDataValues = { 0, 20, 40, 60, 80, 100 };
+            double[] actualDataValues = null;
 
             if (shipNo == "H120")
             {
                 OverallProgress = "80.2";
-                ExpectedEndDate = "2026-11-20";
-                StartDate = "2026-05-05";
-                MidExpectedEndDate = "2026-09-30";
-                ProgressRate = "62%";
-                activeIndex = 3; // 의장 단계에서 반짝
+                ExpectedEndDate = "2026-12-20";
+                StartDate = "2025-06-20"; // 18개월 전
+                MidExpectedEndDate = "2026-08-20";
+                ProgressRate = "80%";
+                activeIndex = 3;
+                dateLabels = new string[] { "2025.06", "2025.10", "2026.02", "2026.06", "2026.08", "2026.12" };
             }
             else if (shipNo == "H121")
             {
                 OverallProgress = "58.8";
-                ExpectedEndDate = "2026-12-10";
-                StartDate = "2026-05-15";
-                MidExpectedEndDate = "2026-10-15";
-                ProgressRate = "54%";
-                activeIndex = 2; // 탑재 단계에서 반짝
+                ExpectedEndDate = "2027-03-29";
+                StartDate = "2025-09-29"; // 18개월 전
+                MidExpectedEndDate = "2026-10-20";
+                ProgressRate = "59%";
+                activeIndex = 2;
+                dateLabels = new string[] { "2025.10", "2026.02", "2026.06", "2026.10", "2027.01", "2027.03" };
             }
             else if (shipNo == "H122")
             {
                 OverallProgress = "22.4";
-                ExpectedEndDate = "2027-02-28";
-                StartDate = "2026-06-01";
-                MidExpectedEndDate = "2026-11-30";
-                ProgressRate = "78%";
-                activeIndex = 1; // 블록조립 단계에서 반짝
+                ExpectedEndDate = "2027-09-12";
+                StartDate = "2026-03-12"; // 18개월 전
+                MidExpectedEndDate = "2027-04-20";
+                ProgressRate = "22%";
+                activeIndex = 1;
+                dateLabels = new string[] { "2026.04", "2026.08", "2026.12", "2027.04", "2027.08", "2027.09" };
             }
 
             // 공정 단계 데이터 동적 구성 (왼쪽: 완료/초록, 기준: 진행중/주황+반짝, 오른쪽: 대기/회색)
@@ -353,8 +359,22 @@ namespace Ship_Progress
                 ChartCanvas.Children.Remove(elem);
             }
 
-            double[] planDataValues = { 0, 15, 35, 60, 85, 100 };
-            double[] actualDataValues = { 0, 12, 32, 58, 86.4 };
+            // 계획선은 전체 6개 포인트
+            double[] planDataValues = { 0, 20, 40, 60, 80, 100 };
+            double[] actualDataValues;
+
+            if (SelectedShipNo == "H120")
+            {
+                actualDataValues = new double[] { 0, 15, 35, 60, 80.2 };
+            }
+            else if (SelectedShipNo == "H121")
+            {
+                actualDataValues = new double[] { 0, 20, 45, 58.8 };
+            }
+            else // H122
+            {
+                actualDataValues = new double[] { 0, 22.4 };
+            }
 
             double width = ChartCanvas.ActualWidth;
             double height = ChartCanvas.ActualHeight;
