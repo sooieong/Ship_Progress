@@ -180,10 +180,10 @@ namespace Ship_Progress
                     StatusBgColor = (Brush)converter.ConvertFromString("#FFEBEE");
                     StatusFgColor = (Brush)converter.ConvertFromString("#D32F2F");
                 }
-                else
+                else // "주의" 일 때 이미지의 주황빛 색상으로 적용
                 {
-                    StatusBgColor = (Brush)converter.ConvertFromString("#FFFDE7");
-                    StatusFgColor = (Brush)converter.ConvertFromString("#FBC02D");
+                    StatusBgColor = (Brush)converter.ConvertFromString("#FFF3E0");
+                    StatusFgColor = (Brush)converter.ConvertFromString("#E65100");
                 }
             }
         }
@@ -408,7 +408,10 @@ namespace Ship_Progress
                 query = query.Where(x => x.Category == _currentCategoryFilter);
             }
 
-            H120RiskDataGrid.ItemsSource = query.ToList();
+            // 💡 3차: 지연 일수(DelayDays) 기준 내림차순 정렬 적용
+            var sortedQuery = query.OrderByDescending(x => x.DelayDays).ToList();
+
+            H120RiskDataGrid.ItemsSource = sortedQuery;
         }
 
         private void DrawSCurveChart()
