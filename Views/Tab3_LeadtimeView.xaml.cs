@@ -235,7 +235,7 @@ namespace Ship_Progress.Views
             if (sender is Border clickedBorder && clickedBorder.Tag is string shipNo)
             {
                 SelectedShipNo = shipNo;
-                SelectedSeriesName = shipNo == "H122" ? "B SERIES" : "A SERIES";
+                SelectedSeriesName = shipNo == "H122" ? "A SERIES" : "A SERIES";
 
                 // 호선 변경 시 필터 초기화
                 _currentCategoryFilter = "전체";
