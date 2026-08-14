@@ -291,14 +291,40 @@ namespace Ship_Progress
 
             DrawSCurveChart();
 
-            BlockProgressList = new List<BlockProgressItem>
+            // 💡 호선별 맞춤 블록 공정 현황 동적 구성
+            if (shipNo == "H120") // 의장 단계
             {
-                new BlockProgressItem("기관실 대형 주기계", 100),
-                new BlockProgressItem("발전기 엔진 및 보일러", 100),
-                new BlockProgressItem("추진 계통", 85),
-                new BlockProgressItem("갑판 대형 장비", 70),
-                new BlockProgressItem("화물창", 45)
-            };
+                BlockProgressList = new List<BlockProgressItem>
+        {
+            new BlockProgressItem("선실 / 거주구", 95),
+            new BlockProgressItem("기관 제어실", 90),
+            new BlockProgressItem("조타실", 85),
+            new BlockProgressItem("갑판 의장", 75),
+            new BlockProgressItem("연료 공급 장치", 60)
+        };
+            }
+            else if (shipNo == "H121") // 탑재 단계
+            {
+                BlockProgressList = new List<BlockProgressItem>
+        {
+            new BlockProgressItem("기관실 대형 주기계", 100),
+            new BlockProgressItem("발전기 엔진 및 보일러", 100),
+            new BlockProgressItem("추진 계통", 85),
+            new BlockProgressItem("갑판 대형 장비", 70),
+            new BlockProgressItem("화물창", 45)
+        };
+            }
+            else if (shipNo == "H122") // 블록 조립 단계
+            {
+                BlockProgressList = new List<BlockProgressItem>
+        {
+            new BlockProgressItem("선미 및 기관실 구역", 45),
+            new BlockProgressItem("선체바닥 / 하부구조", 35),
+            new BlockProgressItem("외판 및 갑판구역", 25),
+            new BlockProgressItem("선수구역", 15),
+            new BlockProgressItem("거주구 및 상부의장", 10)
+        };
+            }
 
             var riskItems = new List<H120RiskItem>
             {
