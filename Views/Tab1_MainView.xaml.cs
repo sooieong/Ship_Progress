@@ -110,12 +110,14 @@ namespace Ship_Progress
             set { _radarDataPoints = value; OnPropertyChangedImpl(); }
         }
 
+        // 1. 데이터를 백분율 숫자로 저장하도록 변경 (문자열 파싱용 % 제거)
         private Dictionary<string, double[]> shipVendorData = new Dictionary<string, double[]>()
-        {
-            { "H120", new double[] { 85.0, 90.0, 78.0, 92.0, 88.0 } },
-            { "H121", new double[] { 75.0, 82.0, 80.0, 70.0, 85.0 } },
-            { "H122", new double[] { 95.0, 88.0, 91.0, 94.0, 90.0 } }
-        };
+{
+    // 순서: 기자재, 기관의장, 선체의장, 선실의장, 전기의장
+    { "H120", new double[] { 88.89, 88.24, 87.90, 88.41, 88.14 } },
+    { "H121", new double[] { 59.26, 58.82, 59.24, 59.42, 58.76 } },
+    { "H122", new double[] { 31.11, 31.09, 31.21, 30.43, 31.07 } }
+};
 
         // -----------------------------------------------------------
         // 4. 하단 우측: 기자재 수급 현황 (도넛 차트 및 텍스트) 프로퍼티
@@ -405,6 +407,7 @@ namespace Ship_Progress
         {
             double[] values = new double[5];
 
+            // "전체"가 포함되어 있으면 모든 호선의 각 항목별 평균 계산
             if (targetKey.Contains("전체"))
             {
                 for (int i = 0; i < 5; i++)
