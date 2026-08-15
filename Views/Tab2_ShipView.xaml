@@ -205,11 +205,12 @@
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock Text="종합 공정률" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0" HorizontalAlignment="Center">
-                            <TextBlock Text="80.2" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <!-- Text를 OverallProgress에 바인딩 -->
+                            <TextBlock Text="{Binding OverallProgress}" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
                             <TextBlock Text="%" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
                         </StackPanel>
                     </StackPanel>
-
+                    
                     <Border Grid.Column="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" HorizontalAlignment="Right" Margin="0,5"/>
 
                     <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -415,14 +416,6 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <!-- 세로 연결선 -->
-                    <Line Grid.Row="2" 
-              X1="0" Y1="-15" X2="0" Y2="16" 
-              Stroke="{DynamicResource BorderBrush}" 
-              StrokeThickness="1" 
-              HorizontalAlignment="Center" 
-              VerticalAlignment="Center"/>
-
                     <!-- 하단 일정 및 진행률 수치 영역 -->
                     <Border Grid.Row="3" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12,8">
                         <UniformGrid Columns="3">
@@ -563,10 +556,10 @@
 
                             <!-- 나머지 컬럼들 -->
                             <DataGridTextColumn Header="문제 내용" Binding="{Binding EquipmentName}" Width="*" ElementStyle="{StaticResource CenterAlignedCell}"/>
-                            <DataGridTextColumn Header="지연 일수" Binding="{Binding DelayText}" Width="60" ElementStyle="{StaticResource CenterAlignedCell}"/>
+                            <DataGridTextColumn Header="지연 일수" Binding="{Binding DelayText}" Width="65" ElementStyle="{StaticResource CenterAlignedCell}"/>
 
                             <!-- 1. 상태 컬럼 -->
-                            <DataGridTemplateColumn Header="상태" Width="70">
+                            <DataGridTemplateColumn Header="상태" Width="65">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Style="{StaticResource StatusBorderStyle}" Background="{Binding StatusBgColor}">
@@ -577,7 +570,7 @@
                             </DataGridTemplateColumn>
 
                             <!-- 2. 주공정 영향 컬럼 -->
-                            <DataGridTemplateColumn Header="주공정 영향" Width="90">
+                            <DataGridTemplateColumn Header="주공정 영향" Width="120">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Style="{StaticResource StatusBorderStyle}" Background="{Binding StatusBgColor}">
