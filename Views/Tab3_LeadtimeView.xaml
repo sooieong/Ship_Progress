@@ -458,7 +458,7 @@
                                 <lvc:PieChart StartingRotationAngle="0" InnerRadius="35" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" LegendLocation="None" Series="{Binding OrderGaugeSeries}"/>
                                 <TextBlock Text="{Binding OrderPercentText}" FontSize="15" FontWeight="Bold" Foreground="{Binding OrderColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
-                            <TextBlock Text="{Binding OrderSubText}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                            <TextBlock Text="{Binding OrderSubText}" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
                         </StackPanel>
 
                         <!-- 2. 검사 완료 차트 -->
@@ -469,7 +469,7 @@
                                 <lvc:PieChart StartingRotationAngle="0" InnerRadius="35" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" LegendLocation="None" Series="{Binding InspectGaugeSeries}"/>
                                 <TextBlock Text="{Binding InspectPercentText}" FontSize="15" FontWeight="Bold" Foreground="{Binding InspectColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
-                            <TextBlock Text="{Binding InspectSubText}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                            <TextBlock Text="{Binding InspectSubText}" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
                         </StackPanel>
 
                         <!-- 3. 입고 차트 -->
@@ -480,7 +480,7 @@
                                 <lvc:PieChart StartingRotationAngle="0" InnerRadius="35" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" LegendLocation="None" Series="{Binding ReceiveGaugeSeries}"/>
                                 <TextBlock Text="{Binding ReceivePercentText}" FontSize="15" FontWeight="Bold" Foreground="{Binding ReceiveColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
-                            <TextBlock Text="{Binding ReceiveSubText}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                            <TextBlock Text="{Binding ReceiveSubText}" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
                         </StackPanel>
                     </UniformGrid>
                 </Grid>
