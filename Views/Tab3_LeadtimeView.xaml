@@ -447,42 +447,49 @@
 
                     <TextBlock Grid.Row="0" Text="자재 공정 현황 요약" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
-                    <!-- 3개의 도넛 차트를 가로로 나란히 배치 -->
-                    <UniformGrid Grid.Row="1" Columns="3" VerticalAlignment="Center">
+                    <!-- 3개의 도넛 차트를 가로로 나란히 배치 및 세로 구분선 추가 -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
                         <!-- 1. 발주 완료 차트 -->
-                        <StackPanel HorizontalAlignment="Center">
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock Text="발주 완료" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,0,0,6"/>
                             <Grid Width="100" Height="100">
-                                <!-- 아래와 같이 StartingRotationAngle="270" 추가 -->
                                 <lvc:PieChart StartingRotationAngle="0" InnerRadius="35" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" LegendLocation="None" Series="{Binding OrderGaugeSeries}"/>
                                 <TextBlock Text="{Binding OrderPercentText}" FontSize="15" FontWeight="Bold" Foreground="{Binding OrderColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
-                            <TextBlock Text="{Binding OrderSubText}" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
                         </StackPanel>
 
+                        <!-- 첫 번째 구분선 -->
+                        <Border Grid.Column="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" Margin="0,10"/>
+
                         <!-- 2. 검사 완료 차트 -->
-                        <StackPanel HorizontalAlignment="Center">
+                        <StackPanel Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock Text="검사 완료" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,0,0,6"/>
                             <Grid Width="100" Height="100">
-                                <!-- StartingRotationAngle="0" 추가 -->
                                 <lvc:PieChart StartingRotationAngle="0" InnerRadius="35" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" LegendLocation="None" Series="{Binding InspectGaugeSeries}"/>
                                 <TextBlock Text="{Binding InspectPercentText}" FontSize="15" FontWeight="Bold" Foreground="{Binding InspectColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
-                            <TextBlock Text="{Binding InspectSubText}" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
                         </StackPanel>
 
+                        <!-- 두 번째 구분선 -->
+                        <Border Grid.Column="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" Margin="0,10"/>
+
                         <!-- 3. 입고 차트 -->
-                        <StackPanel HorizontalAlignment="Center">
+                        <StackPanel Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock Text="입고" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,0,0,6"/>
                             <Grid Width="100" Height="100">
-                                <!-- StartingRotationAngle="0" 추가 -->
                                 <lvc:PieChart StartingRotationAngle="0" InnerRadius="35" Hoverable="False" DataTooltip="{x:Null}" DisableAnimations="True" Background="Transparent" LegendLocation="None" Series="{Binding ReceiveGaugeSeries}"/>
                                 <TextBlock Text="{Binding ReceivePercentText}" FontSize="15" FontWeight="Bold" Foreground="{Binding ReceiveColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
-                            <TextBlock Text="{Binding ReceiveSubText}" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
                         </StackPanel>
-                    </UniformGrid>
+                    </Grid>
                 </Grid>
             </Border>
 
