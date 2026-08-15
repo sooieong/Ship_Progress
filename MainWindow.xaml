@@ -270,6 +270,7 @@
        Placement="Bottom" 
        StaysOpen="False" 
        AllowsTransparency="True">
+                                    <!-- 🎯 다크/라이트 모드 배경 및 테두리 브러시 연동 -->
                                     <Border Background="{DynamicResource CardBackgroundBrush}" 
             BorderBrush="{DynamicResource BorderBrush}" 
             BorderThickness="1" 
@@ -289,10 +290,19 @@
                                                         <Setter.Value>
                                                             <ControlTemplate TargetType="ListBoxItem">
                                                                 <Border x:Name="ItemBorder" Background="Transparent" Padding="{TemplateBinding Padding}">
-                                                                    <ContentPresenter/>
+                                                                    <!-- 🎯 텍스트 색상도 테마별 PrimaryTextBrush 연동 -->
+                                                                    <ContentPresenter>
+                                                                        <ContentPresenter.Resources>
+                                                                            <Style TargetType="TextBlock">
+                                                                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                                                                            </Style>
+                                                                        </ContentPresenter.Resources>
+                                                                    </ContentPresenter>
                                                                 </Border>
                                                                 <ControlTemplate.Triggers>
-                                                                    <!-- 마우스 올리거나 코드로 IsSelected가 될 때 배경색 강조 -->
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource MainContentBackgroundBrush}"/>
+                                                                    </Trigger>
                                                                     <Trigger Property="IsSelected" Value="True">
                                                                         <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource MainContentBackgroundBrush}"/>
                                                                     </Trigger>

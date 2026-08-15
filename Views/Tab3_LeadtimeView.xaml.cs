@@ -252,8 +252,9 @@ namespace Ship_Progress.Views
             if (SearchTextBox.Text == "품목명 검색...")
             {
                 SearchTextBox.Text = "";
-                SearchTextBox.SetResourceReference(TextBox.ForegroundProperty, "PrimaryTextBrush");
             }
+            // 🎯 테마와 상관없이 무조건 검정 글씨로 강제 설정
+            SearchTextBox.Foreground = new SolidColorBrush(Colors.Black);
         }
 
         // 🎯 검색창에서 마우스가 벗어났을 때, 아무것도 안 적혀있으면 다시 안내 문구 채우기
@@ -262,7 +263,7 @@ namespace Ship_Progress.Views
             if (string.IsNullOrWhiteSpace(SearchTextBox.Text))
             {
                 SearchTextBox.Text = "품목명 검색...";
-                SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray);
+                SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray); // 안내 문구는 회색
             }
         }
 
@@ -428,8 +429,8 @@ namespace Ship_Progress.Views
 
                 if (SearchTextBox != null)
                 {
-                    SearchTextBox.Text = "품목명 검색..."; // 🎯 안내 문구로 초기화
-                    SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray);
+                    SearchTextBox.Text = "품목명 검색...";
+                    SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray); // 안내 문구는 회색
                 }
 
                 FilterDataByShip(shipNo);

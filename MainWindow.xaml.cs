@@ -219,8 +219,9 @@ namespace Ship_Progress
             if (FeedInputTextBox.Text == "멘션(@) 및 메시지 작성...")
             {
                 FeedInputTextBox.Text = "";
-                FeedInputTextBox.SetResourceReference(TextBox.ForegroundProperty, "PrimaryTextBrush");
             }
+            // 🎯 테마와 상관없이 무조건 검정 글씨로 강제 설정
+            FeedInputTextBox.Foreground = new SolidColorBrush(Colors.Black);
         }
 
         // 🎯 플레이스홀더: 입력창 포커스 아웃 시 내용이 없으면 안내 문구 복구
@@ -229,7 +230,7 @@ namespace Ship_Progress
             if (string.IsNullOrWhiteSpace(FeedInputTextBox.Text))
             {
                 FeedInputTextBox.Text = "멘션(@) 및 메시지 작성...";
-                FeedInputTextBox.Foreground = new SolidColorBrush(Colors.Gray);
+                FeedInputTextBox.Foreground = new SolidColorBrush(Colors.Gray); // 안내 문구는 연한 회색
             }
         }
 
@@ -272,6 +273,18 @@ namespace Ship_Progress
         // 🎯 상하 방향키로 팝업 목록 순차 이동 및 엔터 전송 처리
         private void FeedInputTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            // 🎯 타이핑을 시작할 때 안내 문구가 남아있다면 즉시 지우고 정상 글자색으로 변경
+            if (FeedInputTextBox.Text == "멘션(@) 및 메시지 작성...")
+            {
+                // 백스페이스나 방향키 등 특수 키가 아니라 실제 글자 입력 계열일 때만 지우기
+                if (e.Key != Key.Left && e.Key != Key.Right && e.Key != Key.Up && e.Key != Key.Down && e.Key != Key.Tab)
+                {
+                    FeedInputTextBox.Text = "";
+                    FeedInputTextBox.SetResourceReference(TextBox.ForegroundProperty, "PrimaryTextBrush");
+                    FeedInputTextBox.CaretIndex = FeedInputTextBox.Text.Length;
+                }
+            }
+
             if (MentionPopup.IsOpen)
             {
                 int count = MentionListBox.Items.Count;
