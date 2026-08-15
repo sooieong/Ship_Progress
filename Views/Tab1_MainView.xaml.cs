@@ -89,7 +89,6 @@ namespace Ship_Progress
             set { _criticalEquipmentList = value; OnPropertyChangedImpl(); }
         }
 
-        // 필터링을 위한 원본 데이터 및 필터 상태 변수 추가
         private List<EquipmentRiskItem> _originalCriticalEquipmentList = new List<EquipmentRiskItem>();
         private string _currentProcessFilter = "전체";
 
@@ -110,17 +109,16 @@ namespace Ship_Progress
             set { _radarDataPoints = value; OnPropertyChangedImpl(); }
         }
 
-        // 1. 데이터를 백분율 숫자로 저장하도록 변경 (문자열 파싱용 % 제거)
         private Dictionary<string, double[]> shipVendorData = new Dictionary<string, double[]>()
-{
-    // 순서: 기자재, 기관의장, 선체의장, 선실의장, 전기의장
-    { "H120", new double[] { 70.89, 85.24, 75.90, 80.41, 90.14 } },
-    { "H121", new double[] { 60.26, 50.82, 65.24, 60.42, 50.76 } },
-    { "H122", new double[] { 30.11, 40.09, 35.21, 45.43, 40.07 } }
-};
+        {
+            // 순서: 기자재, 기관의장, 선체의장, 선실의장, 전기의장
+            { "H120", new double[] { 70.89, 85.24, 75.90, 80.41, 90.14 } },
+            { "H121", new double[] { 60.26, 50.82, 65.24, 60.42, 50.76 } },
+            { "H122", new double[] { 30.11, 40.09, 35.21, 45.43, 40.07 } }
+        };
 
         // -----------------------------------------------------------
-        // 4. 하단 우측: 기자재 수급 현황 (도넛 차트 및 텍스트) 프로퍼티
+        // 4. 하단 우측: 품목 수급 현황 (도넛 차트 및 텍스트) 프로퍼티
         // -----------------------------------------------------------
         private SeriesCollection _supplyStatusSeries;
         public SeriesCollection SupplyStatusSeries
@@ -216,7 +214,7 @@ namespace Ship_Progress
             LoadProcessStatusData();
             LoadEquipmentRiskData();
             LoadVendorDeliveryData("전체 (평균)");
-            LoadSupplyStatusData();
+            LoadSupplyStatusData("전체 (평균)");
         }
 
         // -----------------------------------------------------------
@@ -264,25 +262,24 @@ namespace Ship_Progress
         private void LoadEquipmentRiskData()
         {
             var riskDataList = new List<EquipmentRiskItem>
-    {
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "기관", IssueDetail = "배관 팽창 루프 서포트", DelayDays = "8일", Status = "주의" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "선실", IssueDetail = "거주구 창문 코밍", DelayDays = "8일", Status = "주의" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "선실", IssueDetail = "현수사다리 거치 브라켓", DelayDays = "11일", Status = "위험" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "전기", IssueDetail = "전장 단로기 부착 브라켓", DelayDays = "10일", Status = "위험" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "전기", IssueDetail = "세면대/수도 배관 서포트", DelayDays = "7일", Status = "주의" },
+            {
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "기관", IssueDetail = "배관 팽창 루프 서포트", DelayDays = "8일", Status = "주의" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "선실", IssueDetail = "거주구 창문 코밍", DelayDays = "8일", Status = "주의" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "선실", IssueDetail = "현수사다리 거치 브라켓", DelayDays = "11일", Status = "위험" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "전기", IssueDetail = "전장 단로기 부착 브라켓", DelayDays = "10일", Status = "위험" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H120", Process = "전기", IssueDetail = "세면대/수도 배관 서포트", DelayDays = "7일", Status = "주의" },
 
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "기관", IssueDetail = "래싱 브릿지 Cross Bar", DelayDays = "7일", Status = "주의" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "선체", IssueDetail = "수직 사다리 A타입", DelayDays = "10일", Status = "위험" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "전기", IssueDetail = "케이블 윈치 러그", DelayDays = "6일", Status = "주의" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "전기", IssueDetail = "자동 전화기", DelayDays = "3일", Status = "주의" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "기관", IssueDetail = "래싱 브릿지 Cross Bar", DelayDays = "7일", Status = "주의" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "선체", IssueDetail = "수직 사다리 A타입", DelayDays = "10일", Status = "위험" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "전기", IssueDetail = "케이블 윈치 러그", DelayDays = "6일", Status = "주의" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H121", Process = "전기", IssueDetail = "자동 전화기", DelayDays = "3일", Status = "주의" },
 
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H122", Process = "선체", IssueDetail = "수직 사다리 A타입", DelayDays = "10일", Status = "위험" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H122", Process = "선실", IssueDetail = "현수사다리 거치 브라켓", DelayDays = "8일", Status = "주의" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H122", Process = "전기", IssueDetail = "케이블 윈치 러그", DelayDays = "6일", Status = "주의" },
-        new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H122", Process = "전기", IssueDetail = "자동 전화기", DelayDays = "3일", Status = "주의" }
-    };
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H122", Process = "선체", IssueDetail = "수직 사다리 A타입", DelayDays = "10일", Status = "위험" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H122", Process = "선실", IssueDetail = "현수사다리 거치 브라켓", DelayDays = "8일", Status = "주의" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H122", Process = "전기", IssueDetail = "케이블 윈치 러그", DelayDays = "6일", Status = "주의" },
+                new EquipmentRiskItem { Series = "A SERIES", ShipNo = "H122", Process = "전기", IssueDetail = "자동 전화기", DelayDays = "3일", Status = "주의" }
+            };
 
-            // 원본 데이터 백업
             _originalCriticalEquipmentList = riskDataList;
             _currentProcessFilter = "전체";
 
@@ -372,9 +369,6 @@ namespace Ship_Progress
             }
         }
 
-        // -----------------------------------------------------------
-        // 선택된 구분에 따라 DataGrid 필터링 적용
-        // -----------------------------------------------------------
         private void ApplyProcessFilter()
         {
             if (CriticalEquipmentDataGrid == null) return;
@@ -407,6 +401,7 @@ namespace Ship_Progress
             {
                 string selection = selectedItem.Content.ToString();
                 LoadVendorDeliveryData(selection);
+                LoadSupplyStatusData(selection);
             }
         }
 
@@ -414,7 +409,6 @@ namespace Ship_Progress
         {
             double[] values = new double[5];
 
-            // "전체"가 포함되어 있으면 모든 호선의 각 항목별 평균 계산
             if (targetKey.Contains("전체"))
             {
                 for (int i = 0; i < 5; i++)
@@ -454,42 +448,87 @@ namespace Ship_Progress
         }
 
         // -----------------------------------------------------------
-        // 5. 기자재 수급 현황 도넛 차트 데이터 로드 함수
+        // 5. 품목 수급 현황 (도넛 차트 및 텍스트) 데이터 로드 및 갱신 함수
         // -----------------------------------------------------------
-        private void LoadSupplyStatusData()
+        private void LoadSupplyStatusData(string targetKey = "전체 (평균)")
         {
-            double onTimeVal = 92.8;
-            double delayedVal = 4.9;
-            double pendingVal = 2.7;
+            double onTimeVal = 0;
+            double delayedVal = 0;
+            double pendingVal = 0;
 
-            OnTimePercentageText = $"{onTimeVal}%";
-            DelayedPercentageText = $"{delayedVal}%";
-            PendingPercentageText = $"{pendingVal}%";
+            if (targetKey.Contains("전체"))
+            {
+                double[] h120Stats = CalculateShipKpiRatio("H120");
+                double[] h121Stats = CalculateShipKpiRatio("H121");
+                double[] h122Stats = CalculateShipKpiRatio("H122");
+
+                onTimeVal = (h120Stats[0] + h121Stats[0] + h122Stats[0]) / 3.0;
+                delayedVal = (h120Stats[1] + h121Stats[1] + h122Stats[1]) / 3.0;
+                pendingVal = (h120Stats[2] + h121Stats[2] + h122Stats[2]) / 3.0;
+            }
+            else
+            {
+                double[] stats = CalculateShipKpiRatio(targetKey);
+                onTimeVal = stats[0];
+                delayedVal = stats[1];
+                pendingVal = stats[2];
+            }
+
+            OnTimePercentageText = $"{onTimeVal:F1}%";
+            DelayedPercentageText = $"{delayedVal:F1}%";
+            PendingPercentageText = $"{pendingVal:F1}%";
 
             SupplyStatusSeries = new SeriesCollection
             {
                 new PieSeries
                 {
-                    Title = "On Time",
+                    Title = "납품 완료",
                     Values = new ChartValues<double> { onTimeVal },
                     Fill = new SolidColorBrush(Color.FromRgb(76, 175, 80)),
                     StrokeThickness = 0
                 },
                 new PieSeries
                 {
-                    Title = "Delayed",
+                    Title = "지연",
                     Values = new ChartValues<double> { delayedVal },
-                    Fill = new SolidColorBrush(Color.FromRgb(229, 57, 53)),
+                    Fill = new SolidColorBrush(Color.FromRgb(234, 179, 8)), // 머스타드색 (주의/지연 색상)
                     StrokeThickness = 0
                 },
                 new PieSeries
                 {
-                    Title = "Pending",
+                    Title = "보류/대기",
                     Values = new ChartValues<double> { pendingVal },
-                    Fill = new SolidColorBrush(Color.FromRgb(224, 224, 224)),
+                    Fill = new SolidColorBrush(Color.FromRgb(229, 57, 53)), // 빨간색 (위험/보류 색상)
                     StrokeThickness = 0
                 }
             };
+        }
+
+        private double[] CalculateShipKpiRatio(string shipNo)
+        {
+            int completed = 0, delayed = 0, pending = 0;
+
+            if (shipNo == "H120")
+            {
+                completed = 18; delayed = 3; pending = 1;
+            }
+            else if (shipNo == "H121")
+            {
+                completed = 15; delayed = 5; pending = 2;
+            }
+            else if (shipNo == "H122")
+            {
+                completed = 12; delayed = 7; pending = 3;
+            }
+
+            int total = completed + delayed + pending;
+            if (total == 0) return new double[] { 0, 0, 0 };
+
+            double cPct = ((double)completed / total) * 100.0;
+            double dPct = ((double)delayed / total) * 100.0;
+            double pPct = ((double)pending / total) * 100.0;
+
+            return new double[] { cPct, dPct, pPct };
         }
     }
 }
