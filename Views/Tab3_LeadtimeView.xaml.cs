@@ -259,20 +259,31 @@ namespace Ship_Progress.Views
             public string Series { get; set; }
             public string ShipNo { get; set; }
             public string Category { get; set; }
-            public string Issuer { get; set; }
             public string Vendor { get; set; }
             public string EquipmentName { get; set; }
             public string NoticeMessage { get; set; }
             public string RegisterDate { get; set; }
 
-            public string IssuerText => $"발신: {Issuer} ({Vendor})";
+            // 지연: 빨강 (#E53935), 보류/대기: 주황 (#FB8C00)
+            public Brush CategoryBgBrush => Category switch
+            {
+                "지연" => new SolidColorBrush(Color.FromArgb(40, 229, 57, 53)),       // 연한 빨강 배경
+                "보류/대기" => new SolidColorBrush(Color.FromArgb(40, 251, 140, 0)),  // 연한 주황 배경
+                _ => new SolidColorBrush(Color.FromArgb(40, 150, 150, 150))
+            };
 
-            public NotificationItem(string series, string shipNo, string category, string issuer, string vendor, string equipmentName, string noticeMessage, string registerDate)
+            public Brush CategoryFgBrush => Category switch
+            {
+                "지연" => new SolidColorBrush(Color.FromRgb(229, 57, 53)),          // 진한 빨강 텍스트
+                "보류/대기" => new SolidColorBrush(Color.FromRgb(251, 140, 0)),     // 진한 주황 텍스트
+                _ => new SolidColorBrush(Color.FromRgb(100, 100, 100))
+            };
+
+            public NotificationItem(string series, string shipNo, string category, string vendor, string equipmentName, string noticeMessage, string registerDate)
             {
                 Series = series;
                 ShipNo = shipNo;
                 Category = category;
-                Issuer = issuer;
                 Vendor = vendor;
                 EquipmentName = equipmentName;
                 NoticeMessage = noticeMessage;
@@ -764,10 +775,13 @@ namespace Ship_Progress.Views
         {
             _allNotificationList = new List<NotificationItem>
             {
-                new NotificationItem("A SERIES", "H120", "지연", "생산팀", "(주)엔케이밸브", "배관 팽창 루프 서포트", "설치 일정을 고려하여 현장 반입 조기화 요청", "2026-08-02 14:30"),
-                new NotificationItem("A SERIES", "H120", "지연", "협력사", "강림중공업", "현수사다리 거치 브라켓", "부품 수급 차질로 인한 납기 지연 확인", "2026-08-02 11:15"),
-                new NotificationItem("A SERIES", "H121", "지연", "협력사", "삼영기계", "BWTS 펌프 메인", "주요 주물 부품 선적 지연 통보", "2026-08-01 17:40"),
-                new NotificationItem("B SERIES", "H122", "보류/대기", "생산팀", "비상발전기코리아", "비상발전기 세트", "부하 시험 일정 조율 요청", "2026-07-30 15:25")
+                new NotificationItem("A SERIES", "H120", "지연", "세진중공업", "배관 팽창 루프 서포트", "원부자재 수급 지연으로 인해 납기 2일 연기 요청", "2026-08-19 15:11"),
+                new NotificationItem("A SERIES", "H120", "보류/대기", "대양전기공업", "세면대/수도 배관 서포트", "협력사 제작 물량 폭주로 인해 납기 조절 요청", "2026-08-20 09:02"),
+                new NotificationItem("A SERIES", "H121", "지연", "동성하이텍", "수직 사다리 A타입", "원자재 입고 지연으로 인해 납기 3일 연기 요청", "2026-08-19 13:11"),
+                new NotificationItem("A SERIES", "H121", "보류/대기", "대양전기공업", "자동 전화기", "부품 조달 일정으로 인해 납기 5일 연기 요청", "2026-08-18 10:22"),
+                new NotificationItem("A SERIES", "H122", "지연", "동성하이텍", "수직 사다리 A타입", "원자재 입고 지연으로 인해 납기 3일 연기 요청", "2026-08-19 13:11"),
+                new NotificationItem("A SERIES", "H122", "지연", "대한전선", "케이블 윈치 러그", "도면 수정 작업 반영으로 인해 납기 2일 연기 요청", "2026-08-21 09:30"),
+                new NotificationItem("A SERIES", "H122", "보류/대기", "대양전기공업", "자동 전화기", "부품 조달 일정으로 인해 납기 5일 연기 요청", "2026-08-18 10:22")
             };
 
             FilterNotifications(SelectedShipNo, _currentNotificationFilter);
