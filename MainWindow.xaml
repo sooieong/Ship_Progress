@@ -43,7 +43,7 @@
 
                 <!-- 우측: 날짜/시간 & 알림 아이콘 & 새로고침 버튼 -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-
+                    
                     <!-- 실시간 날짜 및 시간 -->
                     <Border Background="{DynamicResource CardBackgroundBrush}"
                             BorderBrush="{DynamicResource BorderBrush}"
@@ -64,15 +64,16 @@
                     <!-- 알림 영역 -->
                     <Grid Margin="0,0,8,0">
                         <Button x:Name="NotificationButton"
-                                Height="36" 
-                                Padding="8,0"
-                                Background="Transparent" 
-                                BorderThickness="0" 
-                                Cursor="Hand"
-                                Click="NotificationButton_Click"
-                                ToolTip="알림">
+                Height="36" 
+                Padding="8,0"
+                Background="Transparent" 
+                BorderThickness="0" 
+                Cursor="Hand"
+                Click="NotificationButton_Click"
+                ToolTip="알림">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="🔔" FontSize="15" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <!-- 🎯 Foreground 동적 바인딩 추가 -->
+                                <TextBlock Text="🔔" FontSize="15" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="{DynamicResource PrimaryTextBrush}"/>
                                 <TextBlock Text="알림" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -139,29 +140,30 @@
 
                     <!-- 새로고침 버튼 (회전 애니메이션 및 상태 변경 적용) -->
                     <Button x:Name="RefreshButton"
-                            Height="36" 
-                            Padding="8,0"
-                            Background="Transparent" 
-                            BorderThickness="0" 
-                            Cursor="Hand"
-                            Click="RefreshButton_Click"
-                            ToolTip="새로고침 (1분마다 자동 갱신)">
+            Height="36" 
+            Padding="8,0"
+            Background="Transparent" 
+            BorderThickness="0" 
+            Cursor="Hand"
+            Click="RefreshButton_Click"
+            ToolTip="새로고침 (1분마다 자동 갱신)">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock x:Name="RefreshIconText" 
-                                       Text="🔄" 
-                                       FontSize="15" 
-                                       VerticalAlignment="Center" 
-                                       Margin="0,0,6,0"
-                                       RenderTransformOrigin="0.5,0.5">
+                       Text="🔄" 
+                       FontSize="15" 
+                       VerticalAlignment="Center" 
+                       Margin="0,0,6,0"
+                       RenderTransformOrigin="0.5,0.5"
+                       Foreground="{DynamicResource PrimaryTextBrush}"> <!-- 🎯 Foreground 동적 바인딩 추가 -->
                                 <TextBlock.RenderTransform>
                                     <RotateTransform x:Name="RefreshIconRotate" Angle="0"/>
                                 </TextBlock.RenderTransform>
                             </TextBlock>
                             <TextBlock x:Name="RefreshStatusText" 
-                                       Text="새로고침" 
-                                       FontSize="13" 
-                                       Foreground="{DynamicResource PrimaryTextBrush}" 
-                                       VerticalAlignment="Center"/>
+                       Text="새로고침" 
+                       FontSize="13" 
+                       Foreground="{DynamicResource PrimaryTextBrush}" 
+                       VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 

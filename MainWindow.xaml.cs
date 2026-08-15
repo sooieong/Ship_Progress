@@ -138,7 +138,8 @@ namespace Ship_Progress
                 _resetStatusTimer?.Stop();
 
                 RefreshIconText.Text = "🔄";
-                RefreshIconText.Foreground = (Brush)Application.Current.Resources["PrimaryTextBrush"];
+                // 🎯 하드코딩 대신 동적 리소스 바인딩 유지
+                RefreshIconText.SetResourceReference(TextBlock.ForegroundProperty, "PrimaryTextBrush");
                 RefreshStatusText.Text = "갱신 중...";
 
                 // 회전 애니메이션 시작
@@ -156,7 +157,7 @@ namespace Ship_Progress
         private void ShowSuccessState()
         {
             RefreshIconText.Text = "✔";
-            RefreshIconText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#43A047")); // 초록색
+            RefreshIconText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#43A047")); // 성공 시에는 초록색 고정 유지
             RefreshStatusText.Text = "업데이트됨";
 
             // 1.5초 후 기본 UI 상태로 복귀시키는 타이머
@@ -176,7 +177,8 @@ namespace Ship_Progress
         private void ResetRefreshUI()
         {
             RefreshIconText.Text = "🔄";
-            RefreshIconText.Foreground = (Brush)Application.Current.Resources["PrimaryTextBrush"];
+            // 🎯 복귀할 때도 현재 테마의 PrimaryTextBrush를 동적으로 다시 연결
+            RefreshIconText.SetResourceReference(TextBlock.ForegroundProperty, "PrimaryTextBrush");
             RefreshStatusText.Text = "새로고침";
         }
 
