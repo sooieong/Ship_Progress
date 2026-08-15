@@ -192,8 +192,9 @@ namespace Ship_Progress
                         // SetPlaceholderText("메인 (종합 시리즈 분석) 화면 준비 중입니다.");
                         break;
 
-                    case "Tab2":
-                        SetPlaceholderText("공정 분석 화면 준비 중입니다.");
+                    case "Tab2": // feature/tab2_Ship 브랜치에서 작업 예정
+                        MainContentViewPort.Content = new Tab2_ShipView();
+                        // SetPlaceholderText("공정 분석 화면 준비 중입니다.");
                         break;
 
                     case "Tab3":
