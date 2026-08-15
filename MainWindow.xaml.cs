@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Ship_Progress.Views;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Ship_Progress.Views;
@@ -204,8 +205,8 @@ namespace Ship_Progress
                         break;
 
                     case "Tab4": // feature/tab4_Setting 브랜치에서 작업 예정
-                        //MainContentViewPort.Content = new Tab4_SettingView();
-                        SetPlaceholderText("시스템 설정 화면 준비 중입니다.");
+                        MainContentViewPort.Content = new Tab4_SettingView();
+                        // SetPlaceholderText("시스템 설정 화면 준비 중입니다.");
                         break;
                 }
             }
@@ -247,9 +248,10 @@ namespace Ship_Progress
                 {
                     TextWrapping = TextWrapping.Wrap,
                     FontSize = 11,
-                    Margin = new Thickness(0, 0, 0, 6),
-                    Foreground = (Brush)Application.Current.Resources["PrimaryTextBrush"]
+                    Margin = new Thickness(0, 0, 0, 6)
                 };
+                // 🎯 동적 리소스 바인딩 연결
+                newFeedText.SetResourceReference(TextBlock.ForegroundProperty, "PrimaryTextBrush");
 
                 Run deptRun = new Run("[PM] ") { FontWeight = FontWeights.Bold };
                 newFeedText.Inlines.Add(deptRun);
@@ -261,9 +263,10 @@ namespace Ship_Progress
                     {
                         Run mentionRun = new Run(word + " ")
                         {
-                            Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1976D2")),
                             FontWeight = FontWeights.Bold
                         };
+                        // 🎯 멘션 색상 동적 리소스 바인딩 연결
+                        mentionRun.SetResourceReference(Run.ForegroundProperty, "MentionTextBrush");
                         newFeedText.Inlines.Add(mentionRun);
                     }
                     else
@@ -272,19 +275,17 @@ namespace Ship_Progress
                     }
                 }
 
-                Run timeRun = new Run($"({currentTime})")
-                {
-                    Foreground = (Brush)Application.Current.Resources["SubTextBrush"]
-                };
+                Run timeRun = new Run($"({currentTime})");
+                // 🎯 시간 색상 동적 리소스 바인딩 연결
+                timeRun.SetResourceReference(Run.ForegroundProperty, "SubTextBrush");
                 newFeedText.Inlines.Add(timeRun);
 
                 if (FeedListStackPanel.Children.Count > 0)
                 {
-                    Separator separator = new Separator
-                    {
-                        Background = (Brush)Application.Current.Resources["BorderBrush"],
-                        Margin = new Thickness(0, 2, 0, 6)
-                    };
+                    Separator separator = new Separator();
+                    separator.SetResourceReference(Separator.BackgroundProperty, "BorderBrush");
+                    separator.Margin = new Thickness(0, 2, 0, 6);
+
                     FeedListStackPanel.Children.Insert(0, separator);
                     FeedListStackPanel.Children.Insert(0, newFeedText);
                 }
@@ -298,22 +299,38 @@ namespace Ship_Progress
             }
         }
 
-        // 다크/라이트 모드 전환 함수
+        // 🎯 설정(tab4_Setting)에서 호출할 다크/라이트 모드 전환 함수
         public void ToggleTheme(bool isDarkMode)
         {
             if (isDarkMode)
             {
+                // 🌙 다크 모드: 배경은 어둡게, 모든 텍스트는 완전한 흰색(#FFFFFF) 계열로 통일
                 Application.Current.Resources["HeaderBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E1E1E"));
                 Application.Current.Resources["SidebarBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#252526"));
                 Application.Current.Resources["MainContentBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#121212"));
+                Application.Current.Resources["CardBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2D2D2D"));
+                Application.Current.Resources["BorderBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3E3E42"));
+
+                // 🎯 텍스트 리소스: 회색 없이 모두 흰색(#FFFFFF)으로 설정
                 Application.Current.Resources["PrimaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
+                Application.Current.Resources["SecondaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
+                Application.Current.Resources["SubTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
+
+                Application.Current.Resources["MentionTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#64B5F6"));
             }
             else
             {
+                // ☀️ 라이트 모드: 배경은 밝게, 모든 텍스트는 선명한 검정(#1A1A1A) 계열로 통일
                 Application.Current.Resources["HeaderBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
                 Application.Current.Resources["SidebarBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F4F5F7"));
                 Application.Current.Resources["MainContentBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EBEEF2"));
-                Application.Current.Resources["PrimaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#222222"));
+                Application.Current.Resources["CardBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
+                Application.Current.Resources["BorderBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0"));
+
+                // 🎯 텍스트 리소스: 회색 없이 모두 진한 검정(#1A1A1A)으로 설정
+                Application.Current.Resources["PrimaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1A1A1A"));
+                Application.Current.Resources["SecondaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1A1A1A"));
+                Application.Current.Resources["SubTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1A1A1A"));
             }
         }
     }

@@ -99,34 +99,35 @@
                                 <StackPanel Margin="12">
                                     <Grid Margin="0,0,0,8">
                                         <TextBlock Text="알림 센터" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                                        <TextBlock Text="전체 읽음" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource AccentOrangeBrush}" Cursor="Hand"/>
+                                        <TextBlock Text="전체 읽음" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource HanwhaOrangeBrush}" Cursor="Hand"/>
                                     </Grid>
 
                                     <Separator Background="{DynamicResource BorderBrush}" Margin="0,0,0,8"/>
 
                                     <ScrollViewer MaxHeight="250" VerticalScrollBarVisibility="Auto">
                                         <StackPanel>
+                                            <!-- 알림 카드: 모든 텍스트를 명확한 검정/흰색으로 바인딩 -->
                                             <Border Padding="8" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Margin="0,0,0,6">
                                                 <StackPanel>
                                                     <TextBlock Text="[위험] C SERIES - H116" FontWeight="SemiBold" FontSize="12" Foreground="#E53935"/>
-                                                    <TextBlock Text="철의장 공정 8일 지연 발생" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,2,0,0"/>
-                                                    <TextBlock Text="10분 전" FontSize="10" Foreground="{DynamicResource SubTextBrush}" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="철의장 공정 8일 지연 발생" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="10분 전" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </Border>
 
                                             <Border Padding="8" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Margin="0,0,0,6">
                                                 <StackPanel>
                                                     <TextBlock Text="[주의] A SERIES - H120" FontWeight="SemiBold" FontSize="12" Foreground="#FB8C00"/>
-                                                    <TextBlock Text="배관 공정 자재 입고 지연" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,2,0,0"/>
-                                                    <TextBlock Text="1시간 전" FontSize="10" Foreground="{DynamicResource SubTextBrush}" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="배관 공정 자재 입고 지연" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="10시간 전" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </Border>
 
                                             <Border Padding="8" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4">
                                                 <StackPanel>
                                                     <TextBlock Text="[완료] B SERIES 동기화" FontWeight="SemiBold" FontSize="12" Foreground="#43A047"/>
-                                                    <TextBlock Text="실시간 품질 로그 데이터 업데이트 완료" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,2,0,0"/>
-                                                    <TextBlock Text="2시간 전" FontSize="10" Foreground="{DynamicResource SubTextBrush}" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="실시간 품질 로그 데이터 업데이트 완료" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="2시간 전" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </Border>
                                         </StackPanel>
@@ -278,19 +279,20 @@
                                            Margin="0,0,0,8"/>
 
                                 <ScrollViewer x:Name="FeedScrollViewer" MaxHeight="160" VerticalScrollBarVisibility="Auto">
+                                    <!-- 실시간 피드 목록 카드 내부 ScrollViewer 아래 StackPanel -->
                                     <StackPanel x:Name="FeedListStackPanel">
                                         <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,0,0,6" Foreground="{DynamicResource PrimaryTextBrush}">
-                                            <Run Text="[생산팀]" FontWeight="Bold"/> <Run Text="@구매팀_최부장" Foreground="#1976D2" FontWeight="Bold"/> <Run Text="H120 메안엔진 지연으로 탑재 순서 변경 검토 요청 (14:20)"/>
+        <Run Text="[생산팀]" FontWeight="Bold"/> <Run Text="@구매팀_최부장" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="H120 메안엔진 지연으로 탑재 순서 변경 검토 요청 (14:20)"/>
                                         </TextBlock>
                                         <Separator Background="{DynamicResource BorderBrush}" Margin="0,2,0,6"/>
 
                                         <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,0,0,6" Foreground="{DynamicResource PrimaryTextBrush}">
-                                            <Run Text="[구매팀]" FontWeight="Bold"/> <Run Text="@PM_홍길동" Foreground="#1976D2" FontWeight="Bold"/> <Run Text="고압 LNG 밸브 공급처 교체 승인 요청 (11:15)"/>
+        <Run Text="[구매팀]" FontWeight="Bold"/> <Run Text="@PM_홍길동" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="고압 LNG 밸브 공급처 교체 승인 요청 (11:15)"/>
                                         </TextBlock>
                                         <Separator Background="{DynamicResource BorderBrush}" Margin="0,2,0,6"/>
 
                                         <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}">
-                                            <Run Text="[PM]" FontWeight="Bold"/> <Run Text="@생산팀_김과장" Foreground="#1976D2" FontWeight="Bold"/> <Run Text="CP 영향 +2일로 확인, 일정 수정 진행하세요. (15:01)"/>
+        <Run Text="[PM]" FontWeight="Bold"/> <Run Text="@생산팀_김과장" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="CP 영향 +2일로 확인, 일정 수정 진행하세요. (15:01)"/>
                                         </TextBlock>
                                     </StackPanel>
                                 </ScrollViewer>
