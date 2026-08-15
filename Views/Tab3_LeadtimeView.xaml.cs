@@ -198,9 +198,9 @@ namespace Ship_Progress.Views
 
         private Brush GetStatusBrush(double percent)
         {
-            if (percent >= 80.0)
+            if (percent >= 70.0)
                 return new SolidColorBrush(Color.FromRgb(76, 175, 80));
-            else if (percent >= 50.0)
+            else if (percent >= 40.0)
                 return new SolidColorBrush(Color.FromRgb(234, 179, 8));
             else
                 return new SolidColorBrush(Color.FromRgb(229, 57, 53));
