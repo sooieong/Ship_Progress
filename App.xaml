@@ -7,7 +7,8 @@
         <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="#FFFFFF"/>
         <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#F4F5F7"/>
         <SolidColorBrush x:Key="MainContentBackgroundBrush" Color="#EBEEF2"/>
-
+        <SolidColorBrush x:Key="BorderBrush" Color="#E0E0E0"/>
+        
         <!-- 🎯 회색 계열(#666666 등)을 전면 제거하고 선명한 검정(#1A1A1A)으로 통일 -->
         <SolidColorBrush x:Key="PrimaryTextBrush" Color="#1A1A1A"/>
         <SolidColorBrush x:Key="SecondaryTextBrush" Color="#1A1A1A"/>

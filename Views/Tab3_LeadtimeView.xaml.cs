@@ -665,9 +665,9 @@ namespace Ship_Progress.Views
                     Y1 = yPos,
                     X2 = width - paddingRight,
                     Y2 = yPos,
-                    Stroke = new SolidColorBrush(Color.FromRgb(220, 220, 220)),
-                    StrokeThickness = 0.5,
-                    Opacity = 0.5
+                    Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0")),
+                    StrokeThickness = 1
+                    //Opacity = 0.5
                 };
                 LeadtimeChartCanvas.Children.Add(gridLine);
 

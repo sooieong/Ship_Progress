@@ -344,32 +344,32 @@
                     <Viewbox Grid.Row="1" Stretch="Uniform">
                         <Grid Width="260" Height="220" Margin="10">
                             <!-- 1. 배경 오각형 격자선 -->
-                            <Polygon Points="130,20 225,89 189,201 71,201 35,89" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.8" Fill="Transparent"/>
-                            <Polygon Points="130,36 206,91 177,181 83,181 54,91" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
-                            <Polygon Points="130,52 187,93 165,161 95,161 73,93" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
-                            <Polygon Points="130,68 168,95 153,141 107,141 92,95" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
-                            <Polygon Points="130,84 149,97 141,121 119,121 111,97" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5" Fill="Transparent"/>
+                            <Polygon Points="130,20 225,89 189,201 71,201 35,89" Stroke="#E0E0E0" StrokeThickness="0.8" Fill="Transparent"/>
+                            <Polygon Points="130,36 206,91 177,181 83,181 54,91" Stroke="#E0E0E0" StrokeThickness="0.5" Fill="Transparent"/>
+                            <Polygon Points="130,52 187,93 165,161 95,161 73,93" Stroke="#E0E0E0" StrokeThickness="0.5" Fill="Transparent"/>
+                            <Polygon Points="130,68 168,95 153,141 107,141 92,95" Stroke="#E0E0E0" StrokeThickness="0.5" Fill="Transparent"/>
+                            <Polygon Points="130,84 149,97 141,121 119,121 111,97" Stroke="#E0E0E0" StrokeThickness="0.5" Fill="Transparent"/>
 
                             <!-- 2. 방사형 축 선 -->
-                            <Line X1="130" Y1="110" X2="130" Y2="20" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
-                            <Line X1="130" Y1="110" X2="225" Y2="89" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
-                            <Line X1="130" Y1="110" X2="189" Y2="201" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
-                            <Line X1="130" Y1="110" X2="71" Y2="201" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
-                            <Line X1="130" Y1="110" X2="35" Y2="89" Stroke="{DynamicResource BorderBrush}" StrokeThickness="0.5"/>
+                            <Line X1="130" Y1="110" X2="130" Y2="20" Stroke="#E0E0E0" StrokeThickness="0.5"/>
+                            <Line X1="130" Y1="110" X2="225" Y2="89" Stroke="#E0E0E0" StrokeThickness="0.5"/>
+                            <Line X1="130" Y1="110" X2="189" Y2="201" Stroke="#E0E0E0" StrokeThickness="0.5"/>
+                            <Line X1="130" Y1="110" X2="71" Y2="201" Stroke="#E0E0E0" StrokeThickness="0.5"/>
+                            <Line X1="130" Y1="110" X2="35" Y2="89" Stroke="#E0E0E0" StrokeThickness="0.5"/>
 
                             <!-- 3. 실데이터 기반 오각형 영역 -->
                             <Polygon Points="{Binding RadarPolygonPoints}" 
-                         Fill="#77F37321" 
-                         Stroke="#F37321" 
-                         StrokeThickness="2" 
-                         StrokeLineJoin="Round"/>
+     Fill="#77F37321" 
+     Stroke="#F37321" 
+     StrokeThickness="2" 
+     StrokeLineJoin="Round"/>
 
                             <!-- 5. 5대 의장 부문 축 레이블 (기자재, 기관의장, 선체의장, 선실의장, 전기의장) -->
-                            <TextBlock Text="기자재" Canvas.Top="2" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                            <TextBlock Text="기관의장" Margin="190,75,0,0" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                            <TextBlock Text="선체의장" Margin="170,203,0,0" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                            <TextBlock Text="선실의장" Margin="0,203,170,0" HorizontalAlignment="Right" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                            <TextBlock Text="전기의장" Margin="0,75,190,0" HorizontalAlignment="Right" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="기자재" Canvas.Top="2" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="기관의장" Margin="190,75,0,0" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="선체의장" Margin="170,203,0,0" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="선실의장" Margin="0,203,170,0" HorizontalAlignment="Right" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="전기의장" Margin="0,75,190,0" HorizontalAlignment="Right" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}"/>
                         </Grid>
                     </Viewbox>
                 </Grid>
