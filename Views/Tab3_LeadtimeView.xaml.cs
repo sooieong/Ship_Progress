@@ -32,6 +32,21 @@ namespace Ship_Progress.Views
             set { _selectedSeriesName = value; OnPropertyChanged(); }
         }
 
+        private int _kpiCompletedCount = 0;
+        public int KpiCompletedCount { get => _kpiCompletedCount; set { _kpiCompletedCount = value; OnPropertyChanged(); } }
+        private string _kpiCompletedPercent = "(0%)";
+        public string KpiCompletedPercent { get => _kpiCompletedPercent; set { _kpiCompletedPercent = value; OnPropertyChanged(); } }
+
+        private int _kpiDelayCount = 0;
+        public int KpiDelayCount { get => _kpiDelayCount; set { _kpiDelayCount = value; OnPropertyChanged(); } }
+        private string _kpiDelayPercent = "(0%)";
+        public string KpiDelayPercent { get => _kpiDelayPercent; set { _kpiDelayPercent = value; OnPropertyChanged(); } }
+
+        private int _kpiHoldCount = 0;
+        public int KpiHoldCount { get => _kpiHoldCount; set { _kpiHoldCount = value; OnPropertyChanged(); } }
+        private string _kpiHoldPercent = "(0%)";
+        public string KpiHoldPercent { get => _kpiHoldPercent; set { _kpiHoldPercent = value; OnPropertyChanged(); } }
+
         // -----------------------------------------------------------
         // 2. 3행 좌측 3개 독립 도넛 차트 바인딩 프로퍼티
         // -----------------------------------------------------------
@@ -77,17 +92,12 @@ namespace Ship_Progress.Views
         {
             if (sender is CheckBox chk && chk.DataContext is LeadtimeItem item)
             {
-                // 현재 필터링된 항목 중 하나라도 선택(IsSelected == true)된 것이 있는지 확인
                 var currentItems = GetFilteredLeadtimeList(SelectedShipNo);
                 bool hasAnySelection = currentItems.Any(x => x.IsSelected);
 
-                // 만약 모든 항목이 해제되려고 한다면
                 if (!hasAnySelection)
                 {
-                    // 알림창 띄우기
                     MessageBox.Show("하나 이상의 기자재를 선택해야 합니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
-
-                    // 해제하려는 항목을 다시 강제로 선택 상태로 되돌림
                     item.IsSelected = true;
                     return;
                 }
@@ -102,7 +112,6 @@ namespace Ship_Progress.Views
 
             var currentItems = GetFilteredLeadtimeList(shipNo);
 
-            // [변경됨] 선택(IsSelected)되었고, 상태가 '위험', '주의', '납품 예정'인 항목만 차트에 표시
             var selectedItems = currentItems
                 .Where(x => x.IsSelected && (x.Status == "위험" || x.Status == "주의" || x.Status == "납품 예정"))
                 .ToList();
@@ -198,6 +207,46 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
+        // KPI 계산 및 갱신 메서드
+        // -----------------------------------------------------------
+        private void UpdateKpiData(string shipNo)
+        {
+            if (_allLeadtimeList == null || _allNotificationList == null) return;
+
+            // 1. 납품 완료 및 지연(위험+주의) 건수 계산 (납기 데이터 기준)
+            var shipLeadtimeItems = _allLeadtimeList.Where(x => x.ShipNo == shipNo).ToList();
+            KpiCompletedCount = shipLeadtimeItems.Count(x => x.Status == "납품 완료");
+            KpiDelayCount = shipLeadtimeItems.Count(x => x.Status == "위험" || x.Status == "주의");
+
+            // 2. 보류/대기 건수 계산 (알림 데이터 기준)
+            var shipNotificationItems = _allNotificationList.Where(x => x.ShipNo == shipNo).ToList();
+            KpiHoldCount = shipNotificationItems.Count(x => x.Category == "보류/대기");
+
+            // 3. 전체 KPI 항목의 합산 건수 (100%의 기준)
+            int totalKpiCount = KpiCompletedCount + KpiDelayCount + KpiHoldCount;
+
+            if (totalKpiCount > 0)
+            {
+                // 각각의 비율 계산
+                double completedPct = ((double)KpiCompletedCount / totalKpiCount) * 100.0;
+                double delayPct = ((double)KpiDelayCount / totalKpiCount) * 100.0;
+                double holdPct = ((double)KpiHoldCount / totalKpiCount) * 100.0;
+
+                // 반올림했을 때 정확히 100%가 되도록 가장 큰 값에 잔여 오차를 보정할 수도 있지만,
+                // 일반적인 정수 표기로 출력합니다.
+                KpiCompletedPercent = $"({Math.Round(completedPct)}%)";
+                KpiDelayPercent = $"({Math.Round(delayPct)}%)";
+                KpiHoldPercent = $"({Math.Round(holdPct)}%)";
+            }
+            else
+            {
+                KpiCompletedPercent = "(0%)";
+                KpiDelayPercent = "(0%)";
+                KpiHoldPercent = "(0%)";
+            }
+        }
+
+        // -----------------------------------------------------------
         // 5. 납기 현황 DB 모델 및 데이터 리스트
         // -----------------------------------------------------------
         private List<LeadtimeItem> _allLeadtimeList;
@@ -214,7 +263,6 @@ namespace Ship_Progress.Views
                 set { _isSelected = value; OnPropertyChanged(); }
             }
 
-            // 납품 완료인 경우 체크박스 비활성화 (false 반환)
             public bool IsEnabled => Status != "납품 완료";
 
             public string Series { get; set; }
@@ -261,7 +309,6 @@ namespace Ship_Progress.Views
                 RemainingDaysText = remainingDaysText;
                 Status = status;
 
-                // 데이터 생성 시 납품 완료면 기본 선택을 해제(false) 상태로 둠
                 if (status == "납품 완료")
                 {
                     _isSelected = false;
@@ -291,18 +338,17 @@ namespace Ship_Progress.Views
             public string NoticeMessage { get; set; }
             public string RegisterDate { get; set; }
 
-            // 지연: 빨강 (#E53935), 보류/대기: 주황 (#FB8C00)
             public Brush CategoryBgBrush => Category switch
             {
-                "지연" => new SolidColorBrush(Color.FromArgb(40, 229, 57, 53)),       // 연한 빨강 배경
-                "보류/대기" => new SolidColorBrush(Color.FromArgb(40, 251, 140, 0)),  // 연한 주황 배경
+                "지연" => new SolidColorBrush(Color.FromArgb(40, 229, 57, 53)),
+                "보류/대기" => new SolidColorBrush(Color.FromArgb(40, 251, 140, 0)),
                 _ => new SolidColorBrush(Color.FromArgb(40, 150, 150, 150))
             };
 
             public Brush CategoryFgBrush => Category switch
             {
-                "지연" => new SolidColorBrush(Color.FromRgb(229, 57, 53)),          // 진한 빨강 텍스트
-                "보류/대기" => new SolidColorBrush(Color.FromRgb(251, 140, 0)),     // 진한 주황 텍스트
+                "지연" => new SolidColorBrush(Color.FromRgb(229, 57, 53)),
+                "보류/대기" => new SolidColorBrush(Color.FromRgb(251, 140, 0)),
                 _ => new SolidColorBrush(Color.FromRgb(100, 100, 100))
             };
 
@@ -338,6 +384,7 @@ namespace Ship_Progress.Views
             LoadNotificationData();
             UpdateChartDataForShip(SelectedShipNo);
             UpdateSupplyChartData(SelectedShipNo);
+            UpdateKpiData(SelectedShipNo);
         }
 
         private void LeadtimeChartCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -368,6 +415,7 @@ namespace Ship_Progress.Views
                 FilterNotifications(shipNo, _currentNotificationFilter);
                 UpdateChartDataForShip(shipNo);
                 UpdateSupplyChartData(shipNo);
+                UpdateKpiData(shipNo);
             }
         }
 
@@ -375,22 +423,19 @@ namespace Ship_Progress.Views
         // 페이징 및 필터링 관련 로직
         // -----------------------------------------------------------
         private int _currentPage = 1;
-        private const int _pageSize = 5; // 한 페이지당 5개 표시
+        private const int _pageSize = 5;
         private List<LeadtimeItem> _currentFilteredList = new List<LeadtimeItem>();
 
         private void FilterDataByShip(string shipNo)
         {
             if (_allLeadtimeList == null) return;
 
-            // 조건에 맞는 전체 목록을 먼저 캐시
             _currentFilteredList = GetFilteredLeadtimeList(shipNo);
 
-            // 첫 페이지로 초기화 후 페이징 적용된 데이터 바인딩
             _currentPage = 1;
             UpdatePagedDataGrid();
         }
 
-        // 페이징 적용 및 DataGrid 갱신 메서드
         private void UpdatePagedDataGrid()
         {
             if (_currentFilteredList == null) return;
@@ -398,11 +443,9 @@ namespace Ship_Progress.Views
             int totalItems = _currentFilteredList.Count;
             int totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)_pageSize));
 
-            // 현재 페이지 번호 범위 보정
             if (_currentPage > totalPages) _currentPage = totalPages;
             if (_currentPage < 1) _currentPage = 1;
 
-            // 5개씩 끊어서 가져오기
             var pagedData = _currentFilteredList
                 .Skip((_currentPage - 1) * _pageSize)
                 .Take(_pageSize)
@@ -413,14 +456,12 @@ namespace Ship_Progress.Views
                 LeadtimeRiskDataGrid.ItemsSource = pagedData;
             }
 
-            // 페이지 정보 텍스트블록 업데이트 (예: 1 / 3)
             if (PageInfoTextBlock != null)
             {
                 PageInfoTextBlock.Text = $"{_currentPage} / {totalPages}";
             }
         }
 
-        // 이전 페이지 버튼 클릭 이벤트
         private void PrevPage_Click(object sender, RoutedEventArgs e)
         {
             if (_currentPage > 1)
@@ -430,7 +471,6 @@ namespace Ship_Progress.Views
             }
         }
 
-        // 다음 페이지 버튼 클릭 이벤트
         private void NextPage_Click(object sender, RoutedEventArgs e)
         {
             int totalPages = Math.Max(1, (int)Math.Ceiling(_currentFilteredList.Count / (double)_pageSize));
@@ -441,7 +481,6 @@ namespace Ship_Progress.Views
             }
         }
 
-        // 통합 필터링 메서드 (구분, 협력사, 검색어 통합 적용)
         private List<LeadtimeItem> GetFilteredLeadtimeList(string shipNo)
         {
             var query = _allLeadtimeList.Where(x => x.ShipNo == shipNo);
@@ -465,7 +504,6 @@ namespace Ship_Progress.Views
                 .ToList();
         }
 
-        // 실시간 검색 텍스트박스 입력 이벤트
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox tb)
@@ -475,7 +513,6 @@ namespace Ship_Progress.Views
             }
         }
 
-        // 상태별 2차 정렬 순서 부여 헬퍼 메서드
         private int GetStatusSortOrder(string status)
         {
             return status switch
@@ -571,7 +608,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 9. 납기 현황 차트 드로잉 (데이터 기반 동적 Y축 스케일링 적용)
+        // 9. 납기 현황 차트 드로잉
         // -----------------------------------------------------------
         private void DrawLeadtimeChart()
         {
@@ -600,7 +637,6 @@ namespace Ship_Progress.Views
 
             Brush textBrush = Application.Current.Resources["PrimaryTextBrush"] as Brush ?? Brushes.Black;
 
-            // 1. 현재 표시되는 데이터에서 동적으로 최대값(Max) 계산
             double maxTarget = currentChartTargets.Length > 0 ? currentChartTargets.Max() : 400;
             double maxGap = 0;
             for (int i = 0; i < currentChartTargets.Length; i++)
@@ -609,19 +645,15 @@ namespace Ship_Progress.Views
                 if (gap > maxGap) maxGap = gap;
             }
 
-            // 데이터가 모두 0이거나 작을 때의 기본 최소 범위 보정
             if (maxTarget <= 0) maxTarget = 100;
             if (maxGap <= 0) maxGap = 50;
 
-            // 보기 좋게 10단위 또는 50단위 등으로 올림 처리 (막대 Y축 최대값)
             double maxBarValue = Math.Ceiling(maxTarget / 100.0) * 100;
-            if (maxBarValue < 200) maxBarValue = 200; // 최소 200 보장
+            if (maxBarValue < 200) maxBarValue = 200;
 
-            // 꺾은선 Y축 최대값 (막대의 절반 스케일 유지 또는 독립 계산)
             double maxGapValue = Math.Ceiling(maxGap / 50.0) * 50;
-            if (maxGapValue < 100) maxGapValue = 100; // 최소 100 보장
+            if (maxGapValue < 100) maxGapValue = 100;
 
-            // 2. 좌측 Y축 (막대용, 5등분 그리드)
             for (int i = 0; i <= 4; i++)
             {
                 double yVal = (maxBarValue / 4.0) * i;
@@ -646,7 +678,6 @@ namespace Ship_Progress.Views
                 LeadtimeChartCanvas.Children.Add(yLabel);
             }
 
-            // 3. 우측 Y축 (잔여 필요량 꺾은선용, 4~5등분)
             for (int i = 0; i <= 4; i++)
             {
                 double gVal = (maxGapValue / 4.0) * i;
@@ -698,7 +729,6 @@ namespace Ship_Progress.Views
                 double aVal = currentChartActuals[i];
                 double gapVal = Math.Max(0, tVal - aVal);
 
-                // 막대 높이 계산 (maxBarValue 기준)
                 double aHeight = (aVal / maxBarValue) * chartH;
                 double aY = paddingTop + chartH - aHeight;
 
@@ -726,7 +756,6 @@ namespace Ship_Progress.Views
                 Canvas.SetTop(targetRemainingBar, gapY);
                 LeadtimeChartCanvas.Children.Add(targetRemainingBar);
 
-                // 기존 막대 상단 기준이었던 수치 텍스트 위치를 -> 꺾은선 점(lineY) 기준 위쪽으로 수정
                 double lineY = paddingTop + chartH - (gapVal / maxGapValue * chartH);
                 gapPolyline.Points.Add(new Point(centerX, lineY));
 
@@ -739,8 +768,6 @@ namespace Ship_Progress.Views
                 };
                 valueLabel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 Canvas.SetLeft(valueLabel, centerX - (valueLabel.DesiredSize.Width / 2.0));
-
-                // [변경] 동그라미 중심(lineY)에서 위로 18 픽셀만큼 띄워 겹침 방지
                 Canvas.SetTop(valueLabel, lineY - 18);
                 LeadtimeChartCanvas.Children.Add(valueLabel);
 
@@ -756,7 +783,6 @@ namespace Ship_Progress.Views
 
                 double currentX = centerX;
                 double currentY = lineY;
-                // ... (이하 툴팁 이벤트 및 dot 추가 코드는 동일)
 
                 dot.MouseDown += (s, ev) =>
                 {

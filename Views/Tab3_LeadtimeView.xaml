@@ -209,10 +209,10 @@
                         <TextBlock Text="납품 완료" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                         <StackPanel Orientation="Vertical" Margin="0,4,0,0" HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="123" FontSize="20" FontWeight="Bold" Foreground="#4CAF50"/>
+                                <TextBlock Text="{Binding KpiCompletedCount}" FontSize="20" FontWeight="Bold" Foreground="#4CAF50"/>
                                 <TextBlock Text="건" FontSize="11" FontWeight="Bold" Foreground="#4CAF50" VerticalAlignment="Bottom" Margin="2,0,0,3"/>
                             </StackPanel>
-                            <TextBlock Text="(90%)" FontSize="11" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            <TextBlock Text="{Binding KpiCompletedPercent}" FontSize="11" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
                     </StackPanel>
 
@@ -223,10 +223,10 @@
                         <TextBlock Text="지연" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                         <StackPanel Orientation="Vertical" Margin="0,4,0,0" HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="34" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource HanwhaOrangeBrush}"/>
+                                <TextBlock Text="{Binding KpiDelayCount}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource HanwhaOrangeBrush}"/>
                                 <TextBlock Text="건" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource HanwhaOrangeBrush}" VerticalAlignment="Bottom" Margin="2,0,0,3"/>
                             </StackPanel>
-                            <TextBlock Text="(7%)" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource HanwhaOrangeBrush}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            <TextBlock Text="{Binding KpiDelayPercent}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource HanwhaOrangeBrush}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
                     </StackPanel>
 
@@ -237,10 +237,10 @@
                         <TextBlock Text="보류/대기" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                         <StackPanel Orientation="Vertical" Margin="0,4,0,0" HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="2" FontSize="20" FontWeight="Bold" Foreground="#E53935"/>
+                                <TextBlock Text="{Binding KpiHoldCount}" FontSize="20" FontWeight="Bold" Foreground="#E53935"/>
                                 <TextBlock Text="건" FontSize="11" FontWeight="Bold" Foreground="#E53935" VerticalAlignment="Bottom" Margin="2,0,0,3"/>
                             </StackPanel>
-                            <TextBlock Text="(3%)" FontSize="11" FontWeight="Bold" Foreground="#E53935" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            <TextBlock Text="{Binding KpiHoldPercent}" FontSize="11" FontWeight="Bold" Foreground="#E53935" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
