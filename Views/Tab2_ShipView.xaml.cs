@@ -23,11 +23,11 @@ namespace Ship_Progress
             Title = title;
             Progress = progress;
 
-            if (progress >= 90)
+            if (progress >= 70)
             {
                 BarColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4CAF50"));
             }
-            else if (progress >= 60)
+            else if (progress >= 40)
             {
                 BarColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EAB308"));
             }
@@ -249,11 +249,6 @@ namespace Ship_Progress
             LoadShipDashboardData("H120");
         }
 
-        private void ChartCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            DrawSCurveChart();
-        }
-
         private void ShipCard_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is Border clickedBorder && clickedBorder.Tag is string shipNo)
@@ -262,12 +257,16 @@ namespace Ship_Progress
             }
         }
 
+        private void ChartCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            DrawSCurveChart();
+        }
+
         public void LoadShipDashboardData(string shipNo)
         {
             SelectedShipNo = shipNo;
             SelectedSeriesName = "A SERIES";
 
-            // 💡 호선별 자재 납기율 평균 계산 및 반영
             if (_materialDeliveryRates.ContainsKey(shipNo))
             {
                 double avg = _materialDeliveryRates[shipNo].Average();
@@ -283,9 +282,19 @@ namespace Ship_Progress
                 ExpectedEndDate = "2026-12-20";
                 StartDate = "2025-06-20";
                 MidExpectedEndDate = "2026-08-20";
-                ProgressRate = "80%";
+                ProgressRate = "60.8%"; // 평균 60.8% 유지
                 activeIndex = 3;
                 dateLabels = new string[] { "2025.06", "2025.10", "2026.02", "2026.06", "2026.08", "2026.12" };
+
+                // 💡 H120: 초록(1개) + 주황(3개) + 빨강(1개) 믹스
+                BlockProgressList = new List<BlockProgressItem>
+        {
+            new BlockProgressItem("선실 / 거주구", 78),       // 초록 (70~100)
+            new BlockProgressItem("기관 제어실", 65),       // 주황 (40~69)
+            new BlockProgressItem("조타실", 60),          // 주황 (40~69)
+            new BlockProgressItem("갑판 의장", 66),       // 주황 (40~69)
+            new BlockProgressItem("연료 공급 장치", 35)     // 빨강 (0~39) - 🚨 기자재 조달 지연 포인트!
+        };
             }
             else if (shipNo == "H121")
             {
@@ -293,9 +302,19 @@ namespace Ship_Progress
                 ExpectedEndDate = "2027-03-29";
                 StartDate = "2025-09-29";
                 MidExpectedEndDate = "2026-10-20";
-                ProgressRate = "59%";
+                ProgressRate = "82.3%"; // 평균 82.3% (90, 85, 80, 81, 75의 평균)
                 activeIndex = 2;
                 dateLabels = new string[] { "2025.10", "2026.02", "2026.06", "2026.10", "2027.01", "2027.03" };
+
+                // 💡 블록 진행률 평균이 82.3%가 되도록 설정 (새로운 색상 기준 적용)
+                BlockProgressList = new List<BlockProgressItem>
+        {
+            new BlockProgressItem("기관실 대형 주기계", 90),     // 초록 (70~100)
+            new BlockProgressItem("발전기 엔진 및 보일러", 85), // 초록 (70~100)
+            new BlockProgressItem("추진 계통", 80),          // 초록 (70~100)
+            new BlockProgressItem("갑판 대형 장비", 81),       // 초록 (70~100)
+            new BlockProgressItem("화물창", 75)            // 초록 (70~100)
+        };
             }
             else if (shipNo == "H122")
             {
@@ -303,9 +322,19 @@ namespace Ship_Progress
                 ExpectedEndDate = "2027-09-12";
                 StartDate = "2026-03-12";
                 MidExpectedEndDate = "2027-04-20";
-                ProgressRate = "22%";
+                ProgressRate = "69.6%"; // 평균 69.6% (75, 72, 70, 68, 63의 평균)
                 activeIndex = 1;
                 dateLabels = new string[] { "2026.04", "2026.08", "2026.12", "2027.04", "2027.08", "2027.09" };
+
+                // 💡 블록 진행률 평균이 69.6%가 되도록 설정 (새로운 색상 기준 적용)
+                BlockProgressList = new List<BlockProgressItem>
+        {
+            new BlockProgressItem("선수 / 기관실 구역", 75),     // 초록 (70~100)
+            new BlockProgressItem("선체바닥 / 하부구조", 72),     // 초록 (70~100)
+            new BlockProgressItem("외판 및 갑판구역", 70),       // 초록 (70~100)
+            new BlockProgressItem("선수구역", 68),             // 주황 (40~69)
+            new BlockProgressItem("거주구 및 상부의장", 63)      // 주황 (40~69)
+        };
             }
 
             var newSteps = new List<ProcessStepItem>();
@@ -344,40 +373,6 @@ namespace Ship_Progress
             ProcessStepsList = newSteps;
 
             DrawSCurveChart();
-
-            if (shipNo == "H120")
-            {
-                BlockProgressList = new List<BlockProgressItem>
-                {
-                    new BlockProgressItem("선실 / 거주구", 95),
-                    new BlockProgressItem("기관 제어실", 90),
-                    new BlockProgressItem("조타실", 85),
-                    new BlockProgressItem("갑판 의장", 75),
-                    new BlockProgressItem("연료 공급 장치", 60)
-                };
-            }
-            else if (shipNo == "H121")
-            {
-                BlockProgressList = new List<BlockProgressItem>
-                {
-                    new BlockProgressItem("기관실 대형 주기계", 100),
-                    new BlockProgressItem("발전기 엔진 및 보일러", 100),
-                    new BlockProgressItem("추진 계통", 85),
-                    new BlockProgressItem("갑판 대형 장비", 70),
-                    new BlockProgressItem("화물창", 45)
-                };
-            }
-            else if (shipNo == "H122")
-            {
-                BlockProgressList = new List<BlockProgressItem>
-                {
-                    new BlockProgressItem("선수 / 기관실 구역", 45),
-                    new BlockProgressItem("선체바닥 / 하부구조", 35),
-                    new BlockProgressItem("외판 및 갑판구역", 25),
-                    new BlockProgressItem("선수구역", 15),
-                    new BlockProgressItem("거주구 및 상부의장", 10)
-                };
-            }
 
             _currentCategoryFilter = "전체";
             ApplyCategoryFilter();
