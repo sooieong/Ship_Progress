@@ -22,6 +22,9 @@ namespace Ship_Progress
         {
             InitializeComponent();
 
+            // 🎯 앱 실행 시 기본 라이트모드 브러시를 강제로 적용하여 테두리선 누락 방지
+            ToggleTheme(false);
+
             // 🎯 실시간 시계 타이머 시작 (1초 마다)
             StartClock();
 
@@ -328,6 +331,7 @@ namespace Ship_Progress
                 Application.Current.Resources["MainContentBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EBEEF2"));
                 Application.Current.Resources["CardBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
                 Application.Current.Resources["BorderBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0"));
+                Application.Current.Resources["MentionTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E88E5"));
 
                 // 🎯 텍스트 리소스: 회색 없이 모두 진한 검정(#1A1A1A)으로 설정
                 Application.Current.Resources["PrimaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1A1A1A"));
