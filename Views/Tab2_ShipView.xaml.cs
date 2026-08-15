@@ -431,11 +431,11 @@ namespace Ship_Progress
 
             if (SelectedShipNo == "H120")
             {
-                actualDataValues = new double[] { 0, 10, 30, 62, 80.2 };
+                actualDataValues = new double[] { 0, 10.9, 30.3, 62.4, 80.2 };
             }
             else if (SelectedShipNo == "H121")
             {
-                actualDataValues = new double[] { 0, 12, 38, 58.8 };
+                actualDataValues = new double[] { 0, 12.2, 38.3, 58.8 };
             }
             else
             {
