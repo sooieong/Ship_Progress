@@ -235,38 +235,83 @@
                     <StackPanel Grid.Row="1" Margin="8,0">
                         <!-- 1. 메시지 입력 카드 -->
                         <Border Background="{DynamicResource CardBackgroundBrush}" 
-                                BorderBrush="{DynamicResource BorderBrush}" 
-                                BorderThickness="1" 
-                                CornerRadius="8" 
-                                Padding="10" 
-                                Margin="0,0,0,8">
+        BorderBrush="{DynamicResource BorderBrush}" 
+        BorderThickness="1" 
+        CornerRadius="8" 
+        Padding="10" 
+        Margin="0,0,0,8">
                             <StackPanel>
                                 <TextBlock Text="부서 협업/라이브 피드" 
-                                           FontWeight="Bold" 
-                                           FontSize="12" 
-                                           Foreground="{DynamicResource PrimaryTextBrush}" 
-                                           Margin="0,0,0,8"/>
+                   FontWeight="Bold" 
+                   FontSize="12" 
+                   Foreground="{DynamicResource PrimaryTextBrush}" 
+                   Margin="0,0,0,8"/>
 
+                                <!-- 🎯 텍스트박스 이벤트 연결 확인 -->
                                 <TextBox x:Name="FeedInputTextBox" 
-                                         Height="60" 
-                                         AcceptsReturn="True" 
-                                         TextWrapping="Wrap" 
-                                         VerticalScrollBarVisibility="Auto" 
-                                         Padding="4" 
-                                         FontSize="11" 
-                                         Background="#FAFAFA"
-                                         BorderBrush="{DynamicResource BorderBrush}"
-                                         ToolTip="멘션(@) 및 메시지 작성..."/>
+                 Height="60" 
+                 AcceptsReturn="True" 
+                 TextWrapping="Wrap" 
+                 VerticalScrollBarVisibility="Auto" 
+                 Padding="4" 
+                 FontSize="11" 
+                 Background="#FAFAFA"
+                 BorderBrush="{DynamicResource BorderBrush}"
+                 ToolTip="멘션(@) 및 메시지 작성..."
+                 TextChanged="FeedInputTextBox_TextChanged"
+                 PreviewKeyDown="FeedInputTextBox_PreviewKeyDown"/>
+
+                                <!-- 🎯 멘션 자동완성 팝업 (TextBox 바로 밑에 위치) -->
+                                <Popup x:Name="MentionPopup" 
+       PlacementTarget="{Binding ElementName=FeedInputTextBox}"
+       Placement="Bottom" 
+       StaysOpen="False" 
+       AllowsTransparency="True">
+                                    <Border Background="{DynamicResource CardBackgroundBrush}" 
+            BorderBrush="{DynamicResource BorderBrush}" 
+            BorderThickness="1" 
+            CornerRadius="4" 
+            Width="160" 
+            MaxHeight="120">
+                                        <ListBox x:Name="MentionListBox" 
+                 Background="Transparent" 
+                 BorderThickness="0"
+                 Focusable="False">
+                                            <ListBox.ItemContainerStyle>
+                                                <Style TargetType="ListBoxItem">
+                                                    <Setter Property="Padding" Value="8,6"/>
+                                                    <Setter Property="FontSize" Value="11"/>
+                                                    <Setter Property="Cursor" Value="Hand"/>
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="ListBoxItem">
+                                                                <Border x:Name="ItemBorder" Background="Transparent" Padding="{TemplateBinding Padding}">
+                                                                    <ContentPresenter/>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <!-- 마우스 올리거나 코드로 IsSelected가 될 때 배경색 강조 -->
+                                                                    <Trigger Property="IsSelected" Value="True">
+                                                                        <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource MainContentBackgroundBrush}"/>
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </ListBox.ItemContainerStyle>
+                                        </ListBox>
+                                    </Border>
+                                </Popup>
 
                                 <Button Content="[전송]" 
-                                        HorizontalAlignment="Right" 
-                                        Margin="0,6,0,0" 
-                                        Padding="8,2" 
-                                        FontSize="11" 
-                                        Click="SendFeedButton_Click"/>
+                HorizontalAlignment="Right" 
+                Margin="0,6,0,0" 
+                Padding="8,2" 
+                FontSize="11" 
+                Click="SendFeedButton_Click"/>
                             </StackPanel>
                         </Border>
-
+                        
                         <!-- 2. 최근 피드 목록 카드 -->
                         <Border Background="{DynamicResource CardBackgroundBrush}" 
                                 BorderBrush="{DynamicResource BorderBrush}" 
@@ -284,17 +329,17 @@
                                     <!-- 실시간 피드 목록 카드 내부 ScrollViewer 아래 StackPanel -->
                                     <StackPanel x:Name="FeedListStackPanel">
                                         <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,0,0,6" Foreground="{DynamicResource PrimaryTextBrush}">
-        <Run Text="[생산팀]" FontWeight="Bold"/> <Run Text="@구매팀_최부장" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="H120 메안엔진 지연으로 탑재 순서 변경 검토 요청 (14:20)"/>
+        <Run Text="[설계팀]" FontWeight="Bold"/> <Run Text="@생산팀_변수정" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="H116 블록 3차 3D 모델링 간섭 검토 완료, 생산 라인 적용 요망 (14:20)"/>
                                         </TextBlock>
                                         <Separator Background="{DynamicResource BorderBrush}" Margin="0,2,0,6"/>
 
                                         <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,0,0,6" Foreground="{DynamicResource PrimaryTextBrush}">
-        <Run Text="[구매팀]" FontWeight="Bold"/> <Run Text="@PM_홍길동" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="고압 LNG 밸브 공급처 교체 승인 요청 (11:15)"/>
+        <Run Text="[생산팀]" FontWeight="Bold"/> <Run Text="@설계팀_이현곤" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="배관 라우팅 수정 요청 건 현장 반영 가능 여부 확인 부탁 (11:15)"/>
                                         </TextBlock>
                                         <Separator Background="{DynamicResource BorderBrush}" Margin="0,2,0,6"/>
 
                                         <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}">
-        <Run Text="[PM]" FontWeight="Bold"/> <Run Text="@생산팀_김과장" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="CP 영향 +2일로 확인, 일정 수정 진행하세요. (15:01)"/>
+        <Run Text="[영업팀]" FontWeight="Bold"/> <Run Text="@설계팀_곽태영" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="선주 측에서 요구한 친환경 연료탱크 설계 변경안 검토 요망 (15:01)"/>
                                         </TextBlock>
                                     </StackPanel>
                                 </ScrollViewer>

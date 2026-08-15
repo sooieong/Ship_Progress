@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
-using Ship_Progress.Views;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Ship_Progress.Views;
@@ -13,10 +15,22 @@ namespace Ship_Progress
 {
     public partial class MainWindow : Window
     {
-        private DispatcherTimer _clockTimer;        // 1초 실시간 시계용
+        private DispatcherTimer _clockTimer;         // 1초 실시간 시계용
         private DispatcherTimer _autoRefreshTimer;  // 1분 자동 새로고침용
         private DispatcherTimer _resetStatusTimer;  // 체크 표시 1.5초 후 복귀용
-        private Storyboard _rotateStoryboard;       // 아이콘 회전 애니메이션
+        private Storyboard _rotateStoryboard;        // 아이콘 회전 애니메이션
+
+        // 🎯 멘션 관련 필드 및 인덱스 추적 변수
+        private bool _isSelectingMention = false;
+        private int _mentionSelectedIndex = -1; // 방향키 순차 이동용 인덱스
+        private readonly List<string> _mentionList = new List<string>
+        {
+            "@설계팀_곽태영",
+            "@설계팀_김효빈",
+            "@생산팀_변수정",
+            "@설계팀_이현곤",
+            "@영업팀_홍성현"
+        };
 
         public MainWindow()
         {
@@ -128,7 +142,6 @@ namespace Ship_Progress
         // 데이터 로딩 비동기 로직 (DB / API 연동 영역)
         private async Task FetchDashboardDataAsync()
         {
-            // 실제 데이터 바인딩이나 DB 조회 작업을 진행하시면 됩니다.
             await Task.Delay(1000);
         }
 
@@ -137,22 +150,18 @@ namespace Ship_Progress
         {
             if (isRefreshing)
             {
-                // 복귀 타이머가 작동 중이었다면 중지
                 _resetStatusTimer?.Stop();
 
                 RefreshIconText.Text = "🔄";
-                // 🎯 하드코딩 대신 동적 리소스 바인딩 유지
                 RefreshIconText.SetResourceReference(TextBlock.ForegroundProperty, "PrimaryTextBrush");
                 RefreshStatusText.Text = "갱신 중...";
 
-                // 회전 애니메이션 시작
                 _rotateStoryboard.Begin(RefreshIconText, true);
             }
             else
             {
-                // 회전 애니메이션 중지
                 _rotateStoryboard.Stop(RefreshIconText);
-                RefreshIconRotate.Angle = 0; // 회전 각도 초기화
+                RefreshIconRotate.Angle = 0;
             }
         }
 
@@ -160,10 +169,9 @@ namespace Ship_Progress
         private void ShowSuccessState()
         {
             RefreshIconText.Text = "✔";
-            RefreshIconText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#43A047")); // 성공 시에는 초록색 고정 유지
+            RefreshIconText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#43A047"));
             RefreshStatusText.Text = "업데이트됨";
 
-            // 1.5초 후 기본 UI 상태로 복귀시키는 타이머
             _resetStatusTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1.5)
@@ -180,7 +188,6 @@ namespace Ship_Progress
         private void ResetRefreshUI()
         {
             RefreshIconText.Text = "🔄";
-            // 🎯 복귀할 때도 현재 테마의 PrimaryTextBrush를 동적으로 다시 연결
             RefreshIconText.SetResourceReference(TextBlock.ForegroundProperty, "PrimaryTextBrush");
             RefreshStatusText.Text = "새로고침";
         }
@@ -194,41 +201,20 @@ namespace Ship_Progress
 
                 switch (tabTag)
                 {
-                    case "Tab1": // feature/tab1_Main 브랜치에서 작업 예정
+                    case "Tab1":
                         MainContentViewPort.Content = new Tab1_MainView();
-                        // SetPlaceholderText("메인 (종합 시리즈 분석) 화면 준비 중입니다.");
                         break;
-
-                    case "Tab2": // feature/tab2_Ship 브랜치에서 작업 예정
+                    case "Tab2":
                         MainContentViewPort.Content = new Tab2_ShipView();
-                        // SetPlaceholderText("공정 분석 화면 준비 중입니다.");
                         break;
-
-                    case "Tab3": // feature/tab3_Leadtime 브랜치에서 작업 예정
+                    case "Tab3":
                         MainContentViewPort.Content = new Tab3_LeadtimeView();
-                        // SetPlaceholderText("납기 관리 화면 준비 중입니다.");
                         break;
-
-                    case "Tab4": // feature/tab4_Setting 브랜치에서 작업 예정
+                    case "Tab4":
                         MainContentViewPort.Content = new Tab4_SettingView();
-                        // SetPlaceholderText("시스템 설정 화면 준비 중입니다.");
                         break;
                 }
             }
-        }
-
-        // 임시 텍스트 생성 함수
-        private void SetPlaceholderText(string message)
-        {
-            MainContentViewPort.Content = new TextBlock
-            {
-                Text = message,
-                FontSize = 20,
-                FontWeight = FontWeights.Bold,
-                Foreground = (Brush)Application.Current.Resources["PrimaryTextBrush"],
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
         }
 
         // 알림 버튼 클릭 이벤트
@@ -238,6 +224,114 @@ namespace Ship_Progress
             {
                 NotificationPopup.IsOpen = !NotificationPopup.IsOpen;
             }
+        }
+
+        // 🎯 텍스트 박스 입력 내용 변경 감지 (@ 멘션 필터링)
+        // 🎯 텍스트 입력 시 팝업 띄우기
+        private void FeedInputTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_isSelectingMention) return;
+
+            int caretIndex = FeedInputTextBox.CaretIndex;
+            string text = FeedInputTextBox.Text;
+
+            int lastAtIndex = text.LastIndexOf('@', Math.Max(0, caretIndex - 1));
+
+            if (lastAtIndex >= 0)
+            {
+                if (lastAtIndex == 0 || char.IsWhiteSpace(text[lastAtIndex - 1]))
+                {
+                    string query = text.Substring(lastAtIndex, caretIndex - lastAtIndex);
+
+                    if (!query.Contains(" "))
+                    {
+                        var filtered = _mentionList.Where(m => m.StartsWith(query, StringComparison.OrdinalIgnoreCase)).ToList();
+                        if (filtered.Count > 0)
+                        {
+                            MentionListBox.ItemsSource = filtered;
+                            _mentionSelectedIndex = -1; // 초기화
+                            MentionListBox.SelectedIndex = -1;
+
+                            MentionPopup.PlacementTarget = FeedInputTextBox;
+                            MentionPopup.IsOpen = true;
+                            return;
+                        }
+                    }
+                }
+            }
+            MentionPopup.IsOpen = false;
+        }
+
+        // 🎯 방향키로 자유롭게 이동하고 엔터로 확정하는 핵심 로직
+        private void FeedInputTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (MentionPopup.IsOpen)
+            {
+                int count = MentionListBox.Items.Count;
+
+                if (e.Key == Key.Down)
+                {
+                    if (count > 0)
+                    {
+                        _mentionSelectedIndex = (_mentionSelectedIndex + 1) % count;
+                        MentionListBox.SelectedIndex = _mentionSelectedIndex;
+                    }
+                    e.Handled = true;
+                    return;
+                }
+                else if (e.Key == Key.Up)
+                {
+                    if (count > 0)
+                    {
+                        _mentionSelectedIndex = (_mentionSelectedIndex - 1 + count) % count;
+                        MentionListBox.SelectedIndex = _mentionSelectedIndex;
+                    }
+                    e.Handled = true;
+                    return;
+                }
+                else if (e.Key == Key.Enter || e.Key == Key.Tab)
+                {
+                    if (_mentionSelectedIndex >= 0 && _mentionSelectedIndex < count)
+                    {
+                        string selectedMention = MentionListBox.Items[_mentionSelectedIndex].ToString();
+                        ApplySelectedMention(selectedMention);
+                        e.Handled = true;
+                        return;
+                    }
+                }
+                else if (e.Key == Key.Escape)
+                {
+                    MentionPopup.IsOpen = false;
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            if (e.Key == Key.Enter && Keyboard.Modifiers != ModifierKeys.Shift)
+            {
+                e.Handled = true;
+                SendFeedButton_Click(sender, e);
+            }
+        }
+
+        // 🎯 선택된 멘션을 텍스트박스에 반영하는 메서드
+        private void ApplySelectedMention(string selectedMention)
+        {
+            _isSelectingMention = true;
+            int caretIndex = FeedInputTextBox.CaretIndex;
+            string text = FeedInputTextBox.Text;
+
+            int lastAtIndex = text.LastIndexOf('@', Math.Max(0, caretIndex - 1));
+            if (lastAtIndex >= 0)
+            {
+                string newText = text.Substring(0, lastAtIndex) + selectedMention + " " + text.Substring(caretIndex);
+                FeedInputTextBox.Text = newText;
+                FeedInputTextBox.CaretIndex = lastAtIndex + selectedMention.Length + 1;
+            }
+
+            MentionPopup.IsOpen = false;
+            _isSelectingMention = false;
+            FeedInputTextBox.Focus();
         }
 
         // 하단 피드 전송 버튼 클릭
@@ -255,7 +349,6 @@ namespace Ship_Progress
                     FontSize = 11,
                     Margin = new Thickness(0, 0, 0, 6)
                 };
-                // 🎯 동적 리소스 바인딩 연결
                 newFeedText.SetResourceReference(TextBlock.ForegroundProperty, "PrimaryTextBrush");
 
                 Run deptRun = new Run("[PM] ") { FontWeight = FontWeights.Bold };
@@ -270,7 +363,6 @@ namespace Ship_Progress
                         {
                             FontWeight = FontWeights.Bold
                         };
-                        // 🎯 멘션 색상 동적 리소스 바인딩 연결
                         mentionRun.SetResourceReference(Run.ForegroundProperty, "MentionTextBrush");
                         newFeedText.Inlines.Add(mentionRun);
                     }
@@ -281,7 +373,6 @@ namespace Ship_Progress
                 }
 
                 Run timeRun = new Run($"({currentTime})");
-                // 🎯 시간 색상 동적 리소스 바인딩 연결
                 timeRun.SetResourceReference(Run.ForegroundProperty, "SubTextBrush");
                 newFeedText.Inlines.Add(timeRun);
 
@@ -304,19 +395,17 @@ namespace Ship_Progress
             }
         }
 
-        // 🎯 설정(tab4_Setting)에서 호출할 다크/라이트 모드 전환 함수
+        // 다크/라이트 모드 전환 함수
         public void ToggleTheme(bool isDarkMode)
         {
             if (isDarkMode)
             {
-                // 🌙 다크 모드: 배경은 어둡게, 모든 텍스트는 완전한 흰색(#FFFFFF) 계열로 통일
                 Application.Current.Resources["HeaderBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E1E1E"));
                 Application.Current.Resources["SidebarBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#252526"));
                 Application.Current.Resources["MainContentBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#121212"));
                 Application.Current.Resources["CardBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2D2D2D"));
                 Application.Current.Resources["BorderBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3E3E42"));
 
-                // 🎯 텍스트 리소스: 회색 없이 모두 흰색(#FFFFFF)으로 설정
                 Application.Current.Resources["PrimaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
                 Application.Current.Resources["SecondaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
                 Application.Current.Resources["SubTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
@@ -325,7 +414,6 @@ namespace Ship_Progress
             }
             else
             {
-                // ☀️ 라이트 모드: 배경은 밝게, 모든 텍스트는 선명한 검정(#1A1A1A) 계열로 통일
                 Application.Current.Resources["HeaderBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
                 Application.Current.Resources["SidebarBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F4F5F7"));
                 Application.Current.Resources["MainContentBackgroundBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EBEEF2"));
@@ -333,7 +421,6 @@ namespace Ship_Progress
                 Application.Current.Resources["BorderBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0"));
                 Application.Current.Resources["MentionTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E88E5"));
 
-                // 🎯 텍스트 리소스: 회색 없이 모두 진한 검정(#1A1A1A)으로 설정
                 Application.Current.Resources["PrimaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1A1A1A"));
                 Application.Current.Resources["SecondaryTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1A1A1A"));
                 Application.Current.Resources["SubTextBrush"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1A1A1A"));
