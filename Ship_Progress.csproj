@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Remove="Images\ci_concept.png" />
+    <None Remove="Images\ship_icon.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +23,7 @@
 
   <ItemGroup>
     <Resource Include="Images\ci_concept.png" />
+    <Resource Include="Images\ship_icon.png" />
   </ItemGroup>
 
 </Project>
