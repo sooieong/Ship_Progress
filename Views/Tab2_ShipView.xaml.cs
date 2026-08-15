@@ -86,6 +86,21 @@ namespace Ship_Progress
     {
         private string[] dateLabels;
 
+        // 💡 호선별 자재 납기율 데이터 딕셔너리 추가
+        private readonly Dictionary<string, double[]> _materialDeliveryRates = new Dictionary<string, double[]>
+        {
+            { "H120", new double[] { 70.89, 85.24, 75.90, 80.41, 90.14 } },
+            { "H121", new double[] { 60.26, 50.82, 65.24, 60.42, 50.76 } },
+            { "H122", new double[] { 30.11, 40.09, 35.21, 45.43, 40.07 } }
+        };
+
+        private string _averageMaterialDeliveryRate = "71.3";
+        public string AverageMaterialDeliveryRate
+        {
+            get => _averageMaterialDeliveryRate;
+            set { _averageMaterialDeliveryRate = value; OnPropertyChanged(); }
+        }
+
         private string _selectedShipNo = "H120";
         public string SelectedShipNo
         {
@@ -180,7 +195,7 @@ namespace Ship_Progress
                     StatusBgColor = (Brush)converter.ConvertFromString("#FFEBEE");
                     StatusFgColor = (Brush)converter.ConvertFromString("#D32F2F");
                 }
-                else // "주의" 일 때 이미지의 주황빛 색상으로 적용
+                else
                 {
                     StatusBgColor = (Brush)converter.ConvertFromString("#FFF3E0");
                     StatusFgColor = (Brush)converter.ConvertFromString("#E65100");
@@ -188,7 +203,6 @@ namespace Ship_Progress
             }
         }
 
-        // 전체 위험 품목 마스터 리스트
         private List<H120RiskItem> _allRiskList = new List<H120RiskItem>();
         private string _currentCategoryFilter = "전체";
 
@@ -197,7 +211,6 @@ namespace Ship_Progress
             InitializeComponent();
             this.DataContext = this;
 
-            // 전체 마스터 데이터 초기화 (H120, H121, H122 통합)
             InitializeMasterRiskData();
 
             ChartCanvas.MouseDown += (s, e) =>
@@ -209,26 +222,26 @@ namespace Ship_Progress
         private void InitializeMasterRiskData()
         {
             _allRiskList = new List<H120RiskItem>
-    {
-        // --- H120 데이터 ---
-        new H120RiskItem("A SERIES", "H120", "기관", "자재 수급 지연으로 배관 팽창 루프 서포트 제작 지연", "", 8, "주의", "기관실의장(+5일)"),
-        new H120RiskItem("A SERIES", "H120", "선실", "상세 설계 승인으로 거주구 창문 코밍 생산 일정 지연", "", 8, "주의", "선실의장(+5일)"),
-        new H120RiskItem("A SERIES", "H120", "선실", "공장 점검으로 현수사다리 거치 브라켓 납품 지연", "", 11, "위험", "선실의장(+8일)"),
-        new H120RiskItem("A SERIES", "H120", "전기", "검사 기준 강화로 전장 단로기 부착 브라켓 출하 지연", "", 10, "위험", "선실의장(+7일)"),
-        new H120RiskItem("A SERIES", "H120", "전기", "물량 폭주로 세면대/수도 배관 서포트 일정 조정", "", 7, "주의", "선실의장(+4일)"),
+            {
+                // --- H120 데이터 ---
+                new H120RiskItem("A SERIES", "H120", "기관", "자재 수급 지연으로 배관 팽창 루프 서포트 제작 지연", "", 8, "주의", "기관실의장(+5일)"),
+                new H120RiskItem("A SERIES", "H120", "선실", "상세 설계 승인으로 거주구 창문 코밍 생산 일정 지연", "", 8, "주의", "선실의장(+5일)"),
+                new H120RiskItem("A SERIES", "H120", "선실", "공장 점검으로 현수사다리 거치 브라켓 납품 지연", "", 11, "위험", "선실의장(+8일)"),
+                new H120RiskItem("A SERIES", "H120", "전기", "검사 기준 강화로 전장 단로기 부착 브라켓 출하 지연", "", 10, "위험", "선실의장(+7일)"),
+                new H120RiskItem("A SERIES", "H120", "전기", "물량 폭주로 세면대/수도 배관 서포트 일정 조정", "", 7, "주의", "선실의장(+4일)"),
 
-        // --- H121 데이터 ---
-        new H120RiskItem("A SERIES", "H121", "기관", "용접 지연으로 래싱 브릿지 Cross Bar 납품 지연", "", 7, "주의", "기관실의장(+4일)"),
-        new H120RiskItem("A SERIES", "H121", "선체", "원자재 입고 지연으로 수직 사다리 A타입 생산 지연", "", 10, "위험", "선체 도장(+6일)"),
-        new H120RiskItem("A SERIES", "H121", "전기", "도면 수정 작업으로 케이블 윈치 러그 제작 지연", "", 6, "주의", "선수 블록조립(+4일)"),
-        new H120RiskItem("A SERIES", "H121", "전기", "조달 기간 연장으로 자동 전화기 납품 일정 조정", "", 3, "주의", "선실의장(+1일)"),
+                // --- H121 데이터 ---
+                new H120RiskItem("A SERIES", "H121", "기관", "용접 지연으로 래싱 브릿지 Cross Bar 납품 지연", "", 7, "주의", "기관실의장(+4일)"),
+                new H120RiskItem("A SERIES", "H121", "선체", "원자재 입고 지연으로 수직 사다리 A타입 생산 지연", "", 10, "위험", "선체 도장(+6일)"),
+                new H120RiskItem("A SERIES", "H121", "전기", "도면 수정 작업으로 케이블 윈치 러그 제작 지연", "", 6, "주의", "선수 블록조립(+4일)"),
+                new H120RiskItem("A SERIES", "H121", "전기", "조달 기간 연장으로 자동 전화기 납품 일정 조정", "", 3, "주의", "선실의장(+1일)"),
 
-        // --- H122 데이터 ---
-        new H120RiskItem("A SERIES", "H122", "선체", "원자재 입고 지연으로 수직 사다리 A타입 생산 지연", "", 10, "위험", "하부구조(+6일)"),
-        new H120RiskItem("A SERIES", "H122", "선실", "공장 내부 보수로 현수사다리 거치 브라켓 납품 지연", "", 8, "주의", "상부의장(+4일)"),
-        new H120RiskItem("A SERIES", "H122", "전기", "도면 수정 작업으로 케이블 윈치 러그 제작 지연", "", 6, "주의", "선수 블록조립(+3일)"),
-        new H120RiskItem("A SERIES", "H122", "전기", "조달 기간 연장으로 자동 전화기 납품 일정 조정", "", 3, "주의", "상부의장(+1일)")
-    };
+                // --- H122 데이터 ---
+                new H120RiskItem("A SERIES", "H122", "선체", "원자재 입고 지연으로 수직 사다리 A타입 생산 지연", "", 10, "위험", "하부구조(+6일)"),
+                new H120RiskItem("A SERIES", "H122", "선실", "공장 내부 보수로 현수사다리 거치 브라켓 납품 지연", "", 8, "주의", "상부의장(+4일)"),
+                new H120RiskItem("A SERIES", "H122", "전기", "도면 수정 작업으로 케이블 윈치 러그 제작 지연", "", 6, "주의", "선수 블록조립(+3일)"),
+                new H120RiskItem("A SERIES", "H122", "전기", "조달 기간 연장으로 자동 전화기 납품 일정 조정", "", 3, "주의", "상부의장(+1일)")
+            };
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -252,7 +265,14 @@ namespace Ship_Progress
         public void LoadShipDashboardData(string shipNo)
         {
             SelectedShipNo = shipNo;
-            SelectedSeriesName = shipNo == "H122" ? "A SERIES" : "A SERIES";
+            SelectedSeriesName = "A SERIES";
+
+            // 💡 호선별 자재 납기율 평균 계산 및 반영
+            if (_materialDeliveryRates.ContainsKey(shipNo))
+            {
+                double avg = _materialDeliveryRates[shipNo].Average();
+                AverageMaterialDeliveryRate = avg.ToString("F1");
+            }
 
             string[] stepNames = { "강재절단", "블록조립", "탑재", "의장", "시운전" };
             int activeIndex = 0;
@@ -359,7 +379,6 @@ namespace Ship_Progress
                 };
             }
 
-            // 호선이 바뀔 때 카테고리 필터 초기화 및 해당 호선 데이터 적용
             _currentCategoryFilter = "전체";
             ApplyCategoryFilter();
         }
@@ -369,7 +388,6 @@ namespace Ship_Progress
             if (sender is Button btn)
             {
                 ContextMenu menu = new ContextMenu();
-                // 현재 선택된 호선의 데이터에서만 카테고리 추출
                 var distinctCategories = _allRiskList
                     .Where(x => x.ShipNo == SelectedShipNo)
                     .Select(x => x.Category)
@@ -398,18 +416,14 @@ namespace Ship_Progress
         {
             if (H120RiskDataGrid == null) return;
 
-            // 1차: 현재 선택된 호선(SelectedShipNo)으로 필터링
             var query = _allRiskList.Where(x => x.ShipNo == SelectedShipNo);
 
-            // 2차: 카테고리 필터가 "전체"가 아니면 추가 필터링
             if (_currentCategoryFilter != "전체")
             {
                 query = query.Where(x => x.Category == _currentCategoryFilter);
             }
 
-            // 💡 3차: 지연 일수(DelayDays) 기준 내림차순 정렬 적용
             var sortedQuery = query.OrderByDescending(x => x.DelayDays).ToList();
-
             H120RiskDataGrid.ItemsSource = sortedQuery;
         }
 

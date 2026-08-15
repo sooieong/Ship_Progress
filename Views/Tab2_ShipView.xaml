@@ -214,9 +214,9 @@
                     <Border Grid.Column="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" HorizontalAlignment="Right" Margin="0,5"/>
 
                     <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock Text="평균 자재 입고률" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="평균 자재 납기율" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0" HorizontalAlignment="Center">
-                            <TextBlock Text="71.3" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="{Binding AverageMaterialDeliveryRate}" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
                             <TextBlock Text="%" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="2,0,0,2"/>
                         </StackPanel>
                     </StackPanel>
