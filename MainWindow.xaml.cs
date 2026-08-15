@@ -276,11 +276,10 @@ namespace Ship_Progress
             // 🎯 타이핑을 시작할 때 안내 문구가 남아있다면 즉시 지우고 정상 글자색으로 변경
             if (FeedInputTextBox.Text == "멘션(@) 및 메시지 작성...")
             {
-                // 백스페이스나 방향키 등 특수 키가 아니라 실제 글자 입력 계열일 때만 지우기
                 if (e.Key != Key.Left && e.Key != Key.Right && e.Key != Key.Up && e.Key != Key.Down && e.Key != Key.Tab)
                 {
                     FeedInputTextBox.Text = "";
-                    FeedInputTextBox.SetResourceReference(TextBox.ForegroundProperty, "PrimaryTextBrush");
+                    FeedInputTextBox.Foreground = new SolidColorBrush(Colors.Black);
                     FeedInputTextBox.CaretIndex = FeedInputTextBox.Text.Length;
                 }
             }
@@ -295,6 +294,9 @@ namespace Ship_Progress
                     {
                         _mentionSelectedIndex = (_mentionSelectedIndex + 1) % count;
                         MentionListBox.SelectedIndex = _mentionSelectedIndex;
+
+                        // 🎯 아래 방향키 이동 시 스크롤바 동기화
+                        MentionListBox.ScrollIntoView(MentionListBox.SelectedItem);
                     }
                     e.Handled = true;
                     return;
@@ -305,6 +307,9 @@ namespace Ship_Progress
                     {
                         _mentionSelectedIndex = (_mentionSelectedIndex - 1 + count) % count;
                         MentionListBox.SelectedIndex = _mentionSelectedIndex;
+
+                        // 🎯 위 방향키 이동 시 스크롤바 동기화
+                        MentionListBox.ScrollIntoView(MentionListBox.SelectedItem);
                     }
                     e.Handled = true;
                     return;
