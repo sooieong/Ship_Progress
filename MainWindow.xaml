@@ -28,8 +28,8 @@
             <Grid Margin="16,0">
                 <!-- 좌측: 로고 + 프로젝트 타이틀 -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Image Source="C:\Users\sooieong\source\repos\Ship_Progress\Images\Hanwha_Ocean_Logo.png"
-                           Height="40" 
+                    <Image Source="Images/ci_concept.png"
+                           Height="30" 
                            Stretch="Uniform"
                            Margin="0,0,16,0" 
                            RenderOptions.BitmapScalingMode="HighQuality"/>
