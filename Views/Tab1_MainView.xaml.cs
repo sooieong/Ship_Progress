@@ -6,10 +6,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
-using System.Text.RegularExpressions;
 
 namespace Ship_Progress
 {
@@ -529,6 +530,33 @@ namespace Ship_Progress
             double pPct = ((double)pending / total) * 100.0;
 
             return new double[] { cPct, dPct, pPct };
+        }
+
+        // 인포메이션 아이콘 클릭 이벤트 (열기/닫기 토글)
+        private void InfoButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (InfoPopup != null)
+            {
+                InfoPopup.IsOpen = !InfoPopup.IsOpen;
+            }
+        }
+
+        // 마우스 올렸을 때 팝업 열기
+        private void InfoButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (InfoPopup != null)
+            {
+                InfoPopup.IsOpen = true;
+            }
+        }
+
+        // 마우스가 벗어났을 때 팝업 닫기
+        private void InfoButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (InfoPopup != null)
+            {
+                InfoPopup.IsOpen = false;
+            }
         }
     }
 }
