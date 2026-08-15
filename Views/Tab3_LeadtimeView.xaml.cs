@@ -340,15 +340,15 @@ namespace Ship_Progress.Views
 
             public Brush CategoryBgBrush => Category switch
             {
-                "지연" => new SolidColorBrush(Color.FromArgb(40, 229, 57, 53)),
-                "보류/대기" => new SolidColorBrush(Color.FromArgb(40, 251, 140, 0)),
+                "지연" => new SolidColorBrush(Color.FromArgb(40, 251, 140, 0)),     // 연한 주황 배경 (지연)
+                "보류/대기" => new SolidColorBrush(Color.FromArgb(40, 229, 57, 53)),  // 연한 빨강 배경 (보류/대기)
                 _ => new SolidColorBrush(Color.FromArgb(40, 150, 150, 150))
             };
 
             public Brush CategoryFgBrush => Category switch
             {
-                "지연" => new SolidColorBrush(Color.FromRgb(229, 57, 53)),
-                "보류/대기" => new SolidColorBrush(Color.FromRgb(251, 140, 0)),
+                "지연" => new SolidColorBrush(Color.FromRgb(251, 140, 0)),          // 진한 주황 텍스트 (지연)
+                "보류/대기" => new SolidColorBrush(Color.FromRgb(229, 57, 53)),     // 진한 빨강 텍스트 (보류/대기)
                 _ => new SolidColorBrush(Color.FromRgb(100, 100, 100))
             };
 
