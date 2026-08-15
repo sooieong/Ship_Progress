@@ -6,6 +6,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using Ship_Progress.Views;
 
 namespace Ship_Progress
 {
@@ -197,8 +198,9 @@ namespace Ship_Progress
                         // SetPlaceholderText("공정 분석 화면 준비 중입니다.");
                         break;
 
-                    case "Tab3":
-                        SetPlaceholderText("납기 관리 화면 준비 중입니다.");
+                    case "Tab3": // feature/tab3_Leadtime 브랜치에서 작업 예정
+                        MainContentViewPort.Content = new Tab3_LeadtimeView();
+                        // SetPlaceholderText("납기 관리 화면 준비 중입니다.");
                         break;
 
                     case "Tab4": // feature/tab4_Setting 브랜치에서 작업 예정
