@@ -413,7 +413,7 @@
                                 <Border Background="#E0E0E0" BorderBrush="#B0B0B0" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,4,0,0">
                                     <StackPanel Width="240">
                                         <TextBlock Text="[산출 방식]" FontWeight="Bold" Foreground="Black" FontSize="12" Margin="0,0,0,6"/>
-                                        <TextBlock Text="• 각 호선의 납품 완료, 지연, 보류/대기 비율을 산출한 뒤 전체 평균값으로 표시합니다." Foreground="#222222" FontSize="11" TextWrapping="Wrap" LineHeight="16"/>
+                                        <TextBlock Text="• 각 호선별 자재의 납품 완료, 지연, 보류 건수를 합산하여 전체 물량 대비 비율을 평균으로 산출합니다." Foreground="#222222" FontSize="11" TextWrapping="Wrap" LineHeight="16"/>
                                     </StackPanel>
                                 </Border>
                             </Popup>

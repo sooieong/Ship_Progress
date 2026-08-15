@@ -402,7 +402,6 @@ namespace Ship_Progress
             {
                 string selection = selectedItem.Content.ToString();
                 LoadVendorDeliveryData(selection);
-                LoadSupplyStatusData(selection);
             }
         }
 
@@ -511,15 +510,15 @@ namespace Ship_Progress
 
             if (shipNo == "H120")
             {
-                completed = 18; delayed = 3; pending = 1;
+                completed = 16; delayed = 5; pending = 1;
             }
             else if (shipNo == "H121")
             {
-                completed = 15; delayed = 5; pending = 2;
+                completed = 14; delayed = 4; pending = 1;
             }
             else if (shipNo == "H122")
             {
-                completed = 12; delayed = 7; pending = 3;
+                completed = 10; delayed = 4; pending = 1;
             }
 
             int total = completed + delayed + pending;
