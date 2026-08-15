@@ -282,8 +282,8 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <!-- 4. 문제 내용 -->
-                        <DataGridTextColumn Header="문제 내용" Binding="{Binding IssueDetail}" Width="*" ElementStyle="{StaticResource CenterAlignedCell}"/>
+                        <!-- 4. 품목명 -->
+                        <DataGridTextColumn Header="품목명" Binding="{Binding IssueDetail}" Width="*" ElementStyle="{StaticResource CenterAlignedCell}"/>
 
                         <!-- 5. 지연 일수 -->
                         <DataGridTextColumn Header="지연 일수" Binding="{Binding DelayDays}" Width="70" ElementStyle="{StaticResource CenterAlignedCell}"/>
