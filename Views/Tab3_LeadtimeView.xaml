@@ -351,12 +351,13 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" 
-                                      HorizontalAlignment="Center" VerticalAlignment="Center"
-                                      Checked="RiskItem_CheckChanged" Unchecked="RiskItem_CheckChanged"/>
+                                              IsEnabled="{Binding IsEnabled}"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Checked="RiskItem_CheckChanged" Unchecked="RiskItem_CheckChanged"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-
+                            
                             <!-- [구분] 컬럼 -->
                             <DataGridTemplateColumn Width="65">
                                 <DataGridTemplateColumn.HeaderTemplate>

@@ -75,6 +75,24 @@ namespace Ship_Progress.Views
         // 체크박스 상태 변경 시 차트 실시간 갱신 이벤트
         private void RiskItem_CheckChanged(object sender, RoutedEventArgs e)
         {
+            if (sender is CheckBox chk && chk.DataContext is LeadtimeItem item)
+            {
+                // 현재 필터링된 항목 중 하나라도 선택(IsSelected == true)된 것이 있는지 확인
+                var currentItems = GetFilteredLeadtimeList(SelectedShipNo);
+                bool hasAnySelection = currentItems.Any(x => x.IsSelected);
+
+                // 만약 모든 항목이 해제되려고 한다면
+                if (!hasAnySelection)
+                {
+                    // 알림창 띄우기
+                    MessageBox.Show("하나 이상의 기자재를 선택해야 합니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                    // 해제하려는 항목을 다시 강제로 선택 상태로 되돌림
+                    item.IsSelected = true;
+                    return;
+                }
+            }
+
             UpdateChartDataForShip(SelectedShipNo);
         }
 
@@ -196,6 +214,9 @@ namespace Ship_Progress.Views
                 set { _isSelected = value; OnPropertyChanged(); }
             }
 
+            // 납품 완료인 경우 체크박스 비활성화 (false 반환)
+            public bool IsEnabled => Status != "납품 완료";
+
             public string Series { get; set; }
             public string ShipNo { get; set; }
             public string Category { get; set; }
@@ -239,6 +260,12 @@ namespace Ship_Progress.Views
                 DeliveryDate = deliveryDate;
                 RemainingDaysText = remainingDaysText;
                 Status = status;
+
+                // 데이터 생성 시 납품 완료면 기본 선택을 해제(false) 상태로 둠
+                if (status == "납품 완료")
+                {
+                    _isSelected = false;
+                }
             }
 
             public event PropertyChangedEventHandler PropertyChanged;
@@ -740,29 +767,71 @@ namespace Ship_Progress.Views
                 new LeadtimeItem("A SERIES", "H120", "기관", "배관 팽창 루프 서포트", "세진중공업", 65, 10, "2026-08-13", "8일", "주의"),
                 new LeadtimeItem("A SERIES", "H120", "기관", "선저 배수 플러그 소켓", "세진중공업", 70, 70, "2026-04-13", "-", "납품 완료"),
                 new LeadtimeItem("A SERIES", "H120", "기관", "러그형 버터플라이 밸브", "삼진정공", 280, 280, "2026-07-26", "-", "납품 완료"),
-                new LeadtimeItem("A SERIES", "H120", "기관", "갑판 드레인 스커퍼 및 배관 피팅", "성광벤드", 120, 0, "2026-09-25", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H120", "기관", "갑판 드레인 스커퍼", "성광벤드", 120, 0, "2026-09-25", "-", "납품 예정"),
                 new LeadtimeItem("A SERIES", "H120", "기관", "래싱 브릿지 Cross Bar", "오리엔탈정공", 320, 320, "2026-05-21", "-", "납품 완료"),
                 new LeadtimeItem("A SERIES", "H120", "선체", "곡형 핸드 그립", "동성하이텍", 280, 280, "2026-04-21", "-", "납품 완료"),
                 new LeadtimeItem("A SERIES", "H120", "선체", "워터 타이트 맨홀 커버", "강림중공업", 240, 240, "2026-05-27", "-", "납품 완료"),
-                new LeadtimeItem("A SERIES", "H120", "선체", "아이 플레이트 (20톤 이상)", "삼우중공업", 150, 150, "2026-07-08", "-", "납품 완료"),
-                new LeadtimeItem("A SERIES", "H120", "선체", "수직 사다리 (직형 A타입)", "동성하이텍", 260, 260, "2026-04-01", "-", "납품 완료"),
-                new LeadtimeItem("A SERIES", "H120", "선체", "미끄럼 방지 바 (2형) 10EA", "동성하이텍", 210, 210, "2026-04-23", "-", "납품 완료"),
-                new LeadtimeItem("A SERIES", "H120", "선실", "현수사다리 거치 브라켓", "강림중공업", 2, 0, "2026-08-10", "11일", "위험"),
-                new LeadtimeItem("A SERIES", "H120", "선실", "거주구 창문 코밍 (사각)", "스타코 (STACO)", 52, 20, "2026-08-13", "8일", "주의"),
-                new LeadtimeItem("A SERIES", "H120", "선실", "청동 소화전 각밸브", "스타코 (STACO)", 180, 180, "2026-05-11", "-", "납품 완료"),
-                new LeadtimeItem("A SERIES", "H120", "선실", "A급 내화 정전기 방지 카펫", "스타코 (STACO)", 350, 350, "2026-07-12", "-", "납품 완료"),
-                new LeadtimeItem("A SERIES", "H120", "선실", "주방/세탁실 미끄럼방지 타일", "스타코 (STACO)", 220, 220, "2026-07-14", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선체", "아이 플레이트", "삼우중공업", 150, 150, "2026-07-08", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선체", "수직 사다리 A타입", "동성하이텍", 260, 260, "2026-04-01", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선체", "미끄럼 방지 바 2형", "동성하이텍", 210, 210, "2026-04-23", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선실", "현수사다리 거치 브라켓", "강림중공업", 60, 30, "2026-08-10", "11일", "위험"),
+                new LeadtimeItem("A SERIES", "H120", "선실", "거주구 창문 코밍", "STACO", 52, 20, "2026-08-13", "8일", "주의"),
+                new LeadtimeItem("A SERIES", "H120", "선실", "청동 소화전 각밸브", "STACO", 180, 180, "2026-05-11", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선실", "내화 정전기 방지 카펫", "STACO", 350, 350, "2026-07-12", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "선실", "주방/세탁실 미끄럼방지 타일", "STACO", 220, 220, "2026-07-14", "-", "납품 완료"),
                 new LeadtimeItem("A SERIES", "H120", "전기", "전장 단로기 부착 브라켓", "현대일렉트릭", 260, 100, "2026-08-16", "10일", "위험"),
                 new LeadtimeItem("A SERIES", "H120", "전기", "세면대/수도 배관 서포트", "대양전기공업", 50, 25, "2026-08-14", "7일", "주의"),
                 new LeadtimeItem("A SERIES", "H120", "전기", "케이블 윈치 러그", "대한전선", 52, 52, "2026-05-03", "-", "납품 완료"),
                 new LeadtimeItem("A SERIES", "H120", "전기", "대형 LED 투광등", "대양전기공업", 130, 130, "2026-05-07", "-", "납품 완료"),
                 new LeadtimeItem("A SERIES", "H120", "전기", "비상 유도 표지등", "대양전기공업", 140, 140, "2026-05-15", "-", "납품 완료"),
-                new LeadtimeItem("A SERIES", "H120", "전기", "자동 전화기 (탁상/벽걸이)", "대양전기공업", 100, 100, "2026-07-02", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H120", "전기", "자동 전화기", "대양전기공업", 100, 100, "2026-07-02", "-", "납품 완료"),
                 new LeadtimeItem("A SERIES", "H120", "전기", "정온식/차동식 열 감지기", "한화시스템", 240, 240, "2026-07-24", "-", "납품 완료"),
 
-                new LeadtimeItem("A SERIES", "H121", "기관", "BWTS 펌프 메인", "삼영기계", 150, 80, "2026-08-20", "15일", "주의"),
-                new LeadtimeItem("A SERIES", "H121", "전기", "스위치보드 배전반", "KCC글로벌", 200, 190, "2026-08-10", "5일", "정상"),
-                new LeadtimeItem("B SERIES", "H122", "기관", "비상발전기 세트", "비상발전기코리아", 100, 30, "2026-08-05", "20일", "위험")
+                new LeadtimeItem("A SERIES", "H121", "기관", "배관 팽창 루프 서포트", "세진중공업", 65, 65, "2026-05-07", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "기관", "선저 배수 플러그 소켓", "세진중공업", 70, 70, "2026-05-13", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "기관", "러그형 버터플라이 밸브", "삼진정공", 280, 280, "2026-06-06", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "기관", "갑판 드레인 스커퍼", "성광벤드", 120, 0, "2026-11-17", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H121", "기관", "래싱 브릿지 Cross Bar", "오리엔탈정공", 320, 100, "2026-08-14", "7일", "주의"),
+                new LeadtimeItem("A SERIES", "H121", "선체", "곡형 핸드 그립", "동성하이텍", 280, 280, "2026-05-21", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "선체", "워터 타이트 맨홀 커버", "강림중공업", 240, 240, "2026-06-26", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "선체", "아이 플레이트", "삼우중공업", 150, 150, "2026-08-07", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "선체", "수직 사다리 A타입", "동성하이텍", 260, 120, "2026-08-11", "10일", "위험"),
+                new LeadtimeItem("A SERIES", "H121", "선체", "미끄럼 방지 바 2형", "동성하이텍", 210, 210, "2026-05-23", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "선실", "현수사다리 거치 브라켓", "강림중공업", 60, 60, "2026-05-01", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "선실", "거주구 창문 코밍", "STACO", 52, 52, "2026-05-11", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "선실", "청동 소화전 각밸브", "STACO", 180, 180, "2026-06-10", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "선실", "내화 정전기 방지 카펫", "STACO", 350, 50, "2026-09-06", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H121", "선실", "주방/세탁실 미끄럼방지 타일", "STACO", 220, 20, "2026-09-08", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H121", "전기", "전장 단로기 부착 브라켓", "현대일렉트릭", 260, 260, "2026-05-03", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "전기", "세면대/수도 배관 서포트", "대양전기공업", 50, 50, "2026-05-11", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "전기", "케이블 윈치 러그", "대한전선", 52, 20, "2026-08-15", "6일", "주의"),
+                new LeadtimeItem("A SERIES", "H121", "전기", "대형 LED 투광등", "대양전기공업", 130, 130, "2026-06-26", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "전기", "비상 유도 표지등", "대양전기공업", 140, 140, "2026-07-04", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H121", "전기", "자동 전화기", "대양전기공업", 100, 20, "2026-08-18", "3일", "주의"),
+                new LeadtimeItem("A SERIES", "H121", "전기", "정온식/차동식 열 감지기", "한화시스템", 240, 40, "2026-10-18", "-", "납품 예정"),
+
+                new LeadtimeItem("A SERIES", "H122", "기관", "배관 팽창 루프 서포트", "세진중공업", 65, 65, "2026-05-07", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H122", "기관", "선저 배수 플러그 소켓", "세진중공업", 70, 70, "2026-05-13", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H122", "기관", "러그형 버터플라이 밸브", "삼진정공", 280, 30, "2026-12-26", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H122", "기관", "갑판 드레인 스커퍼", "성광벤드", 120, 0, "2026-11-24", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H122", "기관", "래싱 브릿지 Cross Bar", "오리엔탈정공", 320, 320, "2026-06-20", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H122", "선체", "곡형 핸드 그립", "동성하이텍", 280, 280, "2026-05-21", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H122", "선체", "워터 타이트 맨홀 커버", "강림중공업", 240, 240, "2026-06-26", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H122", "선체", "아이 플레이트", "삼우중공업", 150, 10, "2026-12-08", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H122", "선체", "수직 사다리 A타입", "동성하이텍", 260, 70, "2026-08-11", "10일", "위험"),
+                new LeadtimeItem("A SERIES", "H122", "선체", "미끄럼 방지 바 2형", "동성하이텍", 210, 210, "2026-05-23", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H122", "선실", "현수사다리 거치 브라켓", "강림중공업", 60, 30, "2026-08-13", "8일", "주의"),
+                new LeadtimeItem("A SERIES", "H122", "선실", "거주구 창문 코밍", "STACO", 52, 52, "2026-05-11", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H122", "선실", "청동 소화전 각밸브", "STACO", 180, 180, "2026-06-10", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H122", "선실", "내화 정전기 방지 카펫", "STACO", 350, 30, "2026-12-12", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H122", "선실", "주방/세탁실 미끄럼방지 타일", "STACO", 220, 50, "2026-12-14", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H122", "전기", "전장 단로기 부착 브라켓", "현대일렉트릭", 260, 260, "2026-05-03", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H122", "전기", "세면대/수도 배관 서포트", "대양전기공업", 50, 50, "2026-05-11", "-", "납품 완료"),
+                new LeadtimeItem("A SERIES", "H122", "전기", "케이블 윈치 러그", "대한전선", 52, 15, "2026-08-15", "6일", "주의"),
+                new LeadtimeItem("A SERIES", "H122", "전기", "대형 LED 투광등", "대양전기공업", 130, 20, "2026-10-07", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H122", "전기", "비상 유도 표지등", "대양전기공업", 140, 0, "2026-10-15", "-", "납품 예정"),
+                new LeadtimeItem("A SERIES", "H122", "전기", "자동 전화기", "대양전기공업", 100, 20, "2026-08-18", "3일", "주의"),
+                new LeadtimeItem("A SERIES", "H122", "전기", "정온식/차동식 열 감지기", "한화시스템", 240, 40, "2026-12-24", "-", "납품 예정")
             };
 
             FilterDataByShip(SelectedShipNo);
