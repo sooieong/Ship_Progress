@@ -246,6 +246,26 @@ namespace Ship_Progress.Views
             }
         }
 
+        // 🎯 검색창을 클릭(포커스)했을 때 안내 문구 지우기
+        private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (SearchTextBox.Text == "품목명 검색...")
+            {
+                SearchTextBox.Text = "";
+                SearchTextBox.SetResourceReference(TextBox.ForegroundProperty, "PrimaryTextBrush");
+            }
+        }
+
+        // 🎯 검색창에서 마우스가 벗어났을 때, 아무것도 안 적혀있으면 다시 안내 문구 채우기
+        private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(SearchTextBox.Text))
+            {
+                SearchTextBox.Text = "품목명 검색...";
+                SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray);
+            }
+        }
+
         // -----------------------------------------------------------
         // 5. 납기 현황 DB 모델 및 데이터 리스트
         // -----------------------------------------------------------
@@ -408,7 +428,8 @@ namespace Ship_Progress.Views
 
                 if (SearchTextBox != null)
                 {
-                    SearchTextBox.Text = string.Empty;
+                    SearchTextBox.Text = "품목명 검색..."; // 🎯 안내 문구로 초기화
+                    SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray);
                 }
 
                 FilterDataByShip(shipNo);
@@ -493,7 +514,9 @@ namespace Ship_Progress.Views
             {
                 query = query.Where(x => x.Vendor == _currentVendorFilter);
             }
-            if (!string.IsNullOrWhiteSpace(_currentSearchKeyword))
+
+            // 🎯 [수정] 검색 키워드가 비어있거나, 플레이스홀더 안내 문구인 경우 검색 필터 무시
+            if (!string.IsNullOrWhiteSpace(_currentSearchKeyword) && _currentSearchKeyword != "품목명 검색...")
             {
                 query = query.Where(x => x.EquipmentName != null && x.EquipmentName.Contains(_currentSearchKeyword));
             }

@@ -306,8 +306,11 @@ Margin="0,0,30,0"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <!-- 기자재명 검색 텍스트박스 -->
                             <TextBox x:Name="SearchTextBox" Width="130" Height="24" FontSize="11" VerticalContentAlignment="Center" Padding="4,0" Margin="0,0,8,0"
-                         TextChanged="SearchTextBox_TextChanged"
-                         ToolTip="품목명 검색"/>
+         Text="품목명 검색..."
+         Foreground="Gray"
+         GotFocus="SearchTextBox_GotFocus"
+         LostFocus="SearchTextBox_LostFocus"
+         TextChanged="SearchTextBox_TextChanged"/>
 
                             <!-- 페이지네이션 컨트롤 (가장 우측) -->
                             <Button Content="◀" Click="PrevPage_Click" FontSize="9" Padding="4,2" Margin="0,0,4,0" Cursor="Hand"/>

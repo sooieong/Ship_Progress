@@ -146,7 +146,7 @@
             BorderThickness="0" 
             Cursor="Hand"
             Click="RefreshButton_Click"
-            ToolTip="새로고침 (1분마다 자동 갱신)">
+            ToolTip="1분마다 자동 갱신">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock x:Name="RefreshIconText" 
                        Text="🔄" 
@@ -249,17 +249,20 @@
 
                                 <!-- 🎯 텍스트박스 이벤트 연결 확인 -->
                                 <TextBox x:Name="FeedInputTextBox" 
-                 Height="60" 
-                 AcceptsReturn="True" 
-                 TextWrapping="Wrap" 
-                 VerticalScrollBarVisibility="Auto" 
-                 Padding="4" 
-                 FontSize="11" 
-                 Background="#FAFAFA"
-                 BorderBrush="{DynamicResource BorderBrush}"
-                 ToolTip="멘션(@) 및 메시지 작성..."
-                 TextChanged="FeedInputTextBox_TextChanged"
-                 PreviewKeyDown="FeedInputTextBox_PreviewKeyDown"/>
+         Height="60" 
+         AcceptsReturn="True" 
+         TextWrapping="Wrap" 
+         VerticalScrollBarVisibility="Auto" 
+         Padding="4" 
+         FontSize="11" 
+         Background="#FAFAFA"
+         BorderBrush="{DynamicResource BorderBrush}"
+         Text="멘션(@) 및 메시지 작성..."
+         Foreground="Gray"
+         GotFocus="FeedInputTextBox_GotFocus"
+         LostFocus="FeedInputTextBox_LostFocus"
+         TextChanged="FeedInputTextBox_TextChanged"
+         PreviewKeyDown="FeedInputTextBox_PreviewKeyDown"/>
 
                                 <!-- 🎯 멘션 자동완성 팝업 (TextBox 바로 밑에 위치) -->
                                 <Popup x:Name="MentionPopup" 

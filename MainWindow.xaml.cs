@@ -73,13 +73,10 @@ namespace Ship_Progress
         {
             DateTime now = DateTime.Now;
 
-            // 다음 정각 00초 시각 계산 (예: 현재 10:04:25라면 다음은 10:05:00)
+            // 다음 정각 00초 시각 계산
             DateTime nextMinute = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0).AddMinutes(1);
-
-            // 다음 정각 00초까지 남은 시간 계산 (예: 35초)
             TimeSpan initialDelay = nextMinute - now;
 
-            // 1단계: 첫 정각 00초가 될 때까지 기다리는 일회성 타이머
             DispatcherTimer initialTimer = new DispatcherTimer
             {
                 Interval = initialDelay
@@ -87,12 +84,9 @@ namespace Ship_Progress
 
             initialTimer.Tick += (s, e) =>
             {
-                initialTimer.Stop(); // 일회성 타이머 종료
-
-                // 첫 정각(00초) 시점에 1회 새로고침 수행
+                initialTimer.Stop();
                 Dispatcher.InvokeAsync(async () => await ExecuteRefreshAsync());
 
-                // 2단계: 정각 맞춘 이후부터 정확히 1분(60초) 간격으로 반복 실행하는 타이머 시작
                 _autoRefreshTimer = new DispatcherTimer
                 {
                     Interval = TimeSpan.FromMinutes(1)
@@ -122,24 +116,17 @@ namespace Ship_Progress
             await ExecuteRefreshAsync();
         }
 
-        // 🚀 핵심: 자동/수동 새로고침 프로세스 & UI 애니메이션 제어
+        // 🚀 자동/수동 새로고침 프로세스 & UI 애니메이션 제어
         private async Task ExecuteRefreshAsync()
         {
-            // 1. [상태: Refreshing] 회전 애니메이션 시작 및 UI 갱신
             SetRefreshingUIState(true);
-
-            // 2. 비동기 데이터 갱신 작업 (1초 비동기 대기 시뮬레이션)
             await FetchDashboardDataAsync();
-
-            // 3. 시간 최신화
             UpdateDateTime();
-
-            // 4. [상태: Success] 회전 멈추고 초록색 체크 아이콘으로 전환
             SetRefreshingUIState(false);
             ShowSuccessState();
         }
 
-        // 데이터 로딩 비동기 로직 (DB / API 연동 영역)
+        // 데이터 로딩 비동기 로직
         private async Task FetchDashboardDataAsync()
         {
             await Task.Delay(1000);
@@ -226,15 +213,35 @@ namespace Ship_Progress
             }
         }
 
+        // 🎯 플레이스홀더: 입력창 클릭(포커스) 시 안내 문구 제거
+        private void FeedInputTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (FeedInputTextBox.Text == "멘션(@) 및 메시지 작성...")
+            {
+                FeedInputTextBox.Text = "";
+                FeedInputTextBox.SetResourceReference(TextBox.ForegroundProperty, "PrimaryTextBrush");
+            }
+        }
+
+        // 🎯 플레이스홀더: 입력창 포커스 아웃 시 내용이 없으면 안내 문구 복구
+        private void FeedInputTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(FeedInputTextBox.Text))
+            {
+                FeedInputTextBox.Text = "멘션(@) 및 메시지 작성...";
+                FeedInputTextBox.Foreground = new SolidColorBrush(Colors.Gray);
+            }
+        }
+
         // 🎯 텍스트 박스 입력 내용 변경 감지 (@ 멘션 필터링)
-        // 🎯 텍스트 입력 시 팝업 띄우기
         private void FeedInputTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (_isSelectingMention) return;
 
-            int caretIndex = FeedInputTextBox.CaretIndex;
             string text = FeedInputTextBox.Text;
+            if (text == "멘션(@) 및 메시지 작성...") return;
 
+            int caretIndex = FeedInputTextBox.CaretIndex;
             int lastAtIndex = text.LastIndexOf('@', Math.Max(0, caretIndex - 1));
 
             if (lastAtIndex >= 0)
@@ -249,7 +256,7 @@ namespace Ship_Progress
                         if (filtered.Count > 0)
                         {
                             MentionListBox.ItemsSource = filtered;
-                            _mentionSelectedIndex = -1; // 초기화
+                            _mentionSelectedIndex = -1;
                             MentionListBox.SelectedIndex = -1;
 
                             MentionPopup.PlacementTarget = FeedInputTextBox;
@@ -262,7 +269,7 @@ namespace Ship_Progress
             MentionPopup.IsOpen = false;
         }
 
-        // 🎯 방향키로 자유롭게 이동하고 엔터로 확정하는 핵심 로직
+        // 🎯 상하 방향키로 팝업 목록 순차 이동 및 엔터 전송 처리
         private void FeedInputTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (MentionPopup.IsOpen)
@@ -339,60 +346,66 @@ namespace Ship_Progress
         {
             string rawText = FeedInputTextBox.Text?.Trim();
 
-            if (!string.IsNullOrEmpty(rawText))
+            // 안내 문구이거나 빈 값이면 전송 차단
+            if (string.IsNullOrEmpty(rawText) || rawText == "멘션(@) 및 메시지 작성...")
             {
-                string currentTime = DateTime.Now.ToString("HH:mm");
+                return;
+            }
 
-                TextBlock newFeedText = new TextBlock
+            string currentTime = DateTime.Now.ToString("HH:mm");
+
+            TextBlock newFeedText = new TextBlock
+            {
+                TextWrapping = TextWrapping.Wrap,
+                FontSize = 11,
+                Margin = new Thickness(0, 0, 0, 6)
+            };
+            newFeedText.SetResourceReference(TextBlock.ForegroundProperty, "PrimaryTextBrush");
+
+            Run deptRun = new Run("[PM] ") { FontWeight = FontWeights.Bold };
+            newFeedText.Inlines.Add(deptRun);
+
+            string[] words = rawText.Split(' ');
+            foreach (var word in words)
+            {
+                if (word.StartsWith("@"))
                 {
-                    TextWrapping = TextWrapping.Wrap,
-                    FontSize = 11,
-                    Margin = new Thickness(0, 0, 0, 6)
-                };
-                newFeedText.SetResourceReference(TextBlock.ForegroundProperty, "PrimaryTextBrush");
-
-                Run deptRun = new Run("[PM] ") { FontWeight = FontWeights.Bold };
-                newFeedText.Inlines.Add(deptRun);
-
-                string[] words = rawText.Split(' ');
-                foreach (var word in words)
-                {
-                    if (word.StartsWith("@"))
+                    Run mentionRun = new Run(word + " ")
                     {
-                        Run mentionRun = new Run(word + " ")
-                        {
-                            FontWeight = FontWeights.Bold
-                        };
-                        mentionRun.SetResourceReference(Run.ForegroundProperty, "MentionTextBrush");
-                        newFeedText.Inlines.Add(mentionRun);
-                    }
-                    else
-                    {
-                        newFeedText.Inlines.Add(new Run(word + " "));
-                    }
-                }
-
-                Run timeRun = new Run($"({currentTime})");
-                timeRun.SetResourceReference(Run.ForegroundProperty, "SubTextBrush");
-                newFeedText.Inlines.Add(timeRun);
-
-                if (FeedListStackPanel.Children.Count > 0)
-                {
-                    Separator separator = new Separator();
-                    separator.SetResourceReference(Separator.BackgroundProperty, "BorderBrush");
-                    separator.Margin = new Thickness(0, 2, 0, 6);
-
-                    FeedListStackPanel.Children.Insert(0, separator);
-                    FeedListStackPanel.Children.Insert(0, newFeedText);
+                        FontWeight = FontWeights.Bold
+                    };
+                    mentionRun.SetResourceReference(Run.ForegroundProperty, "MentionTextBrush");
+                    newFeedText.Inlines.Add(mentionRun);
                 }
                 else
                 {
-                    FeedListStackPanel.Children.Add(newFeedText);
+                    newFeedText.Inlines.Add(new Run(word + " "));
                 }
-
-                FeedInputTextBox.Clear();
-                FeedScrollViewer?.ScrollToTop();
             }
+
+            Run timeRun = new Run($"({currentTime})");
+            timeRun.SetResourceReference(Run.ForegroundProperty, "SubTextBrush");
+            newFeedText.Inlines.Add(timeRun);
+
+            if (FeedListStackPanel.Children.Count > 0)
+            {
+                Separator separator = new Separator();
+                separator.SetResourceReference(Separator.BackgroundProperty, "BorderBrush");
+                separator.Margin = new Thickness(0, 2, 0, 6);
+
+                FeedListStackPanel.Children.Insert(0, separator);
+                FeedListStackPanel.Children.Insert(0, newFeedText);
+            }
+            else
+            {
+                FeedListStackPanel.Children.Add(newFeedText);
+            }
+
+            // 전송 후 입력창 초기화 및 플레이스홀더 복구
+            FeedInputTextBox.Clear();
+            FeedInputTextBox.Text = "멘션(@) 및 메시지 작성...";
+            FeedInputTextBox.Foreground = new SolidColorBrush(Colors.Gray);
+            FeedScrollViewer?.ScrollToTop();
         }
 
         // 다크/라이트 모드 전환 함수
