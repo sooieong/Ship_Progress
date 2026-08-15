@@ -571,7 +571,7 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
-        // 9. 납기 현황 차트 드로잉 (목표, 현재 입고, 잔여 필요량 기준)
+        // 9. 납기 현황 차트 드로잉 (데이터 기반 동적 Y축 스케일링 적용)
         // -----------------------------------------------------------
         private void DrawLeadtimeChart()
         {
@@ -600,12 +600,31 @@ namespace Ship_Progress.Views
 
             Brush textBrush = Application.Current.Resources["PrimaryTextBrush"] as Brush ?? Brushes.Black;
 
-            double maxBarValue = 400;
-            double maxGapValue = 200;
+            // 1. 현재 표시되는 데이터에서 동적으로 최대값(Max) 계산
+            double maxTarget = currentChartTargets.Length > 0 ? currentChartTargets.Max() : 400;
+            double maxGap = 0;
+            for (int i = 0; i < currentChartTargets.Length; i++)
+            {
+                double gap = Math.Max(0, currentChartTargets[i] - currentChartActuals[i]);
+                if (gap > maxGap) maxGap = gap;
+            }
 
+            // 데이터가 모두 0이거나 작을 때의 기본 최소 범위 보정
+            if (maxTarget <= 0) maxTarget = 100;
+            if (maxGap <= 0) maxGap = 50;
+
+            // 보기 좋게 10단위 또는 50단위 등으로 올림 처리 (막대 Y축 최대값)
+            double maxBarValue = Math.Ceiling(maxTarget / 100.0) * 100;
+            if (maxBarValue < 200) maxBarValue = 200; // 최소 200 보장
+
+            // 꺾은선 Y축 최대값 (막대의 절반 스케일 유지 또는 독립 계산)
+            double maxGapValue = Math.Ceiling(maxGap / 50.0) * 50;
+            if (maxGapValue < 100) maxGapValue = 100; // 최소 100 보장
+
+            // 2. 좌측 Y축 (막대용, 5등분 그리드)
             for (int i = 0; i <= 4; i++)
             {
-                double yVal = i * 100;
+                double yVal = (maxBarValue / 4.0) * i;
                 double yPos = paddingTop + chartH - (yVal / maxBarValue * chartH);
 
                 Line gridLine = new Line
@@ -620,20 +639,22 @@ namespace Ship_Progress.Views
                 };
                 LeadtimeChartCanvas.Children.Add(gridLine);
 
-                TextBlock yLabel = new TextBlock { Text = $"{yVal}", FontSize = 10, Foreground = textBrush, FontWeight = FontWeights.SemiBold };
-                Canvas.SetLeft(yLabel, 10);
+                TextBlock yLabel = new TextBlock { Text = $"{yVal:F0}", FontSize = 10, Foreground = textBrush, FontWeight = FontWeights.SemiBold };
+                yLabel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                Canvas.SetLeft(yLabel, paddingLeft - yLabel.DesiredSize.Width - 6);
                 Canvas.SetTop(yLabel, yPos - 7);
                 LeadtimeChartCanvas.Children.Add(yLabel);
             }
 
+            // 3. 우측 Y축 (잔여 필요량 꺾은선용, 4~5등분)
             for (int i = 0; i <= 4; i++)
             {
-                double gVal = i * 50;
+                double gVal = (maxGapValue / 4.0) * i;
                 double yPos = paddingTop + chartH - (gVal / maxGapValue * chartH);
 
                 TextBlock rightYLabel = new TextBlock
                 {
-                    Text = $"{gVal}",
+                    Text = $"{gVal:F0}",
                     FontSize = 9,
                     Foreground = new SolidColorBrush(Color.FromRgb(229, 57, 53)),
                     FontWeight = FontWeights.Bold
@@ -677,6 +698,7 @@ namespace Ship_Progress.Views
                 double aVal = currentChartActuals[i];
                 double gapVal = Math.Max(0, tVal - aVal);
 
+                // 막대 높이 계산 (maxBarValue 기준)
                 double aHeight = (aVal / maxBarValue) * chartH;
                 double aY = paddingTop + chartH - aHeight;
 
@@ -704,6 +726,7 @@ namespace Ship_Progress.Views
                 Canvas.SetTop(targetRemainingBar, gapY);
                 LeadtimeChartCanvas.Children.Add(targetRemainingBar);
 
+                // 기존 막대 상단 기준이었던 수치 텍스트 위치를 -> 꺾은선 점(lineY) 기준 위쪽으로 수정
                 double lineY = paddingTop + chartH - (gapVal / maxGapValue * chartH);
                 gapPolyline.Points.Add(new Point(centerX, lineY));
 
@@ -716,7 +739,9 @@ namespace Ship_Progress.Views
                 };
                 valueLabel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 Canvas.SetLeft(valueLabel, centerX - (valueLabel.DesiredSize.Width / 2.0));
-                Canvas.SetTop(valueLabel, gapY - 16);
+
+                // [변경] 동그라미 중심(lineY)에서 위로 18 픽셀만큼 띄워 겹침 방지
+                Canvas.SetTop(valueLabel, lineY - 18);
                 LeadtimeChartCanvas.Children.Add(valueLabel);
 
                 Ellipse dot = new Ellipse
@@ -731,6 +756,7 @@ namespace Ship_Progress.Views
 
                 double currentX = centerX;
                 double currentY = lineY;
+                // ... (이하 툴팁 이벤트 및 dot 추가 코드는 동일)
 
                 dot.MouseDown += (s, ev) =>
                 {
