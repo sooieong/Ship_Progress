@@ -20,13 +20,31 @@ namespace Ship_Progress.Views
 
         private void Tab4_SettingView_Loaded(object sender, RoutedEventArgs e)
         {
-            // 뷰가 로드될 때 MainWindow의 상태 확인
-            if (Application.Current.MainWindow is MainWindow mainWindow)
+            // 1. 이벤트 중복 실행을 막기 위해 플래그 설정
+            _isInitializing = true;
+
+            // 2. 이전에 선택해둔 테마 상태를 가져옴 (기본값은 false = 라이트모드)
+            bool isDark = false;
+            if (Application.Current.Properties.Contains("IsDarkMode"))
             {
-                // 다크모드 체크 여부 (필요 시 라디오 버튼 상태 조절)
-                bool isDark = DarkModeRadio.IsChecked == true;
-                UpdateCardBorder(isDark);
+                isDark = (bool)Application.Current.Properties["IsDarkMode"];
             }
+
+            // 3. 저장된 상태에 맞춰 라디오 버튼 UI 체크 상태 변경
+            if (isDark)
+            {
+                DarkModeRadio.IsChecked = true;
+                LightModeRadio.IsChecked = false;
+            }
+            else
+            {
+                LightModeRadio.IsChecked = true;
+                DarkModeRadio.IsChecked = false;
+            }
+
+            // 4. 카드 테두리 업데이트
+            UpdateCardBorder(isDark);
+
             _isInitializing = false;
         }
 
@@ -37,13 +55,15 @@ namespace Ship_Progress.Views
 
             bool isDark = DarkModeRadio.IsChecked == true;
 
-            // 1. 카드 테두리 강조 변경
+            // 1. 사용자가 선택한 테마 상태를 앱 전역에 저장 (다른 탭을 갔다가 와도 기억하도록)
+            Application.Current.Properties["IsDarkMode"] = isDark;
+
+            // 2. 카드 테두리 강조 변경
             UpdateCardBorder(isDark);
 
-            // 2. MainWindow의 ToggleTheme 메서드 안전하게 호출
+            // 3. MainWindow의 ToggleTheme 메서드 호출
             if (Application.Current.MainWindow is MainWindow mainWindow)
             {
-                // MainWindow에 구현된 ToggleTheme 메소드 호출
                 mainWindow.ToggleTheme(isDark);
             }
         }
