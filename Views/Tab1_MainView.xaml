@@ -95,7 +95,7 @@
                 <TextBlock Grid.Row="0" Text="호선별 공정 흐름" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
                 <DataGrid x:Name="ProcessStatusDataGrid" Grid.Row="1" ItemsSource="{Binding CriticalEquipmentList}" 
-          AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" 
+          AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="False" 
           HeadersVisibility="Column" GridLinesVisibility="Horizontal" 
           HorizontalGridLinesBrush="{DynamicResource BorderBrush}" 
           Background="Transparent" RowHeight="36" BorderThickness="0" VerticalScrollBarVisibility="Auto">
@@ -105,12 +105,6 @@
                         <Style TargetType="DataGridRow">
                             <Setter Property="Background" Value="{DynamicResource HeaderBackgroundBrush}"/>
                             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-                            <Style.Triggers>
-                                <!-- 마우스 올렸을 때 배경색 (선택 사항) -->
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
-                                </Trigger>
-                            </Style.Triggers>
                         </Style>
                     </DataGrid.RowStyle>
 
@@ -119,8 +113,6 @@
                             <Setter Property="HorizontalContentAlignment" Value="Center"/>
                             <Setter Property="VerticalContentAlignment" Value="Center"/>
                             <Setter Property="FontWeight" Value="Bold"/>
-                            <Setter Property="Background" Value="{DynamicResource HeaderBackgroundBrush}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
                         </Style>
                     </DataGrid.ColumnHeaderStyle>
 
@@ -264,9 +256,9 @@
 
                 <TextBlock Grid.Row="0" Text="위험 품목 현황" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12"/>
 
-                <DataGrid x:Name="CriticalEquipmentDataGrid" Grid.Row="1" ItemsSource="{Binding CriticalEquipmentList}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{DynamicResource BorderBrush}" Background="Transparent" RowHeight="36" BorderThickness="0" VerticalScrollBarVisibility="Auto">
+                <DataGrid x:Name="CriticalEquipmentDataGrid" Grid.Row="1" ItemsSource="{Binding CriticalEquipmentList}" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="False" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{DynamicResource BorderBrush}" Background="Transparent" RowHeight="36" BorderThickness="0" VerticalScrollBarVisibility="Auto">
 
-                    <!-- [추가] TextColumn의 기본 셀 스타일 (모든 텍스트 컬럼 상하좌우 가운데 정렬) -->
+                    <!-- 🔹 1. 컬럼 헤더 스타일: 라이트/다크 모드 관계없이 항상 고정된 디자인 및 색상 적용 -->
                     <DataGrid.ColumnHeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -275,10 +267,20 @@
                         </Style>
                     </DataGrid.ColumnHeaderStyle>
 
+                    <!-- 🔹 2. 행(Row) 스타일: 테마에 따라 배경 및 글자색 동적 변경 -->
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="{DynamicResource HeaderBackgroundBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Style>
+                    </DataGrid.RowStyle>
+
                     <DataGrid.Resources>
                         <Style x:Key="CenterAlignedCell" TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Center"/>
                             <Setter Property="VerticalAlignment" Value="Center"/>
+                            <!-- 🔹 3. 셀 내부 텍스트 색상도 테마에 맞게 동적 변경 -->
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
                         </Style>
                     </DataGrid.Resources>
 
@@ -289,24 +291,24 @@
                         <!-- 2. 호선 -->
                         <DataGridTextColumn Header="호선" Binding="{Binding ShipNo}" Width="60" ElementStyle="{StaticResource CenterAlignedCell}"/>
 
-                        <!-- 3. 구분 (필터 아이콘 포함 TemplateColumn) -->
+                        <!-- 3. 구분 -->
                         <DataGridTemplateColumn Width="65">
                             <DataGridTemplateColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <Grid Width="50" Height="24">
-                                        <TextBlock Text="구분" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,0,0,0"/>
+                                        <TextBlock Text="구분" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,0,0,0" Foreground="#000000"/>
                                         <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                        Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
-                                        Click="ProcessFilterButton_Click" Cursor="Hand" ToolTip="구분 필터">
+                                Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                                Click="ProcessFilterButton_Click" Cursor="Hand" ToolTip="구분 필터">
                                             <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
-                                          Fill="#475569" Width="10" Height="10" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                  Fill="#475569" Width="10" Height="10" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                         </Button>
                                     </Grid>
                                 </DataTemplate>
                             </DataGridTemplateColumn.HeaderTemplate>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Process}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Process}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryTextBrush}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
