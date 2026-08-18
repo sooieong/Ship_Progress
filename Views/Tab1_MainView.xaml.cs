@@ -118,6 +118,36 @@ namespace Ship_Progress
             { "H122", new double[] { 30.11, 40.09, 35.21, 45.43, 40.07 } }
         };
 
+        private PointCollection _backgroundPolygon1;
+        public PointCollection BackgroundPolygon1 { get => _backgroundPolygon1; set { _backgroundPolygon1 = value; OnPropertyChangedImpl(); } }
+
+        private PointCollection _backgroundPolygon2;
+        public PointCollection BackgroundPolygon2 { get => _backgroundPolygon2; set { _backgroundPolygon2 = value; OnPropertyChangedImpl(); } }
+
+        private PointCollection _backgroundPolygon3;
+        public PointCollection BackgroundPolygon3 { get => _backgroundPolygon3; set { _backgroundPolygon3 = value; OnPropertyChangedImpl(); } }
+
+        private PointCollection _backgroundPolygon4;
+        public PointCollection BackgroundPolygon4 { get => _backgroundPolygon4; set { _backgroundPolygon4 = value; OnPropertyChangedImpl(); } }
+
+        private PointCollection _backgroundPolygon5;
+        public PointCollection BackgroundPolygon5 { get => _backgroundPolygon5; set { _backgroundPolygon5 = value; OnPropertyChangedImpl(); } }
+
+        private Point _outerPoint1;
+        public Point OuterPoint1 { get => _outerPoint1; set { _outerPoint1 = value; OnPropertyChangedImpl(); } }
+
+        private Point _outerPoint2;
+        public Point OuterPoint2 { get => _outerPoint2; set { _outerPoint2 = value; OnPropertyChangedImpl(); } }
+
+        private Point _outerPoint3;
+        public Point OuterPoint3 { get => _outerPoint3; set { _outerPoint3 = value; OnPropertyChangedImpl(); } }
+
+        private Point _outerPoint4;
+        public Point OuterPoint4 { get => _outerPoint4; set { _outerPoint4 = value; OnPropertyChangedImpl(); } }
+
+        private Point _outerPoint5;
+        public Point OuterPoint5 { get => _outerPoint5; set { _outerPoint5 = value; OnPropertyChangedImpl(); } }
+
         // -----------------------------------------------------------
         // 4. 하단 우측: 품목 수급 현황 (도넛 차트 및 텍스트) 프로퍼티
         // -----------------------------------------------------------
@@ -214,6 +244,7 @@ namespace Ship_Progress
             LoadGaugeData();
             LoadProcessStatusData();
             LoadEquipmentRiskData();
+            LoadBackgroundGrid();
             LoadVendorDeliveryData("전체 (평균)");
             LoadSupplyStatusData("전체 (평균)");
         }
@@ -421,9 +452,11 @@ namespace Ship_Progress
                 values = shipVendorData[targetKey];
             }
 
-            double centerX = 130;
-            double centerY = 110;
-            double maxRadius = 90;
+            // 수정된 XAML의 Grid 크기(Width="320", Height="260")와 
+            // 배경 오각형 중심점/반경에 맞춘 좌표 값
+            double centerX = 160;
+            double centerY = 115;
+            double maxRadius = 90; // 필요에 따라 오각형 크기 조절 (예: 95 또는 100)
 
             double[] angles = new double[] { -90, -18, 54, 126, 198 };
 
@@ -445,6 +478,42 @@ namespace Ship_Progress
 
             RadarPolygonPoints = points;
             RadarDataPoints = pointList;
+        }
+
+        private void LoadBackgroundGrid()
+        {
+            double centerX = 160;
+            double centerY = 115;
+            double maxRadius = 90;
+            double[] angles = new double[] { -90, -18, 54, 126, 198 };
+
+            BackgroundPolygon1 = CreateRegularPentagon(centerX, centerY, maxRadius * 0.2, angles);
+            BackgroundPolygon2 = CreateRegularPentagon(centerX, centerY, maxRadius * 0.4, angles);
+            BackgroundPolygon3 = CreateRegularPentagon(centerX, centerY, maxRadius * 0.6, angles);
+            BackgroundPolygon4 = CreateRegularPentagon(centerX, centerY, maxRadius * 0.8, angles);
+
+            var outerPoints = CreateRegularPentagon(centerX, centerY, maxRadius * 1.0, angles);
+            BackgroundPolygon5 = outerPoints;
+
+            // 방사형 선이 끝날 정확한 꼭짓점 지정
+            OuterPoint1 = outerPoints[0];
+            OuterPoint2 = outerPoints[1];
+            OuterPoint3 = outerPoints[2];
+            OuterPoint4 = outerPoints[3];
+            OuterPoint5 = outerPoints[4];
+        }
+
+        private PointCollection CreateRegularPentagon(double cx, double cy, double radius, double[] angles)
+        {
+            var points = new PointCollection();
+            for (int i = 0; i < 5; i++)
+            {
+                double rad = angles[i] * Math.PI / 180.0;
+                double x = cx + radius * Math.Cos(rad);
+                double y = cy + radius * Math.Sin(rad);
+                points.Add(new Point(x, y));
+            }
+            return points;
         }
 
         // -----------------------------------------------------------
