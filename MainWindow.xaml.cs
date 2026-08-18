@@ -359,6 +359,16 @@ namespace Ship_Progress
             FeedInputTextBox.Focus();
         }
 
+        // 🎯 멘션 항목 마우스 클릭 시 적용
+        private void MentionItem_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ListBoxItem item && item.Content != null)
+            {
+                string selectedMention = item.Content.ToString();
+                ApplySelectedMention(selectedMention);
+            }
+        }
+
         // 하단 피드 전송 버튼 클릭
         private void SendFeedButton_Click(object sender, RoutedEventArgs e)
         {

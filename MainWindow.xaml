@@ -278,19 +278,22 @@
             Width="160" 
             MaxHeight="120">
                                         <ListBox x:Name="MentionListBox" 
-                 Background="Transparent" 
-                 BorderThickness="0"
-                 Focusable="False">
+         Background="Transparent" 
+         BorderThickness="0"
+         Focusable="False">
                                             <ListBox.ItemContainerStyle>
                                                 <Style TargetType="ListBoxItem">
                                                     <Setter Property="Padding" Value="8,6"/>
                                                     <Setter Property="FontSize" Value="11"/>
                                                     <Setter Property="Cursor" Value="Hand"/>
+
+                                                    <!-- 🎯 마우스 클릭 이벤트 추가 -->
+                                                    <EventSetter Event="MouseLeftButtonUp" Handler="MentionItem_MouseLeftButtonUp"/>
+
                                                     <Setter Property="Template">
                                                         <Setter.Value>
                                                             <ControlTemplate TargetType="ListBoxItem">
                                                                 <Border x:Name="ItemBorder" Background="Transparent" Padding="{TemplateBinding Padding}">
-                                                                    <!-- 🎯 텍스트 색상도 테마별 PrimaryTextBrush 연동 -->
                                                                     <ContentPresenter>
                                                                         <ContentPresenter.Resources>
                                                                             <Style TargetType="TextBlock">
