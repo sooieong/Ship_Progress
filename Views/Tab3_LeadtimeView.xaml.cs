@@ -103,11 +103,18 @@ namespace Ship_Progress.Views
             if (sender is CheckBox chk && chk.DataContext is LeadtimeItem item)
             {
                 var currentItems = GetFilteredLeadtimeList(SelectedShipNo);
-                bool hasAnySelection = currentItems.Any(x => x.IsSelected);
+
+                // 현재 페이지에 표시 중인 항목들만 대상으로 체크 여부 확인
+                var pagedItems = currentItems
+                    .Skip((_currentPage - 1) * _pageSize)
+                    .Take(_pageSize)
+                    .ToList();
+
+                bool hasAnySelection = pagedItems.Any(x => x.IsSelected);
 
                 if (!hasAnySelection)
                 {
-                    MessageBox.Show("하나 이상의 기자재를 선택해야 합니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("현재 페이지에서 최소 하나의 품목은 선택되어야 합니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
                     item.IsSelected = true;
                     return;
                 }
