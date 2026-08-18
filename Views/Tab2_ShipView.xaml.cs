@@ -189,16 +189,21 @@ namespace Ship_Progress
                 Status = status;
                 MainProcessImpact = mainProcessImpact;
 
-                var converter = new BrushConverter();
+                // 🔹 탭 1과 동일한 반투명 색상 적용 (다크모드 딸기우유 현상 해결)
                 if (status == "위험")
                 {
-                    StatusBgColor = (Brush)converter.ConvertFromString("#FFEBEE");
-                    StatusFgColor = (Brush)converter.ConvertFromString("#D32F2F");
+                    StatusBgColor = new SolidColorBrush(Color.FromArgb(50, 229, 57, 53)); // 반투명 레드
+                    StatusFgColor = new SolidColorBrush(Color.FromRgb(229, 57, 53));
+                }
+                else if (status == "주의")
+                {
+                    StatusBgColor = new SolidColorBrush(Color.FromArgb(50, 250, 140, 22)); // 반투명 머스타드
+                    StatusFgColor = new SolidColorBrush(Color.FromRgb(250, 140, 22));
                 }
                 else
                 {
-                    StatusBgColor = (Brush)converter.ConvertFromString("#FFF3E0");
-                    StatusFgColor = (Brush)converter.ConvertFromString("#E65100");
+                    StatusBgColor = new SolidColorBrush(Color.FromArgb(50, 76, 175, 80)); // 반투명 그린
+                    StatusFgColor = new SolidColorBrush(Color.FromRgb(34, 197, 94));
                 }
             }
         }
