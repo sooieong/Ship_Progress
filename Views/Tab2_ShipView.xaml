@@ -599,8 +599,8 @@
                             <DataGridTemplateColumn Header="상태" Width="65">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource StatusBorderStyle}" Background="{Binding StatusBgColor}">
-                                            <TextBlock Text="{Binding Status}" Foreground="{Binding StatusFgColor}" FontWeight="Bold" FontSize="11"/>
+                                        <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding StatusBgColor}">
+                                            <TextBlock Text="{Binding Status}" Foreground="{Binding StatusFgColor}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -610,11 +610,8 @@
                             <DataGridTemplateColumn Header="주공정 영향" Width="120">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource StatusBorderStyle}" Background="{Binding StatusBgColor}">
-                                            <TextBlock Text="{Binding MainProcessImpact}" 
-                               Foreground="{Binding StatusFgColor}" 
-                               FontWeight="Bold" 
-                               FontSize="11"/>
+                                        <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding StatusBgColor}">
+                                            <TextBlock Text="{Binding MainProcessImpact}" Foreground="{Binding StatusFgColor}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
