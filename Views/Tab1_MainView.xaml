@@ -461,24 +461,25 @@
                         <!-- 1. 도넛 차트 및 중앙 텍스트 -->
                         <Grid Grid.Column="0">
                             <lvc:PieChart Series="{Binding SupplyStatusSeries}" 
-                              InnerRadius="55" 
-                              Background="Transparent" 
-                              LegendLocation="None" 
-                              Hoverable="True"
-                              DataTooltip="{x:Null}"/>
+                  InnerRadius="55" 
+                  Background="Transparent" 
+                  LegendLocation="None" 
+                  Hoverable="True"
+                  DataTooltip="{x:Null}"
+                  StartingRotationAngle="-90"/>
 
                             <!-- 도넛 차트 중앙 텍스트 -->
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding OnTimePercentageText}" 
-                               FontSize="18" 
-                               FontWeight="Bold" 
-                               Foreground="#4CAF50" 
-                               HorizontalAlignment="Center"/>
+                   FontSize="18" 
+                   FontWeight="Bold" 
+                   Foreground="#4CAF50" 
+                   HorizontalAlignment="Center"/>
                                 <TextBlock Text="납품 완료" 
-                               FontSize="11" 
-                               Foreground="{DynamicResource SecondaryTextBrush}" 
-                               HorizontalAlignment="Center" 
-                               Margin="0,2,0,0"/>
+                   FontSize="11" 
+                   Foreground="{DynamicResource SecondaryTextBrush}" 
+                   HorizontalAlignment="Center" 
+                   Margin="0,2,0,0"/>
                             </StackPanel>
                         </Grid>
 
