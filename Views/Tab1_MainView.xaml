@@ -375,18 +375,18 @@
                     <Viewbox Grid.Row="1" Stretch="Uniform">
                         <Grid Width="320" Height="260" Margin="10">
                             <!-- 1. 배경 오각형 격자선 -->
-                            <Polygon Points="{Binding BackgroundPolygon1}" Stroke="#E0E0E0" StrokeThickness="0.8" Fill="Transparent"/>
-                            <Polygon Points="{Binding BackgroundPolygon2}" Stroke="#E0E0E0" StrokeThickness="0.5" Fill="Transparent"/>
-                            <Polygon Points="{Binding BackgroundPolygon3}" Stroke="#E0E0E0" StrokeThickness="0.5" Fill="Transparent"/>
-                            <Polygon Points="{Binding BackgroundPolygon4}" Stroke="#E0E0E0" StrokeThickness="0.5" Fill="Transparent"/>
-                            <Polygon Points="{Binding BackgroundPolygon5}" Stroke="#E0E0E0" StrokeThickness="0.5" Fill="Transparent"/>
+                            <Polygon Points="{Binding BackgroundPolygon1}" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1" Fill="Transparent"/>
+                            <Polygon Points="{Binding BackgroundPolygon2}" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1" Fill="Transparent"/>
+                            <Polygon Points="{Binding BackgroundPolygon3}" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1" Fill="Transparent"/>
+                            <Polygon Points="{Binding BackgroundPolygon4}" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1" Fill="Transparent"/>
+                            <Polygon Points="{Binding BackgroundPolygon5}" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1" Fill="Transparent"/>
 
                             <!-- 2. 방사형 축 선 -->
-                            <Line X1="160" Y1="115" X2="{Binding OuterPoint1.X}" Y2="{Binding OuterPoint1.Y}" Stroke="#E0E0E0" StrokeThickness="0.5"/>
-                            <Line X1="160" Y1="115" X2="{Binding OuterPoint2.X}" Y2="{Binding OuterPoint2.Y}" Stroke="#E0E0E0" StrokeThickness="0.5"/>
-                            <Line X1="160" Y1="115" X2="{Binding OuterPoint3.X}" Y2="{Binding OuterPoint3.Y}" Stroke="#E0E0E0" StrokeThickness="0.5"/>
-                            <Line X1="160" Y1="115" X2="{Binding OuterPoint4.X}" Y2="{Binding OuterPoint4.Y}" Stroke="#E0E0E0" StrokeThickness="0.5"/>
-                            <Line X1="160" Y1="115" X2="{Binding OuterPoint5.X}" Y2="{Binding OuterPoint5.Y}" Stroke="#E0E0E0" StrokeThickness="0.5"/>
+                            <Line X1="160" Y1="115" X2="{Binding OuterPoint1.X}" Y2="{Binding OuterPoint1.Y}" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1"/>
+                            <Line X1="160" Y1="115" X2="{Binding OuterPoint2.X}" Y2="{Binding OuterPoint2.Y}" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1"/>
+                            <Line X1="160" Y1="115" X2="{Binding OuterPoint3.X}" Y2="{Binding OuterPoint3.Y}" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1"/>
+                            <Line X1="160" Y1="115" X2="{Binding OuterPoint4.X}" Y2="{Binding OuterPoint4.Y}" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1"/>
+                            <Line X1="160" Y1="115" X2="{Binding OuterPoint5.X}" Y2="{Binding OuterPoint5.Y}" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1"/>
 
                             <!-- 3. 실데이터 기반 오각형 영역 (중심점 이동에 맞추어 점 조정 필요) -->
                             <Polygon Points="{Binding RadarPolygonPoints}" 
