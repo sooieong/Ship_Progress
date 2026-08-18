@@ -33,12 +33,12 @@
                            Stretch="Uniform"
                            Margin="0,0,16,0" 
                            RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <TextBlock Text="선박 건조 프로젝트 종합 대시보드" 
-                               FontSize="18" 
-                               FontWeight="Bold" 
-                               Foreground="{DynamicResource PrimaryTextBrush}" 
-                               VerticalAlignment="Center"
-                               TextWrapping="NoWrap"/>
+                    <TextBlock Text="SPOT (Schedule &amp; Progress On-time Tracking)" 
+           FontSize="18" 
+           FontWeight="Bold" 
+           Foreground="{DynamicResource PrimaryTextBrush}" 
+           VerticalAlignment="Center"
+           TextWrapping="NoWrap"/>
                 </StackPanel>
 
                 <!-- 우측: 날짜/시간 & 알림 아이콘 & 새로고침 버튼 -->
@@ -100,7 +100,7 @@
                                 <StackPanel Margin="12">
                                     <Grid Margin="0,0,0,8">
                                         <TextBlock Text="알림 센터" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                                        <TextBlock Text="전체 읽음" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource HanwhaOrangeBrush}" Cursor="Hand"/>
+                                        <TextBlock Text="전체 읽음" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Cursor="Hand"/>
                                     </Grid>
 
                                     <Separator Background="{DynamicResource BorderBrush}" Margin="0,0,0,8"/>
@@ -110,25 +110,25 @@
                                             <!-- 알림 카드: 모든 텍스트를 명확한 검정/흰색으로 바인딩 -->
                                             <Border Padding="8" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Margin="0,0,0,6">
                                                 <StackPanel>
-                                                    <TextBlock Text="[위험] C SERIES - H116" FontWeight="SemiBold" FontSize="12" Foreground="#E53935"/>
-                                                    <TextBlock Text="철의장 공정 8일 지연 발생" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
-                                                    <TextBlock Text="10분 전" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="[요청] A SERIES - H122" FontWeight="SemiBold" FontSize="12" Foreground="#FB8C00"/>
+                                                    <TextBlock Text="케이블 윈치 러그 납기 연기 요청" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="30분 전" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </Border>
 
                                             <Border Padding="8" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Margin="0,0,0,6">
                                                 <StackPanel>
-                                                    <TextBlock Text="[주의] A SERIES - H120" FontWeight="SemiBold" FontSize="12" Foreground="#FB8C00"/>
-                                                    <TextBlock Text="배관 공정 자재 입고 지연" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
-                                                    <TextBlock Text="10시간 전" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="[위험] A SERIES - H121" FontWeight="SemiBold" FontSize="12" Foreground="#E53935"/>
+                                                    <TextBlock Text="수직 사다리 A타입 입고 지연" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="1시간 전" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </Border>
 
                                             <Border Padding="8" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4">
                                                 <StackPanel>
-                                                    <TextBlock Text="[완료] B SERIES 동기화" FontWeight="SemiBold" FontSize="12" Foreground="#43A047"/>
-                                                    <TextBlock Text="실시간 품질 로그 데이터 업데이트 완료" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
-                                                    <TextBlock Text="2시간 전" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="[완료] A SERIES 동기화" FontWeight="SemiBold" FontSize="12" Foreground="#43A047"/>
+                                                    <TextBlock Text="납기 현황 데이터 업데이트 완료" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="1시간 전" FontSize="10" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </Border>
                                         </StackPanel>
