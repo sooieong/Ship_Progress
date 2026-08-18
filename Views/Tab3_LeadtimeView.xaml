@@ -246,18 +246,23 @@ Margin="0,0,30,0"/>
         </Grid>
 
         <!-- ========================================== -->
-        <!-- 2. 중단 시각화 영역 (좌: 납기 현황 차트 / 우: 위험 기자재 현황 표) -->
+        <!-- 2. 중단 시각화 영역 (하나의 큰 카드 안에 좌: 차트 / 우: DB) -->
         <!-- ========================================== -->
-        <Grid Grid.Row="1" Margin="0,0,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="16"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
+        <Border Grid.Row="1" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <!-- 좌측 차트 영역 -->
+                    <ColumnDefinition Width="1*"/>
+                    <!-- 세로 구분선 간격 -->
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="16"/>
+                    <!-- 우측 DB 영역 -->
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- [2-1] 좌측: 납기 현황 차트 카드 -->
-            <Border Grid.Column="0" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
-                <Grid>
+                <!-- [2-1] 좌측: 납기 현황 차트 카드 -->
+                <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
@@ -265,19 +270,26 @@ Margin="0,0,30,0"/>
 
                     <!-- 카드 타이틀 및 범례 -->
                     <Grid Grid.Row="0" Margin="0,0,0,12">
-                        <TextBlock Text="납기 현황 차트" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <!-- 1. 목표 범례 (초록색) -->
+                        <!-- 1. 좌측 타이틀 -->
+                        <TextBlock Text="납기 현황 차트" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+
+                        <!-- 2. 중앙 범례 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <Ellipse Width="10" Height="10" Fill="#888888" VerticalAlignment="Center" Margin="0,0,4,0"/>
                             <TextBlock Text="목표" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
 
-                            <!-- 2. 현재 입고 범례 (주황색) -->
                             <Ellipse Width="10" Height="10" Fill="#4CAF50" VerticalAlignment="Center" Margin="0,0,4,0"/>
                             <TextBlock Text="현재 입고" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
 
-                            <!-- 3. 잔여 필요량 범례 (빨간색) -->
                             <Ellipse Width="10" Height="10" Fill="#E53935" VerticalAlignment="Center" Margin="0,0,4,0"/>
                             <TextBlock Text="잔여 필요량" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- 3. 우측 페이지네이션 컨트롤 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,35,0">
+                            <Button Content="◀" Click="ChartPrevPage_Click" FontSize="9" Padding="4,2" Margin="0,0,4,0" Cursor="Hand"/>
+                            <TextBlock x:Name="ChartPageInfoTextBlock" Text="1 / 1" VerticalAlignment="Center" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="2,0"/>
+                            <Button Content="▶" Click="ChartNextPage_Click" FontSize="9" Padding="4,2" Margin="4,0,0,0" Cursor="Hand"/>
                         </StackPanel>
                     </Grid>
 
@@ -289,49 +301,43 @@ Margin="0,0,30,0"/>
                         </Border>
                     </Canvas>
                 </Grid>
-            </Border>
 
-            <!-- [2-2] 우측: 위험 기자재 현황 표 카드 -->
-            <Border Grid.Column="2" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
-                <Grid>
+                <!-- 차트와 DB를 구분하는 세로선 -->
+                <Border Grid.Column="2" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" Margin="0,4"/>
+
+                <!-- [2-2] 우측: 위험 기자재 현황 표 카드 -->
+                <Grid Grid.Column="4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- 상단 타이틀 + 검색창 + 페이지네이션 영역 -->
+                    <!-- 상단 타이틀 + 검색창 -->
                     <Grid Grid.Row="0" Margin="0,0,0,12">
                         <TextBlock Text="납기 현황 DB" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <!-- 기자재명 검색 텍스트박스 -->
                             <TextBox x:Name="SearchTextBox" Width="130" Height="24" FontSize="11" VerticalContentAlignment="Center" Padding="4,0" Margin="0,0,8,0"
-         Text="품목명 검색..."
-         Foreground="Gray"
-         GotFocus="SearchTextBox_GotFocus"
-         LostFocus="SearchTextBox_LostFocus"
-         TextChanged="SearchTextBox_TextChanged"/>
-
-                            <!-- 페이지네이션 컨트롤 (가장 우측) -->
-                            <Button Content="◀" Click="PrevPage_Click" FontSize="9" Padding="4,2" Margin="0,0,4,0" Cursor="Hand"/>
-                            <TextBlock x:Name="PageInfoTextBlock" Text="1 / 1" VerticalAlignment="Center" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="2,0"/>
-                            <Button Content="▶" Click="NextPage_Click" FontSize="9" Padding="4,2" Margin="4,0,0,0" Cursor="Hand"/>
+                                     Text="품목명 검색..."
+                                     Foreground="Gray"
+                                     GotFocus="SearchTextBox_GotFocus"
+                                     LostFocus="SearchTextBox_LostFocus"
+                                     TextChanged="SearchTextBox_TextChanged"/>
                         </StackPanel>
                     </Grid>
 
                     <!-- 납기 현황 DataGrid -->
                     <DataGrid x:Name="LeadtimeRiskDataGrid" Grid.Row="1" 
-AutoGenerateColumns="False" 
-IsReadOnly="False" 
-CanUserSortColumns="True"
-HeadersVisibility="Column"
-GridLinesVisibility="Horizontal"
-HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
-Background="Transparent" 
-RowHeight="36"
-BorderThickness="0">
+                              AutoGenerateColumns="False" 
+                              IsReadOnly="False" 
+                              CanUserSortColumns="True"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
+                              Background="Transparent" 
+                              RowHeight="36"
+                              BorderThickness="0">
 
-                        <!-- 🔹 1. 행(Row) 배경색 및 테마 연동 -->
                         <DataGrid.RowStyle>
                             <Style TargetType="DataGridRow">
                                 <Setter Property="Background" Value="{DynamicResource HeaderBackgroundBrush}"/>
@@ -339,7 +345,6 @@ BorderThickness="0">
                             </Style>
                         </DataGrid.RowStyle>
 
-                        <!-- 🔹 2. 컬럼 헤더 스타일 (기본 순정 헤더 + 굵게 및 가운데 정렬 유지) -->
                         <DataGrid.ColumnHeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -349,7 +354,6 @@ BorderThickness="0">
                         </DataGrid.ColumnHeaderStyle>
 
                         <DataGrid.Resources>
-                            <!-- 🔹 3. 셀 내부 텍스트 스타일 (다크/라이트 모드 텍스트 색상 자동 적용) -->
                             <Style x:Key="CenterAlignedCell" TargetType="TextBlock">
                                 <Setter Property="HorizontalAlignment" Value="Center"/>
                                 <Setter Property="VerticalAlignment" Value="Center"/>
@@ -363,31 +367,30 @@ BorderThickness="0">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" 
-                            IsEnabled="{Binding IsEnabled}"
-                            HorizontalAlignment="Center" VerticalAlignment="Center"
-                            Checked="RiskItem_CheckChanged" Unchecked="RiskItem_CheckChanged"/>
+                                                  IsEnabled="{Binding IsEnabled}"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  Checked="RiskItem_CheckChanged" Unchecked="RiskItem_CheckChanged"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- [구분] 컬럼 -->
+                            <!-- 구분 컬럼 -->
                             <DataGridTemplateColumn Width="65">
                                 <DataGridTemplateColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <Grid Width="50" Height="24">
                                             <TextBlock Text="구분" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2,0,0,0"/>
                                             <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
-                      Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
-                      Click="CategoryFilterButton_Click" Cursor="Hand" ToolTip="구분 필터">
+                                                    Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                                                    Click="CategoryFilterButton_Click" Cursor="Hand" ToolTip="구분 필터">
                                                 <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
-                        Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                      Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             </Button>
                                         </Grid>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.HeaderTemplate>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <!-- 🔹 템플릿 컬럼 내부 텍스트 테마 적용 -->
                                         <TextBlock Text="{Binding Category}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryTextBrush}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -396,24 +399,23 @@ BorderThickness="0">
                             <!-- 품목명 컬럼 -->
                             <DataGridTextColumn Header="품목명" Binding="{Binding EquipmentName}" Width="*" ElementStyle="{StaticResource CenterAlignedCell}"/>
 
-                            <!-- [협력사] 컬럼 -->
+                            <!-- 협력사 컬럼 -->
                             <DataGridTemplateColumn Width="105">
                                 <DataGridTemplateColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <Grid Width="90" Height="24">
                                             <TextBlock Text="협력사" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="25,0,0,0"/>
                                             <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
-                      Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
-                      Click="VendorFilterButton_Click" Cursor="Hand" ToolTip="협력사 필터">
+                                                    Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                                                    Click="VendorFilterButton_Click" Cursor="Hand" ToolTip="협력사 필터">
                                                 <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
-                        Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                      Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             </Button>
                                         </Grid>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.HeaderTemplate>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <!-- 🔹 템플릿 컬럼 내부 텍스트 테마 적용 -->
                                         <TextBlock Text="{Binding Vendor}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryTextBrush}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -426,7 +428,20 @@ BorderThickness="0">
                             <DataGridTextColumn Header="지연일수" Binding="{Binding RemainingDaysText}" Width="70" ElementStyle="{StaticResource CenterAlignedCell}"/>
 
                             <!-- 상태 컬럼 -->
-                            <DataGridTemplateColumn Header="상태" Width="65">
+                            <DataGridTemplateColumn Width="75">
+                                <DataGridTemplateColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Grid Width="60" Height="24">
+                                            <TextBlock Text="상태" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                                            <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                    Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                                                    Click="StatusFilterButton_Click" Cursor="Hand" ToolTip="상태 필터">
+                                                <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
+                                                      Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.HeaderTemplate>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding StatusBgColor}">
@@ -438,8 +453,8 @@ BorderThickness="0">
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
-            </Border>
-        </Grid>
+            </Grid>
+        </Border>
 
         <!-- ========================================== -->
         <!-- 3. 하단 시각화 (좌: 추후 확장 영역 / 우: 결품/지연 알림) -->

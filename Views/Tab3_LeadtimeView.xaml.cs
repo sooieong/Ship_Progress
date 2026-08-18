@@ -81,11 +81,21 @@ namespace Ship_Progress.Views
         public Brush ReceiveColor { get => _receiveColor; set { _receiveColor = value; OnPropertyChanged(); } }
 
         // -----------------------------------------------------------
-        // 3. 2행 납기 현황 차트용 데이터 캐시
+        // 3. 2행 납기 현황 차트용 데이터 캐시 및 차트 페이징 프로퍼티
         // -----------------------------------------------------------
         private string[] currentChartLabels = Array.Empty<string>();
         private double[] currentChartTargets = Array.Empty<double>();
         private double[] currentChartActuals = Array.Empty<double>();
+
+        private int _chartCurrentPage = 1;
+        private const int _chartPageSize = 5; // 차트에 한 번에 표시할 개수
+
+        private string _chartPageInfoText = "1 / 1";
+        public string ChartPageInfoText
+        {
+            get => _chartPageInfoText;
+            set { _chartPageInfoText = value; OnPropertyChanged(); }
+        }
 
         // 체크박스 상태 변경 시 차트 실시간 갱신 이벤트
         private void RiskItem_CheckChanged(object sender, RoutedEventArgs e)
@@ -106,17 +116,38 @@ namespace Ship_Progress.Views
             UpdateChartDataForShip(SelectedShipNo);
         }
 
+        // 🌟 기존 UpdateChartDataForShip 메서드 내부의 페이징 계산 부분을 다음과 같이 수정
         private void UpdateChartDataForShip(string shipNo)
         {
-            if (_allLeadtimeList == null) return;
+            if (_allLeadtimeList == null || LeadtimeRiskDataGrid == null) return;
 
-            var currentItems = GetFilteredLeadtimeList(shipNo);
+            // 1. 현재 호선에 해당하는 전체 필터링된 목록 가져오기
+            var filteredList = GetFilteredLeadtimeList(shipNo);
 
-            var selectedItems = currentItems
-                .Where(x => x.IsSelected && (x.Status == "위험" || x.Status == "주의" || x.Status == "납품 예정"))
+            // 2. 전체 데이터 개수를 기준으로 총 페이지 수(totalPages) 계산 (최대 5개 기준)
+            int totalItems = filteredList.Count;
+            int totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)_pageSize));
+
+            // 현재 페이지 번호 보정
+            if (_currentPage > totalPages) _currentPage = totalPages;
+            if (_currentPage < 1) _currentPage = 1;
+
+            // 3. 차트 우측 상단의 페이지 텍스트(예: 1 / 3) 갱신
+            if (ChartPageInfoTextBlock != null)
+            {
+                ChartPageInfoTextBlock.Text = $"{_currentPage} / {totalPages}";
+            }
+
+            // 4. 현재 페이지에 해당하는 항목들(최대 5개, 최소 1개)을 그대로 가져오기 (체크 해제해도 페이지가 당겨지지 않음)
+            var currentPagedItems = filteredList
+                .Skip((_currentPage - 1) * _pageSize)
+                .Take(_pageSize)
                 .ToList();
 
-            if (selectedItems.Count == 0)
+            // 5. 현재 페이지의 항목 중 '체크된(IsSelected == true)' 항목들만 필터링하여 차트에 표시
+            var displayItems = currentPagedItems.Where(x => x.IsSelected).ToList();
+
+            if (displayItems.Count == 0)
             {
                 currentChartLabels = Array.Empty<string>();
                 currentChartTargets = Array.Empty<double>();
@@ -125,11 +156,71 @@ namespace Ship_Progress.Views
                 return;
             }
 
-            currentChartLabels = selectedItems.Select(x => x.EquipmentName).ToArray();
-            currentChartTargets = selectedItems.Select(x => (double)x.Target).ToArray();
-            currentChartActuals = selectedItems.Select(x => (double)x.CurrentStock).ToArray();
+            // 6. X축 라벨 두 줄 바꿈 및 중앙 정렬 대응 처리
+            currentChartLabels = displayItems.Select(x => {
+                string name = x.EquipmentName;
+                return name switch
+                {
+                    "배관 팽창 루프 서포트" => "배관 팽창 루프\n서포트",
+                    "현수사다리 거치 브라켓" => "현수사다리 거치\n브라켓",
+                    "전장 단로기 부착 브라켓" => "전장 단로기 부착\n브라켓",
+                    "수직 사다리 A타입" => "수직 사다리\nA타입",
+                    "거주구 창문 코밍" => "거주구 창문\n코밍",
+                    "래싱 브릿지 Cross Bar" => "래싱 브릿지\nCross Bar",
+                    "세면대/수도 배관 서포트" => "세면대/수도 배관\n서포트",
+                    "케이블 윈치 러그" => "케이블 윈치\n러그",
+                    "갑판 드레인 스커퍼" => "갑판 드레인\n스커퍼",
+                    "내화 정전기 방지 카펫" => "내화 정전기 방지\n카펫",
+                    "주방/세탁실 미끄럼방지 타일" => "주방/세탁실\n미끄럼방지 타일",
+                    "정온식/차동식 열 감지기" => "정온식/차동식\n열 감지기",
+                    "러그형 버터플라이 밸브" => "러그형 버터플라이\n밸브",
+                    "대형 LED 투광등" => "대형 LED\n투광등",
+                    "비상 유도 표지등" => "비상 유도\n표지등",
+                    _ => name
+                };
+            }).ToArray();
+
+            currentChartTargets = displayItems.Select(x => (double)x.Target).ToArray();
+            currentChartActuals = displayItems.Select(x => (double)x.CurrentStock).ToArray();
 
             DrawLeadtimeChart();
+        }
+
+        // 🌟 차트 이전 페이지 버튼 이벤트
+        private void ChartPrevPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentPage > 1)
+            {
+                _currentPage--;
+                UpdatePagedDataGrid();
+                UpdateChartDataForShip(SelectedShipNo);
+            }
+            else
+            {
+                // 1페이지인데 이전 페이지를 누를 경우 경고창 표시
+                MessageBox.Show("첫 번째 페이지입니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        // 🌟 차트 다음 페이지 버튼 이벤트
+        private void ChartNextPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (_allLeadtimeList == null) return;
+
+            var filteredList = GetFilteredLeadtimeList(SelectedShipNo);
+            int totalPages = Math.Max(1, (int)Math.Ceiling(filteredList.Count / (double)_pageSize));
+
+            if (_currentPage < totalPages)
+            {
+                _currentPage++;
+                UpdatePagedDataGrid();
+                UpdateChartDataForShip(SelectedShipNo);
+            }
+            else
+            {
+                // 마지막 페이지인데 다음 페이지를 누를 경우 경고창 표시
+                MessageBox.Show("마지막 페이지입니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         // -----------------------------------------------------------
@@ -213,27 +304,21 @@ namespace Ship_Progress.Views
         {
             if (_allLeadtimeList == null || _allNotificationList == null) return;
 
-            // 1. 납품 완료 및 지연(위험+주의) 건수 계산 (납기 데이터 기준)
             var shipLeadtimeItems = _allLeadtimeList.Where(x => x.ShipNo == shipNo).ToList();
             KpiCompletedCount = shipLeadtimeItems.Count(x => x.Status == "납품 완료");
             KpiDelayCount = shipLeadtimeItems.Count(x => x.Status == "위험" || x.Status == "주의");
 
-            // 2. 보류/대기 건수 계산 (알림 데이터 기준)
             var shipNotificationItems = _allNotificationList.Where(x => x.ShipNo == shipNo).ToList();
             KpiHoldCount = shipNotificationItems.Count(x => x.Category == "보류/대기");
 
-            // 3. 전체 KPI 항목의 합산 건수 (100%의 기준)
             int totalKpiCount = KpiCompletedCount + KpiDelayCount + KpiHoldCount;
 
             if (totalKpiCount > 0)
             {
-                // 각각의 비율 계산
                 double completedPct = ((double)KpiCompletedCount / totalKpiCount) * 100.0;
                 double delayPct = ((double)KpiDelayCount / totalKpiCount) * 100.0;
                 double holdPct = ((double)KpiHoldCount / totalKpiCount) * 100.0;
 
-                // 반올림했을 때 정확히 100%가 되도록 가장 큰 값에 잔여 오차를 보정할 수도 있지만,
-                // 일반적인 정수 표기로 출력합니다.
                 KpiCompletedPercent = $"({Math.Round(completedPct)}%)";
                 KpiDelayPercent = $"({Math.Round(delayPct)}%)";
                 KpiHoldPercent = $"({Math.Round(holdPct)}%)";
@@ -246,24 +331,21 @@ namespace Ship_Progress.Views
             }
         }
 
-        // 🎯 검색창을 클릭(포커스)했을 때 안내 문구 지우기
         private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             if (SearchTextBox.Text == "품목명 검색...")
             {
                 SearchTextBox.Text = "";
             }
-            // 🎯 테마와 상관없이 무조건 검정 글씨로 강제 설정
             SearchTextBox.Foreground = new SolidColorBrush(Colors.Black);
         }
 
-        // 🎯 검색창에서 마우스가 벗어났을 때, 아무것도 안 적혀있으면 다시 안내 문구 채우기
         private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(SearchTextBox.Text))
             {
                 SearchTextBox.Text = "품목명 검색...";
-                SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray); // 안내 문구는 회색
+                SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray);
             }
         }
 
@@ -273,6 +355,7 @@ namespace Ship_Progress.Views
         private List<LeadtimeItem> _allLeadtimeList;
         private string _currentCategoryFilter = "전체";
         private string _currentVendorFilter = "전체";
+        private string _currentStatusFilter = "전체";
         private string _currentSearchKeyword = string.Empty;
 
         public class LeadtimeItem : INotifyPropertyChanged
@@ -284,7 +367,8 @@ namespace Ship_Progress.Views
                 set { _isSelected = value; OnPropertyChanged(); }
             }
 
-            public bool IsEnabled => Status != "납품 완료";
+            // 납품 완료된 항목도 체크할 수 있도록 수정 (기존: Status != "납품 완료")
+            public bool IsEnabled => true;
 
             public string Series { get; set; }
             public string ShipNo { get; set; }
@@ -330,10 +414,8 @@ namespace Ship_Progress.Views
                 RemainingDaysText = remainingDaysText;
                 Status = status;
 
-                if (status == "납품 완료")
-                {
-                    _isSelected = false;
-                }
+                // 납품 완료 항목도 기본적으로 체크 상태 유지 (원하시면 false로 변경 가능)
+                _isSelected = true;
             }
 
             public event PropertyChangedEventHandler PropertyChanged;
@@ -361,15 +443,15 @@ namespace Ship_Progress.Views
 
             public Brush CategoryBgBrush => Category switch
             {
-                "지연" => new SolidColorBrush(Color.FromArgb(40, 251, 140, 0)),     // 연한 주황 배경 (지연)
-                "보류/대기" => new SolidColorBrush(Color.FromArgb(40, 229, 57, 53)),  // 연한 빨강 배경 (보류/대기)
+                "지연" => new SolidColorBrush(Color.FromArgb(40, 251, 140, 0)),
+                "보류/대기" => new SolidColorBrush(Color.FromArgb(40, 229, 57, 53)),
                 _ => new SolidColorBrush(Color.FromArgb(40, 150, 150, 150))
             };
 
             public Brush CategoryFgBrush => Category switch
             {
-                "지연" => new SolidColorBrush(Color.FromRgb(251, 140, 0)),          // 진한 주황 텍스트 (지연)
-                "보류/대기" => new SolidColorBrush(Color.FromRgb(229, 57, 53)),     // 진한 빨강 텍스트 (보류/대기)
+                "지연" => new SolidColorBrush(Color.FromRgb(251, 140, 0)),
+                "보류/대기" => new SolidColorBrush(Color.FromRgb(229, 57, 53)),
                 _ => new SolidColorBrush(Color.FromRgb(100, 100, 100))
             };
 
@@ -403,6 +485,10 @@ namespace Ship_Progress.Views
         {
             LoadLeadtimeTableData();
             LoadNotificationData();
+
+            // 데이터가 모두 준비된 상태에서 호선 기준 초기화 실행
+            FilterDataByShip(SelectedShipNo);
+            FilterNotifications(SelectedShipNo, _currentNotificationFilter);
             UpdateChartDataForShip(SelectedShipNo);
             UpdateSupplyChartData(SelectedShipNo);
             UpdateKpiData(SelectedShipNo);
@@ -425,12 +511,14 @@ namespace Ship_Progress.Views
 
                 _currentCategoryFilter = "전체";
                 _currentVendorFilter = "전체";
+                _currentStatusFilter = "전체"; // 초기화 위치에 추가
                 _currentSearchKeyword = string.Empty;
+                _chartCurrentPage = 1; // 호선 변경 시 차트 페이지 초기화
 
                 if (SearchTextBox != null)
                 {
                     SearchTextBox.Text = "품목명 검색...";
-                    SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray); // 안내 문구는 회색
+                    SearchTextBox.Foreground = new SolidColorBrush(Colors.Gray);
                 }
 
                 FilterDataByShip(shipNo);
@@ -441,8 +529,33 @@ namespace Ship_Progress.Views
             }
         }
 
+        private void StatusFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                ContextMenu menu = new ContextMenu();
+                var shipItems = _allLeadtimeList.Where(x => x.ShipNo == SelectedShipNo).ToList();
+                var distinctStatuses = shipItems.Select(x => x.Status).Distinct().OrderBy(x => x).ToList();
+
+                MenuItem allItem = new MenuItem { Header = "전체 보기", Tag = "전체" };
+                allItem.Click += (s, ev) => { _currentStatusFilter = "전체"; RefreshGridAndChart(); };
+                menu.Items.Add(allItem);
+
+                foreach (var status in distinctStatuses)
+                {
+                    MenuItem item = new MenuItem { Header = status, Tag = status };
+                    item.Click += (s, ev) => { _currentStatusFilter = status; RefreshGridAndChart(); };
+                    menu.Items.Add(item);
+                }
+
+                btn.ContextMenu = menu;
+                menu.PlacementTarget = btn;
+                menu.IsOpen = true;
+            }
+        }
+
         // -----------------------------------------------------------
-        // 페이징 및 필터링 관련 로직
+        // 페이징 및 필터링 관련 로직 (데이터그리드 전용)
         // -----------------------------------------------------------
         private int _currentPage = 1;
         private const int _pageSize = 5;
@@ -476,11 +589,6 @@ namespace Ship_Progress.Views
             if (LeadtimeRiskDataGrid != null)
             {
                 LeadtimeRiskDataGrid.ItemsSource = pagedData;
-            }
-
-            if (PageInfoTextBlock != null)
-            {
-                PageInfoTextBlock.Text = $"{_currentPage} / {totalPages}";
             }
         }
 
@@ -516,7 +624,10 @@ namespace Ship_Progress.Views
                 query = query.Where(x => x.Vendor == _currentVendorFilter);
             }
 
-            // 🎯 [수정] 검색 키워드가 비어있거나, 플레이스홀더 안내 문구인 경우 검색 필터 무시
+            if (_currentStatusFilter != "전체")
+            {
+                query = query.Where(x => x.Status == _currentStatusFilter);
+            }
             if (!string.IsNullOrWhiteSpace(_currentSearchKeyword) && _currentSearchKeyword != "품목명 검색...")
             {
                 query = query.Where(x => x.EquipmentName != null && x.EquipmentName.Contains(_currentSearchKeyword));
@@ -604,6 +715,7 @@ namespace Ship_Progress.Views
 
         private void RefreshGridAndChart()
         {
+            _chartCurrentPage = 1;
             FilterDataByShip(SelectedShipNo);
             UpdateChartDataForShip(SelectedShipNo);
         }
@@ -691,7 +803,6 @@ namespace Ship_Progress.Views
                     Y2 = yPos,
                     Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0")),
                     StrokeThickness = 1
-                    //Opacity = 0.5
                 };
                 LeadtimeChartCanvas.Children.Add(gridLine);
 
@@ -739,10 +850,13 @@ namespace Ship_Progress.Views
                     FontSize = 10,
                     Foreground = textBrush,
                     FontWeight = FontWeights.SemiBold,
+                    TextAlignment = TextAlignment.Center, // 🌟 텍스트 내부도 가운데 정렬
                     TextTrimming = TextTrimming.CharacterEllipsis,
                     MaxWidth = slotWidth - 4
                 };
                 xLabel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+
+                // 🌟 슬롯(칸)의 정중앙(centerX)을 기준으로 배치하여 완벽한 대칭 중앙 정렬
                 Canvas.SetLeft(xLabel, centerX - (xLabel.DesiredSize.Width / 2.0));
                 Canvas.SetTop(xLabel, height - paddingBottom + 8);
                 LeadtimeChartCanvas.Children.Add(xLabel);
@@ -925,12 +1039,16 @@ namespace Ship_Progress.Views
                 new NotificationItem("A SERIES", "H121", "지연", "동성하이텍", "수직 사다리 A타입", "원자재 입고 지연으로 인해 납기 3일 연기 요청", "2026-08-19 13:11"),
                 new NotificationItem("A SERIES", "H121", "보류/대기", "대양전기공업", "자동 전화기", "부품 조달 일정으로 인해 납기 5일 연기 요청", "2026-08-18 10:22"),
                 new NotificationItem("A SERIES", "H122", "지연", "동성하이텍", "수직 사다리 A타입", "원자재 입고 지연으로 인해 납기 3일 연기 요청", "2026-08-19 13:11"),
+                new_NotificationItem_Fix(), // 내부 구조 유지
                 new NotificationItem("A SERIES", "H122", "지연", "대한전선", "케이블 윈치 러그", "도면 수정 작업 반영으로 인해 납기 2일 연기 요청", "2026-08-21 09:30"),
                 new NotificationItem("A SERIES", "H122", "보류/대기", "대양전기공업", "자동 전화기", "부품 조달 일정으로 인해 납기 5일 연기 요청", "2026-08-18 10:22")
             };
 
             FilterNotifications(SelectedShipNo, _currentNotificationFilter);
         }
+
+        private NotificationItem new_NotificationItem_Fix() =>
+            new NotificationItem("A SERIES", "H122", "지연", "동성하이텍", "수직 사다리 A타입", "원자재 입고 지연으로 인해 납기 3일 연기 요청", "2026-08-19 13:11");
 
         // -----------------------------------------------------------
         // 12. INotifyPropertyChanged 구현
