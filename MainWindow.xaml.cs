@@ -374,9 +374,10 @@ namespace Ship_Progress
         {
             string rawText = FeedInputTextBox.Text?.Trim();
 
-            // 안내 문구이거나 빈 값이면 전송 차단
+            // 안내 문구이거나 빈 값이면 전송 차단 및 알림창 표시
             if (string.IsNullOrEmpty(rawText) || rawText == "멘션(@) 및 메시지 작성...")
             {
+                MessageBox.Show("메시지를 입력해주세요.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
