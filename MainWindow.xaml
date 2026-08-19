@@ -333,17 +333,22 @@
                                     <ScrollViewer x:Name="FeedScrollViewer" MaxHeight="160" VerticalScrollBarVisibility="Auto">
                                         <StackPanel x:Name="FeedListStackPanel">
                                             <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,0,0,6" Foreground="{DynamicResource PrimaryTextBrush}">
-                                                <Run Text="[설계팀]" FontWeight="Bold"/> <Run Text="@생산팀_변수정" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="H116 블록 3차 3D 모델링 간섭 검토 완료, 생산 라인 적용 요망 (14:20)"/>
+                                                <Run Text="[생산팀]" FontWeight="Bold"/> <Run Text="@구매팀_홍성현" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="H121 호선 아이 플레이트 수량 부족으로 추가 자재 구매 필요, 협력사에 구매요청 부탁드립니다 (11:20)"/>
                                             </TextBlock>
                                             <Separator Background="{DynamicResource BorderBrush}" Margin="0,2,0,6"/>
 
                                             <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,0,0,6" Foreground="{DynamicResource PrimaryTextBrush}">
-                                                <Run Text="[생산팀]" FontWeight="Bold"/> <Run Text="@설계팀_이현곤" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="배관 라우팅 수정 요청 건 현장 반영 가능 여부 확인 부탁 (11:15)"/>
+                                                <Run Text="[PM]" FontWeight="Bold"/> <Run Text="@구매팀_이현곤" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="H122 호선 케이블 윈치 러그 품목 납기 지연 건 확인, 생산팀과 조립 순서 변경 협의 후 재조정 예정입니다 (10:05)"/>
                                             </TextBlock>
                                             <Separator Background="{DynamicResource BorderBrush}" Margin="0,2,0,6"/>
 
                                             <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}">
-                                                <Run Text="[영업팀]" FontWeight="Bold"/> <Run Text="@설계팀_곽태영" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="선주 측에서 요구한 친환경 연료탱크 설계 변경안 검토 요망 (15:01)"/>
+                                                <Run Text="[구매팀]" FontWeight="Bold"/> <Run Text="@PM_변수정" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="H122 호선 케이블 윈치 러그 품목 납기 2일 지연 예상, 전체 공정 영향도 검토 부탁드립니다 (10:02)"/>
+                                            </TextBlock>
+                                            <Separator Background="{DynamicResource BorderBrush}" Margin="0,2,0,6"/>
+                                            
+                                            <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}">
+    <Run Text="[구매팀]" FontWeight="Bold"/> <Run Text="@PM_곽태영" Foreground="{DynamicResource MentionTextBrush}" FontWeight="Bold"/> <Run Text="H120 호선 거주구 창문 코밍 품목 납품 확인 완료, 납기 관리 대시보드 반영 예정입니다 (09:10)"/>
                                             </TextBlock>
                                         </StackPanel>
                                     </ScrollViewer>
