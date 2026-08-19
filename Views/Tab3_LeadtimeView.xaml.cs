@@ -751,6 +751,49 @@ namespace Ship_Progress.Views
         }
 
         // -----------------------------------------------------------
+        // 🌟 13. 협력사 상세 정보 관리 사전 (Dictionary) 및 클릭 이벤트
+        // -----------------------------------------------------------
+        private readonly Dictionary<string, (string Factory, string Manager, string Phone, string Tel)> _vendorInfoDict = new()
+{
+    { "강림중공업", ("창원공장", "PM 배동현 과장", "010-4105-9283", "055-269-7700") },
+    { "대양전기공업", ("부산공장", "PM 백경훈 차장", "010-7164-3892", "051-200-5330") },
+    { "대한전선", ("당진공장", "PM 송현준 부장", "010-9031-4826", "031-860-4114") },
+    { "동성하이텍", ("김해공장", "PM 최규원 과장", "010-6382-9104", "055-345-6720") },
+    { "삼우중공업", ("광양공장", "PM 조영호 수석", "010-7410-6893", "061-750-3200") },
+    { "삼진정공", ("부산공장", "PM 이민호 차장", "010-5321-7890", "051-831-2300") },
+    { "성광벤드", ("부산공장", "PM 서민재 차장", "010-6294-7150", "051-330-0200") },
+    { "세진중공업", ("울산공장", "PM 김진호 부장", "010-3841-5290", "052-279-8114") },
+    { "오리엔탈정공", ("부산공장", "PM 강태진 부장", "010-9182-3745", "051-202-0101") },
+    { "한화시스템", ("구미공장", "PM 장도윤 책임", "010-6745-1289", "054-460-8114") },
+    { "현대일렉트릭", ("울산공장", "PM 곽민수 책임", "010-5183-9204", "052-202-7710") },
+    { "STACO", ("부산공장", "PM 윤준서 차장", "010-2849-5612", "051-831-7000") }
+};
+
+        private void VendorText_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is TextBlock tb && tb.DataContext is LeadtimeItem item)
+            {
+                string vendorName = item.Vendor;
+
+                if (_vendorInfoDict.TryGetValue(vendorName, out var info))
+                {
+                    string message = $"[협력사 상세 정보]\n\n" +
+                                     $"• 업체명: {vendorName}\n" +
+                                     $"• 공장/위치: {info.Factory}\n" +
+                                     $"• 담당자: {info.Manager}\n" +
+                                     $"• 핸드폰: {info.Phone}\n" +
+                                     $"• 전화번호: {info.Tel}";
+
+                    MessageBox.Show(message, "협력사 정보 조회", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show($"'{vendorName}'에 대한 상세 정보가 등록되어 있지 않습니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        // -----------------------------------------------------------
         // 9. 납기 현황 차트 드로잉
         // -----------------------------------------------------------
         private void DrawLeadtimeChart()

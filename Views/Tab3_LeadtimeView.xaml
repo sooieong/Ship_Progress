@@ -406,17 +406,24 @@ Margin="0,0,30,0"/>
                                         <Grid Width="90" Height="24">
                                             <TextBlock Text="협력사" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="25,0,0,0"/>
                                             <Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                    Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
-                                                    Click="VendorFilterButton_Click" Cursor="Hand" ToolTip="협력사 필터">
+                        Background="#E2E8F0" BorderBrush="#CBD5E1" BorderThickness="1"
+                        Click="VendorFilterButton_Click" Cursor="Hand" ToolTip="협력사 필터">
                                                 <Path Data="M 2,4 L 18,4 L 11,12 L 11,18 L 9,18 L 9,12 Z" 
-                                                      Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                          Fill="#475569" Width="8" Height="8" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             </Button>
                                         </Grid>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.HeaderTemplate>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Vendor}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                        <!-- 🌟 이 부분을 아래와 같이 수정 (TextDecorations="Underline", Cursor="Hand", MouseLeftButtonUp 이벤트 추가) -->
+                                        <TextBlock Text="{Binding Vendor}" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center" 
+                       Foreground="{DynamicResource PrimaryTextBrush}"
+                       TextDecorations="Underline"
+                       Cursor="Hand"
+                       MouseLeftButtonUp="VendorText_MouseLeftButtonUp"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
