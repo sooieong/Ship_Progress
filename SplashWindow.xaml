@@ -1,0 +1,18 @@
+﻿<Window x:Class="Ship_Progress.SplashWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SplashWindow" Height="380" Width="680"
+        WindowStyle="None" WindowStartupLocation="CenterScreen" 
+        AllowsTransparency="True" Background="Transparent">
+
+    <Border CornerRadius="8" ClipToBounds="True">
+        <Grid>
+            <!-- 이미지 적용 (CenterCrop 형태) -->
+            <Image Source="/Images/splash.png" Stretch="UniformToFill"/>
+
+            <!-- (선택) 로딩 프로그레스바 또는 안내 문구 -->
+            <ProgressBar IsIndeterminate="True" Height="4" VerticalAlignment="Bottom" 
+                         Foreground="#1E88E5" Background="Transparent" BorderThickness="0"/>
+        </Grid>
+    </Border>
+</Window>
