@@ -25,11 +25,11 @@ namespace Ship_Progress
         private int _mentionSelectedIndex = -1; // 방향키 순차 이동용 인덱스
         private readonly List<string> _mentionList = new List<string>
         {
-            "@설계팀_곽태영",
-            "@설계팀_김효빈",
-            "@생산팀_변수정",
-            "@설계팀_이현곤",
-            "@영업팀_홍성현"
+            "@PM_곽태영",
+            "@생산팀_김효빈",
+            "@PM_변수정",
+            "@구매팀_이현곤",
+            "@구매팀_홍성현"
         };
 
         public MainWindow()
@@ -435,6 +435,26 @@ namespace Ship_Progress
             FeedInputTextBox.Text = "멘션(@) 및 메시지 작성...";
             FeedInputTextBox.Foreground = new SolidColorBrush(Colors.Gray);
             FeedScrollViewer?.ScrollToTop();
+        }
+
+        // 창이 닫히기 직전에 호출되는 이벤트
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            // 사용자에게 종료 확인 메세지박스 출력
+            MessageBoxResult result = MessageBox.Show(
+                "프로그램을 종료하시겠습니까?",
+                "종료 확인",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+            );
+
+            // '아니오(No)'를 누르면 창이 닫히는 취소 처리
+            if (result == MessageBoxResult.No)
+            {
+                e.Cancel = true;
+            }
         }
 
         // 다크/라이트 모드 전환 함수
