@@ -218,9 +218,28 @@ namespace Ship_Progress
 
             InitializeMasterRiskData();
 
-            ChartCanvas.MouseDown += (s, e) =>
+            // 💡 화면 전체(UserControl) 수준에서 마우스 클릭을 감지하여 툴팁 닫기 처리
+            this.PreviewMouseDown += (s, e) =>
             {
-                PointTooltip.Visibility = Visibility.Collapsed;
+                if (PointTooltip.Visibility == Visibility.Visible)
+                {
+                    // 클릭한 대상이 툴팁 자체이거나 차트의 포인트(Ellipse)인 경우는 제외하고 닫기
+                    DependencyObject hit = e.OriginalSource as DependencyObject;
+                    bool clickedInsideTooltip = false;
+                    bool clickedOnDot = false;
+
+                    while (hit != null)
+                    {
+                        if (hit == PointTooltip) clickedInsideTooltip = true;
+                        if (hit is Ellipse) clickedOnDot = true;
+                        hit = VisualTreeHelper.GetParent(hit);
+                    }
+
+                    if (!clickedInsideTooltip && !clickedOnDot)
+                    {
+                        PointTooltip.Visibility = Visibility.Collapsed;
+                    }
+                }
             };
         }
 
