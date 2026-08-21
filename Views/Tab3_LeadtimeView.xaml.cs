@@ -482,9 +482,27 @@ namespace Ship_Progress.Views
             InitializeComponent();
             this.DataContext = this;
 
-            LeadtimeChartCanvas.MouseDown += (s, e) =>
+            // 💡 화면 전체에서 클릭을 감지하여 차트 외의 공간을 누르면 툴팁 닫기
+            this.PreviewMouseDown += (s, e) =>
             {
-                if (LeadtimeTooltip != null) LeadtimeTooltip.Visibility = Visibility.Collapsed;
+                if (LeadtimeTooltip != null && LeadtimeTooltip.Visibility == Visibility.Visible)
+                {
+                    DependencyObject hit = e.OriginalSource as DependencyObject;
+                    bool clickedInsideTooltip = false;
+                    bool clickedOnDot = false;
+
+                    while (hit != null)
+                    {
+                        if (hit == LeadtimeTooltip) clickedInsideTooltip = true;
+                        if (hit is Ellipse) clickedOnDot = true;
+                        hit = VisualTreeHelper.GetParent(hit);
+                    }
+
+                    if (!clickedInsideTooltip && !clickedOnDot)
+                    {
+                        LeadtimeTooltip.Visibility = Visibility.Collapsed;
+                    }
+                }
             };
         }
 
@@ -972,17 +990,27 @@ namespace Ship_Progress.Views
                 double currentX = centerX;
                 double currentY = lineY;
 
+                // 💡 값을 미리 지역 변수로 복사하여 인덱스 참조 오류 방지
+                string localLabel = currentChartLabels[i].Replace("\n", " ");
+                double localGap = gapVal;
+                double localT = tVal;
+                double localA = aVal;
+
                 dot.MouseDown += (s, ev) =>
                 {
                     if (LeadtimeTooltip != null && LeadtimeTooltipText != null)
                     {
-                        LeadtimeTooltipText.Text = $"{currentChartLabels[i]} 잔여 필요량: {gapVal} (목표: {tVal}, 현재입고: {aVal})";
+                        LeadtimeTooltipText.Text = $"목표: {localT}\n현재입고: {localA}";
+                        LeadtimeTooltipText.TextAlignment = TextAlignment.Center; // 💡 텍스트 중앙 정렬 추가
                         LeadtimeTooltip.Visibility = Visibility.Visible;
                         LeadtimeTooltip.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
 
                         double tooltipWidth = LeadtimeTooltip.DesiredSize.Width;
+                        double tooltipHeight = LeadtimeTooltip.DesiredSize.Height; // 툴팁의 실제 높이 측정
+
                         double targetLeft = currentX - (tooltipWidth / 2.0);
-                        double targetTop = currentY - 32;
+                        // 💡 동그라미(dot) 또는 막대기 바로 위로 오도록 높이만큼 위로 배치 (- tooltipHeight - 10)
+                        double targetTop = currentY - tooltipHeight - 10;
 
                         Canvas.SetLeft(LeadtimeTooltip, Math.Max(0, targetLeft));
                         Canvas.SetTop(LeadtimeTooltip, targetTop);
